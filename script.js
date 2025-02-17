@@ -139,7 +139,7 @@ document.getElementById('redirect-btn').addEventListener('click', () => {
 
 // Toggle Menu Screen
 const menuScreen = document.getElementById('menu-screen');
-const menuWidth = window.innerWidth <= 600 ? '-90%' : '-50%'; // Ajuster en fonction de la largeur de l'écran
+const menuWidth = window.innerWidth <= 600 ? '-90%' : '-80%'; // Ajuster en fonction de la largeur de l'écran
 document.getElementById('menu-btn').addEventListener('click', () => {
   if (menuScreen.style.right === '0px') {
     menuScreen.style.right = menuWidth; // Close the menu screen
@@ -158,7 +158,7 @@ function saveSelection() {
   localStorage.setItem('selectedSurahs', JSON.stringify(selectedSurahs));
   // Close the menu screen
   const menuScreen = document.getElementById('menu-screen');
-  const menuWidth = window.innerWidth <= 600 ? '-90%' : '-50%'; // Ajuster en fonction de la largeur de l'écran
+  const menuWidth = window.innerWidth <= 600 ? '-90%' : '-80%'; // Ajuster en fonction de la largeur de l'écran
   menuScreen.style.right = menuWidth;
 }
 

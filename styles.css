@@ -365,7 +365,7 @@ footer small {
   }
 
   #verse-container {
-    font-size: 0.5em;
+    font-size: 0.65em;
   }
 
   #button-container {
@@ -423,7 +423,7 @@ footer small {
   }
 
   #verse-container {
-    font-size: 0.85em;
+    font-size: 0.75em;
   }
 
   #button-container {
@@ -474,8 +474,9 @@ footer small {
   }
 
   #button-container {
-    width: 35%;
+    width: 40%;
     bottom: 75px;
+    font-size: 150%;
   }
 
   #menu-screen {
@@ -488,7 +489,7 @@ footer small {
   }
 
   button {
-    font-size: 1em;
+    font-size: 1.5em;
     padding: 10px 15px;
   }
 
