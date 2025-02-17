@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>آيات قرآنية عشوائية</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav>
+    <h1 class="nav-title">آيات قرآنية عشوائية</h1>
+    <button id="menu-btn" class="square-btn">☰</button>
+    <div class="nav-center">
+      <button id="toggle-surah-btn">إخفاء اسم السورة</button>
+      <button id="redirect-btn">فضائل قرآنية</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div id="verse-container">
+      <p>الآيات</p>
+      <div id="error-message" style="color: red; display: none;"></div>
+      <!-- Verses will appear here -->
+    </div>
+  </div>
+  <div id="button-container">
+    <button id="random-verse-btn">الحصول على آية عشوائية</button>
+    <button id="next-verse-btn">الحصول على الآية التالية</button>
+  </div>
+
+  <div id="menu-screen">
+    <div class="menu-content">
+      <div class="content" id="surah-selection">
+        <!-- Les cases à cocher pour les Surahs seront ajoutées dynamiquement ici -->
+      </div>  
+      <div id="selection-buttons">
+        <button id="select-all-btn">تحديد الكل</button>
+        <button id="deselect-all-btn">إلغاء التحديد الكل</button>
+      </div>
+      <button id="save-selection-btn">حفظ التحديد</button>           
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <small>(JSON) <a href="https://tanzil.net" target="_blank">tanzil.net</a></small>
+    <p>صُنع بواسطة فضيل</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
