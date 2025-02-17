@@ -92,7 +92,7 @@ function displayNextVerse() {
   const nextVerse = quran[currentSurahIndex].aya[currentVerseIndex];
   displayedVerses.push({ surah: quran[currentSurahIndex], verse: nextVerse });
 
-  if (displayedVerses.length > 4) {
+  if (displayedVerses.length > 3) {
     displayedVerses.shift();
   }
 
