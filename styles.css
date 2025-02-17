@@ -295,3 +295,215 @@ border: 3px solid transparent;
  background-clip: content-box;
   background-color: rgb(0, 123, 255);
 }
+/* Styles de base (pour tous les écrans) */
+.container {
+  width: 80%;
+  padding: 20px;
+  border-radius: 50px;
+  margin-top: 20px;
+}
+
+#verse-container {
+  font-size: 1em;
+}
+
+#button-container {
+  width: 35%;
+  bottom: 75px;
+}
+
+#menu-screen {
+  width: 50%;
+  right: -50%;
+}
+
+.nav-center {
+  margin-left: 60px;
+  width: 100%;
+  font-size: 1em;
+}
+
+.nav-title {
+  font-size: 1.5em;
+}
+
+button {
+  font-size: 1em;
+  padding: 10px 15px;
+}
+
+#random-verse-btn, #next-verse-btn {
+  font-size: 1em;
+  padding: 10px;
+}
+
+.square-btn {
+  font-size: 1.5em;
+  height: 40px;
+  width: 40px;
+}
+
+footer {
+  width: 100%;
+  padding: 15px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer small {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+/* Styles pour les téléphones (écrans de moins de 600px) */
+@media only screen and (max-width: 600px) {
+  .container {
+    width: 95%;
+    padding: 10px;
+    border-radius: 20px;
+  }
+
+  #verse-container {
+    font-size: 0.5em;
+  }
+
+  #button-container {
+    width: 90%;
+    bottom: 65px;
+  }
+
+  #menu-screen {
+    width: 85%;
+    right: -90%;
+  }
+
+  .nav-center {
+    margin-left: 60px;
+    width: 100%;
+    font-size: 1em;
+  }
+
+  .nav-title {
+    font-size: 0.8em;
+  }
+
+  button {
+    font-size: 0.7em;
+    padding: 8px 12px;
+  }
+
+  #random-verse-btn, #next-verse-btn {
+    font-size: 0.7em;
+    padding: 5px;
+  }
+
+  .square-btn {
+    font-size: 1em;
+    height: 30px;
+    width: 30px;
+  }
+
+  footer {
+    padding: 10px 0;
+  }
+
+  footer small {
+    margin-right: 10px;
+    margin-left: 10px;
+  }
+}
+
+/* Styles pour les tablettes (écrans entre 600px et 1024px) */
+@media only screen and (min-width: 601px) and (max-width: 1024px) {
+  .container {
+    width: 90%;
+    padding: 15px;
+    border-radius: 30px;
+  }
+
+  #verse-container {
+    font-size: 0.85em;
+  }
+
+  #button-container {
+    width: 70%;
+    bottom: 70px;
+  }
+
+  #menu-screen {
+    width: 60%;
+    right: -60%;
+  }
+
+  .nav-title {
+    font-size: 1.2em;
+  }
+
+  button {
+    font-size: 0.9em;
+    padding: 10px 15px;
+  }
+
+  #random-verse-btn, #next-verse-btn {
+    font-size: 0.9em;
+    padding: 8px;
+  }
+
+  .square-btn {
+    font-size: 1.2em;
+    height: 35px;
+    width: 35px;
+  }
+
+  footer {
+    padding: 12px 0;
+  }
+}
+
+/* Styles pour les grands écrans (au-dessus de 1024px) */
+@media only screen and (min-width: 1025px) {
+  .container {
+    width: 80%;
+    padding: 20px;
+    border-radius: 50px;
+  }
+
+  #verse-container {
+    font-size: 1em;
+  }
+
+  #button-container {
+    width: 35%;
+    bottom: 75px;
+  }
+
+  #menu-screen {
+    width: 50%;
+    right: -50%;
+  }
+
+  .nav-title {
+    font-size: 1.5em;
+  }
+
+  button {
+    font-size: 1em;
+    padding: 10px 15px;
+  }
+
+  #random-verse-btn, #next-verse-btn {
+    font-size: 1em;
+    padding: 10px;
+  }
+
+  .square-btn {
+    font-size: 1.5em;
+    height: 40px;
+    width: 40px;
+  }
+
+  footer {
+    padding: 15px 0;
+  }
+}
