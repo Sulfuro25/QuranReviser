@@ -5,6 +5,8 @@ let currentVerseIndex = 0;
 let displayedVerses = [];
 let selectedSurahs = [];
 let isSurahNameHidden = false;
+let isVerseNumberVisible = true;
+
 
 // Fetch Quran data
 fetch('quran_verses.json')
@@ -139,7 +141,7 @@ document.getElementById('redirect-btn').addEventListener('click', () => {
 
 // Toggle Menu Screen
 const menuScreen = document.getElementById('menu-screen');
-const menuWidth = window.innerWidth <= 600 ? '-90%' : '-80%'; // Ajuster en fonction de la largeur de l'écran
+const menuWidth = window.innerWidth <= 600 ? '-100%' : '-90%'; // Ajuster en fonction de la largeur de l'écran
 document.getElementById('menu-btn').addEventListener('click', () => {
   if (menuScreen.style.right === '0px') {
     menuScreen.style.right = menuWidth; // Close the menu screen
@@ -200,6 +202,80 @@ function deselectAllSurahs() {
   selectedSurahs = []; // Clear selectedSurahs array
 }
 
-// Event listeners for "Select All" and "Deselect All" buttons
+// Fonction pour basculer l'affichage des numéros
+function toggleVerseNumbers() {
+  isVerseNumberVisible = !isVerseNumberVisible;
+  displayVerses(); // Rafraîchir l'affichage des versets
+}
+
+function displayVerses() {
+  const verseContainer = document.getElementById('verse-container');
+  verseContainer.innerHTML = '';
+
+  if (!isSurahNameHidden) {
+    const surahNameElement = document.createElement('p');
+    surahNameElement.style.fontSize = '1.5em';
+    surahNameElement.style.fontFamily = "'Noto Sans Arabic', serif";
+    surahNameElement.style.fontWeight = 'bold';
+    surahNameElement.style.color = '#007bff';
+    surahNameElement.textContent = `سورة ${displayedVerses[0].surah._name}`;
+    verseContainer.appendChild(surahNameElement);
+  }
+
+  displayedVerses.forEach((verseData, index) => {
+    const verseElement = document.createElement('p');
+    verseElement.style.fontSize = '1.5em';
+    verseElement.style.fontFamily = "'Noto Sans Arabic', serif";
+    if (isVerseNumberVisible) {
+      verseElement.textContent = `${verseData.verse._text} (${verseData.verse._index})`;
+    } else {
+      verseElement.textContent = `${verseData.verse._text}`;
+    }
+    verseContainer.appendChild(verseElement);
+  });
+}
+
+function toggleVerseNumbers() {
+  isVerseNumberVisible = !isVerseNumberVisible;
+  const toggleNumberBtn = document.getElementById('toggle-number-btn');
+  toggleNumberBtn.textContent = isVerseNumberVisible ? 'إخفاء الأرقام' : 'إظهار الأرقام';
+  displayVerses(); // Rafraîchir l'affichage des versets
+}
+
+// Fonction pour basculer entre le mode clair et le mode sombre
+function toggleDarkMode() {
+  const body = document.body;
+  body.classList.toggle('dark-mode');
+
+  // Sauvegarder l'état du mode dans le localStorage
+  const isDarkMode = body.classList.contains('dark-mode');
+  localStorage.setItem('darkMode', isDarkMode);
+
+  // Changer l'icône du bouton en fonction du mode
+  const darkModeBtn = document.getElementById('toggle-darkmode-btn');
+  darkModeBtn.textContent = isDarkMode ? '☀️' : '🌙';
+}
+
+// Charger l'état du mode sombre depuis le localStorage au chargement de la page
+function loadDarkMode() {
+  const isDarkMode = localStorage.getItem('darkMode') === 'true';
+  if (isDarkMode) {
+    document.body.classList.add('dark-mode');
+    document.getElementById('toggle-darkmode-btn').textContent = '☀️';
+  } else {
+    document.body.classList.remove('dark-mode');
+    document.getElementById('toggle-darkmode-btn').textContent = '🌙';
+  }
+}
+
+// Charger l'état du mode sombre au chargement de la page
+window.addEventListener('load', loadDarkMode);
+
+//All EventListener
+document.getElementById('toggle-darkmode-btn').addEventListener('click', toggleDarkMode);
+document.getElementById('save-selection-btn').addEventListener('click', saveSelection)
+document.getElementById('random-verse-btn').addEventListener('click', displayRandomVerse);
+document.getElementById('next-verse-btn').addEventListener('click', displayNextVerse);
 document.getElementById('select-all-btn').addEventListener('click', selectAllSurahs);
 document.getElementById('deselect-all-btn').addEventListener('click', deselectAllSurahs);
+document.getElementById('toggle-number-btn').addEventListener('click', toggleVerseNumbers);

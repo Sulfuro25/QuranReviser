@@ -71,13 +71,13 @@ nav {
   padding: 5px;
   border-radius: 50px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-  margin-top: 20px;
+  margin-top: 0px;
   width: 80%;
   max-width: 80%;
 }
 
 #verse-container {
-  margin: 20px 0;
+  margin: 5px 0;
   font-size: 1em;
   color: #333;
   width: 100%;
@@ -87,7 +87,7 @@ nav {
 }
 
 #verse-container p {
-  margin: 10px 0;
+  margin: 5px 0;
   font-family: 'Noto Sans Arabic', serif;
   font-optical-sizing: auto;
   font-weight: 400;
@@ -356,6 +356,56 @@ footer small {
   margin-left: 10px;
 }
 
+/* Styles pour le mode sombre */
+body.dark-mode {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+body.dark-mode .container {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+body.dark-mode nav {
+  background-color: #007bff;
+}
+
+body.dark-mode button {
+  background-color: #333;
+  color: #ffffff;
+}
+
+body.dark-mode button:hover {
+  background-color: #555;
+}
+
+body.dark-mode footer {
+  background-color:  #007bff;
+  color: #ffffff;
+}
+
+body.dark-mode #verse-container {
+  color: #ffffff;
+}
+
+body.dark-mode #menu-screen {
+  background-color: rgba(0, 0, 0, 0.95);
+  color: #ffffff;
+}
+
+body.dark-mode #surah-selection label {
+  color: #ffffff;
+}
+
+body.dark-mode #button-container{
+  background-color:  #1a1a1a;
+}
+body.dark-mode #random-verse-btn,#next-verse-btn{
+  background-color: #007bff;
+}
+
+
 /* Styles pour les téléphones (écrans de moins de 600px) */
 @media only screen and (max-width: 600px) {
   .container {
@@ -379,19 +429,27 @@ footer small {
   }
 
   .nav-center {
-    margin-left: 60px;
     width: 100%;
     font-size: 1em;
+    flex-wrap: wrap;
+  }
+
+  .nav-center button {
+    margin: 0 2px 0px 2px; /* Réduire encore l'espace entre les boutons */
+    font-size: 0.6em; /* Réduire davantage la taille de la police */
+    padding: 3px 3px; /* Réduire davantage le padding */
   }
 
   .nav-title {
-    font-size: 0.8em;
+    font-size: 0.7em;
+    margin-left: 5px;
+
   }
 
   button {
-    font-size: 0.7em;
-    padding: 8px 12px;
-  }
+    font-size: 0.6em;
+    padding: 8px 5px 5px 5px;
+  } 
 
   #random-verse-btn, #next-verse-btn {
     font-size: 0.7em;
@@ -399,9 +457,10 @@ footer small {
   }
 
   .square-btn {
-    font-size: 1em;
-    height: 30px;
-    width: 30px;
+    font-size: 0.8em;
+    height: 20px;
+    width: 20px;
+    margin-left: 3px;
   }
 
   footer {
