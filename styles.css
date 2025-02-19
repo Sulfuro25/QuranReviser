@@ -356,6 +356,22 @@ footer small {
   margin-left: 10px;
 }
 
+#toggle-selection-btn {
+  width: 100%;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+#toggle-selection-btn:hover {
+  background-color: #0056b3;
+}
+
 /* Styles pour le mode sombre */
 body.dark-mode {
   background-color: #121212;

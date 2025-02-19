@@ -6,13 +6,14 @@ let displayedVerses = [];
 let selectedSurahs = [];
 let isSurahNameHidden = false;
 let isVerseNumberVisible = true;
-
+const juzs = quran.juzs;
+let isJuzSelection = false; // Default to Surah selection
 
 // Fetch Quran data
 fetch('quran_verses.json')
   .then(response => response.json())
   .then(data => {
-    quran = data.quran.sura; // Load all surahs
+    quran = data.quran; // Load the entire Quran object (including sura and juzs)
     console.log('Quran data loaded:', quran);
     loadSurahSelection(); // Load surah selection UI
     loadSavedSelection(); // Load saved selection from local storage
@@ -22,17 +23,42 @@ fetch('quran_verses.json')
 // Function to load surah selection UI
 function loadSurahSelection() {
   const surahSelection = document.getElementById('surah-selection');
-  quran.forEach((surah, index) => {
-    const label = document.createElement('label');
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.value = index;
-    checkbox.checked = true; // Default to all surahs selected
-    label.appendChild(checkbox);
-    label.appendChild(document.createTextNode(surah._name));
-    surahSelection.appendChild(label);
-  });
+  surahSelection.innerHTML = ''; // Effacer le contenu précédent
+
+  if (isJuzSelection) {
+    // Charger la sélection des Juzz
+    quran.juzs.forEach((juz, index) => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = index;
+      checkbox.checked = selectedSurahs.includes(index); // Préserver l'état de sélection
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(`الجزء ${juz.index}`));
+      surahSelection.appendChild(label);
+    });
+  } else {
+    // Charger la sélection des sourates
+    quran.sura.forEach((surah, index) => {
+      const label = document.createElement('label');
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = index;
+      checkbox.checked = selectedSurahs.includes(index); // Préserver l'état de sélection
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(surah._name));
+      surahSelection.appendChild(label);
+    });
+  }
 }
+
+document.getElementById('toggle-selection-btn').addEventListener('click', () => {
+  isJuzSelection = !isJuzSelection; // Toggle between Surah and Juz selection
+  document.getElementById('toggle-selection-btn').textContent = isJuzSelection
+    ? 'التحديد حسب الأجزاء'
+    : 'التحديد حسب السور';
+  loadSurahSelection(); // Reload the selection UI
+});
 
 // Function to load saved selection from local storage
 function loadSavedSelection() {
@@ -54,27 +80,97 @@ function loadSavedSelection() {
 function displayRandomVerse() {
   const errorMessage = document.getElementById('error-message');
   if (quran.length === 0 || selectedSurahs.length === 0) {
-    // Afficher un message d'erreur dans l'interface utilisateur
-    errorMessage.textContent = "يرجى اختيار سورة واحدة على الأقل قبل طلب آية عشوائية";
+    errorMessage.textContent = "يرجى اختيار سورة أو جزء واحد على الأقل قبل طلب آية عشوائية";
     errorMessage.style.display = 'block';
     return;
   }
 
-  // Select a random surah from the selected surahs
-  const randomSurahIndex = selectedSurahs[Math.floor(Math.random() * selectedSurahs.length)];
-  const surah = quran[randomSurahIndex];
+  if (isJuzSelection) {
+    // Étape 1 : Calculer la plage totale des versets pour tous les Juzz sélectionnés
+    let totalVerses = 0;
+    const juzRanges = [];
 
-  // Select a random verse from the surah
-  currentVerseIndex = Math.floor(Math.random() * surah.aya.length);
-  const verse = surah.aya[currentVerseIndex];
+    selectedSurahs.forEach(juzIndex => {
+      const juz = quran.juzs[juzIndex];
 
-  // Reset displayed verses with the new random verse
-  displayedVerses = [{ surah, verse }];
+      // Trouver la sourate et le verset correspondant au début du Juz
+      const startSurah = quran.sura.find(s => s._index === juz.start.sura.toString());
+      const startVerseIndex = startSurah.aya.findIndex(a => a._index === juz.start.aya.toString());
 
-  // Update currentSurahIndex to the selected surah
-  currentSurahIndex = randomSurahIndex;
+      // Trouver la sourate et le verset correspondant à la fin du Juz
+      const endSurah = quran.sura.find(s => s._index === juz.end.sura.toString());
+      const endVerseIndex = endSurah.aya.findIndex(a => a._index === juz.end.aya.toString());
 
-  // Display the verse
+      // Calculer le nombre de versets dans ce Juz
+      let versesInRange = 0;
+      if (startSurah._index === endSurah._index) {
+        // Si le Juz commence et se termine dans la même sourate
+        versesInRange = endVerseIndex - startVerseIndex + 1;
+      } else {
+        // Si le Juz s'étend sur plusieurs sourates
+        // Versets restants dans la sourate de début
+        versesInRange += startSurah.aya.length - startVerseIndex;
+        // Versets dans les sourates intermédiaires
+        for (let i = parseInt(startSurah._index) + 1; i < parseInt(endSurah._index); i++) {
+          const surah = quran.sura.find(s => s._index === i.toString());
+          versesInRange += surah.aya.length;
+        }
+        // Versets dans la sourate de fin
+        versesInRange += endVerseIndex + 1;
+      }
+
+      // Ajouter la plage de ce Juz à la liste des plages
+      juzRanges.push({ juzIndex, startSurah, startVerseIndex, endSurah, endVerseIndex, versesInRange });
+      totalVerses += versesInRange;
+    });
+
+    // Étape 2 : Choisir un index aléatoire dans la plage totale des versets
+    const randomVerseIndex = Math.floor(Math.random() * totalVerses);
+
+    // Étape 3 : Trouver le Juzz et le verset correspondant à cet index
+    let cumulativeVerses = 0;
+    let selectedJuzRange = null;
+
+    for (const range of juzRanges) {
+      if (randomVerseIndex < cumulativeVerses + range.versesInRange) {
+        selectedJuzRange = range;
+        break;
+      }
+      cumulativeVerses += range.versesInRange;
+    }
+
+    // Étape 4 : Sélectionner le verset correspondant
+    let verseIndexInRange = randomVerseIndex - cumulativeVerses;
+    let currentSurah = selectedJuzRange.startSurah;
+    let currentVerseIndexInSurah = selectedJuzRange.startVerseIndex;
+
+    while (verseIndexInRange >= 0) {
+      const versesRemainingInSurah = currentSurah.aya.length - currentVerseIndexInSurah;
+      if (verseIndexInRange < versesRemainingInSurah) {
+        // Le verset se trouve dans cette sourate
+        const verse = currentSurah.aya[currentVerseIndexInSurah + verseIndexInRange];
+        displayedVerses = [{ surah: currentSurah, verse }];
+        currentSurahIndex = selectedJuzRange.juzIndex; // Mettre à jour l'index du Juz actuel
+        currentVerseIndex = currentVerseIndexInSurah + verseIndexInRange;
+        break;
+      } else {
+        // Passer à la sourate suivante
+        verseIndexInRange -= versesRemainingInSurah;
+        const nextSurahIndex = parseInt(currentSurah._index) + 1;
+        currentSurah = quran.sura.find(s => s._index === nextSurahIndex.toString());
+        currentVerseIndexInSurah = 0;
+      }
+    }
+  } else {
+    // Mode Surah
+    const randomSurahIndex = selectedSurahs[Math.floor(Math.random() * selectedSurahs.length)];
+    const surah = quran.sura[randomSurahIndex];
+    currentVerseIndex = Math.floor(Math.random() * surah.aya.length);
+    const verse = surah.aya[currentVerseIndex];
+
+    displayedVerses = [{ surah, verse }];
+    currentSurahIndex = randomSurahIndex;
+  }
   displayVerses();
 }
 
@@ -82,18 +178,42 @@ function displayRandomVerse() {
 function displayNextVerse() {
   if (quran.length === 0 || displayedVerses.length === 0) return;
 
-  const surah = quran[currentSurahIndex];
-  currentVerseIndex = (currentVerseIndex + 1) % surah.aya.length;
+  if (isJuzSelection) {
+    // Mode Juzz
+    const currentJuz = quran.juzs[currentSurahIndex]; // currentSurahIndex représente l'index du Juz actuel
+    const surah = quran.sura.find(s => s._index === currentJuz.start.sura.toString());
+    const verseIndex = surah.aya.findIndex(a => a._index === currentJuz.start.aya.toString());
 
-  if (currentVerseIndex === 0) {
-    const currentSurahIndexInSelection = selectedSurahs.indexOf(currentSurahIndex);
-    const nextSurahIndexInSelection = (currentSurahIndexInSelection + 1) % selectedSurahs.length;
-    currentSurahIndex = selectedSurahs[nextSurahIndexInSelection];
+    // Passer au verset suivant dans le Juz
+    currentVerseIndex = (currentVerseIndex + 1) % surah.aya.length;
+
+    // Si on dépasse la fin du Juz, passer au Juz suivant
+    if (currentVerseIndex === 0) {
+      const nextJuzIndex = (currentSurahIndex + 1) % quran.juzs.length;
+      currentSurahIndex = nextJuzIndex;
+      const nextJuz = quran.juzs[nextJuzIndex];
+      const nextSurah = quran.sura.find(s => s._index === nextJuz.start.sura.toString());
+      currentVerseIndex = nextSurah.aya.findIndex(a => a._index === nextJuz.start.aya.toString());
+    }
+
+    const nextVerse = surah.aya[currentVerseIndex];
+    displayedVerses.push({ surah, verse: nextVerse });
+  } else {
+    // Mode Surah
+    const surah = quran.sura[currentSurahIndex];
+    currentVerseIndex = (currentVerseIndex + 1) % surah.aya.length;
+
+    // Si on dépasse la fin de la sourate, passer à la sourate suivante
+    if (currentVerseIndex === 0) {
+      const nextSurahIndex = (currentSurahIndex + 1) % quran.sura.length;
+      currentSurahIndex = nextSurahIndex;
+    }
+
+    const nextVerse = quran.sura[currentSurahIndex].aya[currentVerseIndex];
+    displayedVerses.push({ surah: quran.sura[currentSurahIndex], verse: nextVerse });
   }
 
-  const nextVerse = quran[currentSurahIndex].aya[currentVerseIndex];
-  displayedVerses.push({ surah: quran[currentSurahIndex], verse: nextVerse });
-
+  // Limiter le nombre de versets affichés
   if (displayedVerses.length > 3) {
     displayedVerses.shift();
   }
@@ -158,10 +278,8 @@ function saveSelection() {
   });
 
   localStorage.setItem('selectedSurahs', JSON.stringify(selectedSurahs));
-  // Close the menu screen
-  const menuScreen = document.getElementById('menu-screen');
-  const menuWidth = window.innerWidth <= 600 ? '-90%' : '-80%'; // Ajuster en fonction de la largeur de l'écran
-  menuScreen.style.right = menuWidth;
+  localStorage.setItem('isJuzSelection', isJuzSelection); // Save the selection mode
+  menuScreen.style.right = menuWidth; // Close the menu
 }
 
 // Save Selection
@@ -266,6 +384,25 @@ function loadDarkMode() {
     document.body.classList.remove('dark-mode');
     document.getElementById('toggle-darkmode-btn').textContent = '🌙';
   }
+}
+
+function loadSavedSelection() {
+  const savedSurahs = localStorage.getItem('selectedSurahs');
+  if (savedSurahs) {
+    selectedSurahs = JSON.parse(savedSurahs);
+  } else {
+    selectedSurahs = isJuzSelection ? quran.juzs.map((_, index) => index) : quran.sura.map((_, index) => index);
+  }
+
+  const savedJuzSelection = localStorage.getItem('isJuzSelection');
+  if (savedJuzSelection) {
+    isJuzSelection = savedJuzSelection === 'true';
+    document.getElementById('toggle-selection-btn').textContent = isJuzSelection
+      ? 'التحديد حسب الأجزاء'
+      : 'التحديد حسب السور';
+  }
+
+  loadSurahSelection();
 }
 
 // Charger l'état du mode sombre au chargement de la page

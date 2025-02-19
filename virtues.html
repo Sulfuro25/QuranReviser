@@ -1,12 +1,41 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quranic Virtues</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>فضائل قرآنية</title>
+  <link rel="stylesheet" href="virtues.css"> <!-- Utilisez le même fichier CSS que index.html -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-    <h1>Under Construction</h1>
-    <p>Here will be all virtues of memorising and reciting the Quran...</p>
+  <!-- Barre de navigation -->
+  <nav>
+    <h1 class="nav-title">فضائل قرآنية</h1>
+    <button id="menu-btn" class="square-btn">☰</button>
+    <div class="nav-center">
+    <button id="toggle-darkmode-btn">🌙</button> <!-- Bouton du mode sombre -->
+    </div>
+  </nav>
+
+  <!-- Conteneur principal -->
+  <div class="container">
+    <div id="text-container">
+      <p id="text-display">النص المعروض هنا</p> <!-- Conteneur pour le texte -->
+    </div>
+  </div>
+
+  <!-- Flèches de navigation -->
+  <div id="navigation-buttons">
+    <button id="next-btn"><i class="fas fa-chevron-right"></i></button>
+    <button id="prev-btn"><i class="fas fa-chevron-left"></i></button>
+  </div>
+
+  <!-- Pied de page -->
+  <footer>
+    <small>صُنع بواسطة فضيل</small>
+  </footer>
+
+  <!-- Script pour la logique de la page -->
+  <script src="virtues.js"></script>
 </body>
 </html>

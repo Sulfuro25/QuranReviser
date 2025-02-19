@@ -25741,7 +25741,39 @@
 				"_index": "114",
 				"_name": "الناس"
 			}
-		]
+		],
+"juzs": [
+    { "index": 1, "start": { "sura": 1, "aya": 1 }, "end": { "sura": 2, "aya": 141 } } ,
+    { "index": 2, "start": { "sura": 2, "aya": 142 }, "end": { "sura": 2, "aya": 252 } },
+    { "index": 3, "start": { "sura": 2, "aya": 253 }, "end": { "sura": 3, "aya": 92 } },
+    { "index": 4, "start": { "sura": 3, "aya": 93 }, "end": { "sura": 4, "aya": 23 } },
+    { "index": 5, "start": { "sura": 4, "aya": 24 }, "end": { "sura": 4, "aya": 147 } },
+    { "index": 6, "start": { "sura": 4, "aya": 148 }, "end": { "sura": 5, "aya": 81 } },
+    { "index": 7, "start": { "sura": 5, "aya": 82 }, "end": { "sura": 6, "aya": 110 } },
+    { "index": 8, "start": { "sura": 6, "aya": 111 }, "end": { "sura": 7, "aya": 87 } },
+    { "index": 9, "start": { "sura": 7, "aya": 88 }, "end": { "sura": 8, "aya": 40 } },
+    { "index": 10, "start": { "sura": 8, "aya": 41 }, "end": { "sura": 9, "aya": 92 } },
+    { "index": 11, "start": { "sura": 9, "aya": 93 }, "end": { "sura": 11, "aya": 5 } },
+    { "index": 12, "start": { "sura": 11, "aya": 6 }, "end": { "sura": 12, "aya": 52 } },
+    { "index": 13, "start": { "sura": 12, "aya": 53 }, "end": { "sura": 14, "aya": 52 } },
+    { "index": 14, "start": { "sura": 15, "aya": 1 }, "end": { "sura": 16, "aya": 128 } },
+    { "index": 15, "start": { "sura": 17, "aya": 1 }, "end": { "sura": 18, "aya": 74 } },
+    { "index": 16, "start": { "sura": 18, "aya": 75 }, "end": { "sura": 20, "aya": 135 } },
+    { "index": 17, "start": { "sura": 21, "aya": 1 }, "end": { "sura": 22, "aya": 78 } },
+    { "index": 18, "start": { "sura": 23, "aya": 1 }, "end": { "sura": 25, "aya": 20 } },
+    { "index": 19, "start": { "sura": 25, "aya": 21 }, "end": { "sura": 27, "aya": 55 } },
+    { "index": 20, "start": { "sura": 27, "aya": 56 }, "end": { "sura": 29, "aya": 45 } },
+    { "index": 21, "start": { "sura": 29, "aya": 46 }, "end": { "sura": 33, "aya": 30 } },
+    { "index": 22, "start": { "sura": 33, "aya": 31 }, "end": { "sura": 36, "aya": 27 } },
+    { "index": 23, "start": { "sura": 36, "aya": 28 }, "end": { "sura": 39, "aya": 31 } },
+    { "index": 24, "start": { "sura": 39, "aya": 32 }, "end": { "sura": 41, "aya": 46 } },
+    { "index": 25, "start": { "sura": 41, "aya": 47 }, "end": { "sura": 45, "aya": 37 } },
+    { "index": 26, "start": { "sura": 46, "aya": 1 }, "end": { "sura": 51, "aya": 30 } },
+    { "index": 27, "start": { "sura": 51, "aya": 31 }, "end": { "sura": 57, "aya": 29 } },
+    { "index": 28, "start": { "sura": 58, "aya": 1 }, "end": { "sura": 66, "aya": 12 } },
+    { "index": 29, "start": { "sura": 67, "aya": 1 }, "end": { "sura": 77, "aya": 50 } },
+    { "index": 30, "start": { "sura": 78, "aya": 1 }, "end": { "sura": 114, "aya": 6 } }
+  ]
 	}
 }
 
