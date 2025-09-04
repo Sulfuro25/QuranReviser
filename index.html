@@ -1,70 +1,22 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>اختبار الحفظ</title>
-  <link rel="stylesheet" href="styles.css">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@100..900&display=swap" rel="stylesheet">
-  <!--Favicons Apple-->
-  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-icon-180x180.png">
-  <!--Favicons Android-->
-  <link rel="icon" type="image/png" sizes="192x192"  href="/favicons/android-icon-192x192.png">
-  <!--Microsoft-->
-  <meta name="msapplication-square70x70logo" content="/favicons/ms-icon-70x70.png">
-  <meta name="msapplication-TileImage" content="/favicons/ms-icon-144x144.png">
-  <meta name="msapplication-square150x150logo" content="/favicons/ms-icon-150x150.png">
-  <meta name="msapplication-square310x310logo" content="/favicons/ms-icon-310x310.png">
-  <!--Favicon SVG-->
-  <link rel="icon" type="image/svg+xml" href="/favicons/favicon.svg">
-  <meta name="theme-color" content="#ffffff">
-  <!--Favicon Manifest-->
-  <link rel="manifest" href="/favicons/manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Viewer with Tajweed</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Navigation Bar -->
-  <nav>
-      <h1 class="nav-title">اختبار الحفظ</h1>
-      <button id="toggle-number-btn">إخفاء الأرقام</button>
-      <button id="toggle-surah-btn">إخفاء اسم السورة</button>
-      <button id="redirect-btn">فضائل قرآنية</button>
-      <button id="toggle-darkmode-btn">🌙</button>
-      <button id="menu-btn" class="square-btn">☰</button>
-  </nav>
-
-  <!-- Main Content -->
-  <div class="container">
-    <div id="verse-container">
-      <p>الآيات</p>
-      <div id="error-message" style="color: red; display: none;"></div>
-      <!-- Verses will appear here -->
-    </div>
-  </div>
-  <div id="button-container">
-    <button id="random-verse-btn">الحصول على آية عشوائية</button>
-    <button id="next-verse-btn">الحصول على الآية التالية</button>
-  </div>
-
-  <div id="menu-screen">
-    <div class="menu-content">
-      <button id="toggle-selection-btn">التحديد حسب السور</button>
-      <div class="content" id="surah-selection">
-        <!-- Surah or Juz checkboxes will be dynamically added here -->
-      </div>
-      <div id="selection-buttons">
-        <button id="select-all-btn">تحديد الكل</button>
-        <button id="deselect-all-btn">إلغاء التحديد الكل</button>
-      </div>
-      <button id="save-selection-btn">حفظ التحديد</button>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer>
-    <small>(JSON) <a href="https://tanzil.net" target="_blank">tanzil.net |</a></small>
-    <small>صُنع بواسطة فضيل</small>
-  </footer>
-
-  <script src="script.js"></script>
+    <header>
+        <h1>Quran Viewer with Tajweed</h1>
+    </header>
+    <nav>
+        <select id="surah-select"></select>
+        <input type="text" id="ayah-range" placeholder="Ayah range e.g. 1-10">
+        <button id="load-btn">Load</button>
+    </nav>
+    <div id="quran-display"></div>
+    <script src="script.js"></script>
 </body>
 </html>
