@@ -1,23 +1,19 @@
-const API_BASE = 'https://api.quran.com/api/v4';
+const API_BASE = 'https://cors-anywhere.herokuapp.com/https://api.quran.com/api/v4';
 
 async function loadChapters() {
     const select = document.getElementById('surah-select');
-    select.innerHTML = '<option value="">Loading Surahs...</option>'; // Initial placeholder
+    select.innerHTML = '<option value="">Loading Surahs...</option>';
 
     try {
         const response = await fetch(`${API_BASE}/chapters?language=en`);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
         
-        // Check if data.chapters exists
         if (!data.chapters || !Array.isArray(data.chapters)) {
             throw new Error('Invalid API response: chapters array not found');
         }
 
-        // Clear placeholder
         select.innerHTML = '<option value="">Select a Surah</option>';
-        
-        // Populate dropdown
         data.chapters.forEach(chapter => {
             const option = document.createElement('option');
             option.value = chapter.id;
@@ -97,5 +93,4 @@ document.getElementById('load-btn').addEventListener('click', async () => {
     displayVerses(verses, start, end);
 });
 
-// Ensure DOM is ready before loading chapters
 document.addEventListener('DOMContentLoaded', loadChapters);
