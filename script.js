@@ -1,10 +1,23 @@
 const API_BASE = 'https://api.quran.com/api/v4';
 
 async function loadChapters() {
+    const select = document.getElementById('surah-select');
+    select.innerHTML = '<option value="">Loading Surahs...</option>'; // Initial placeholder
+
     try {
         const response = await fetch(`${API_BASE}/chapters?language=en`);
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const data = await response.json();
-        const select = document.getElementById('surah-select');
+        
+        // Check if data.chapters exists
+        if (!data.chapters || !Array.isArray(data.chapters)) {
+            throw new Error('Invalid API response: chapters array not found');
+        }
+
+        // Clear placeholder
+        select.innerHTML = '<option value="">Select a Surah</option>';
+        
+        // Populate dropdown
         data.chapters.forEach(chapter => {
             const option = document.createElement('option');
             option.value = chapter.id;
@@ -13,7 +26,8 @@ async function loadChapters() {
         });
     } catch (error) {
         console.error('Error loading chapters:', error);
-        alert('Failed to load Surah list. Please try again.');
+        select.innerHTML = '<option value="">Failed to load Surahs</option>';
+        alert('Failed to load Surah list: ' + error.message + '. Please check your connection or try again later.');
     }
 }
 
@@ -24,14 +38,17 @@ async function fetchAllVerses(surahId) {
     while (true) {
         try {
             const response = await fetch(`${API_BASE}/verses/by_chapter/${surahId}?fields=text_uthmani_tajweed&per_page=${perPage}&page=${page}`);
-            if (!response.ok) throw new Error('API request failed');
+            if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
             const data = await response.json();
+            if (!data.verses || !Array.isArray(data.verses)) {
+                throw new Error('Invalid API response: verses array not found');
+            }
             verses = verses.concat(data.verses);
             if (!data.pagination.next_page) break;
             page++;
         } catch (error) {
             console.error('Error fetching verses:', error);
-            alert('Failed to load verses. Please check your connection.');
+            alert('Failed to load verses: ' + error.message);
             return [];
         }
     }
@@ -80,5 +97,5 @@ document.getElementById('load-btn').addEventListener('click', async () => {
     displayVerses(verses, start, end);
 });
 
-// Load chapters on page load
-loadChapters();
+// Ensure DOM is ready before loading chapters
+document.addEventListener('DOMContentLoaded', loadChapters);
