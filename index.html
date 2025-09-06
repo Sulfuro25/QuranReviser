@@ -3,20 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quran Viewer with Tajweed</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap">
+    <title>Quran Reviser — Tajweed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="favicons/favicon.svg">
     <link rel="stylesheet" href="styles.css">
+    <meta name="description" content="Beautiful Quran viewer with tajweed colors, audio, and translations.">
+    <meta name="theme-color" content="#0f172a">
 </head>
 <body>
-    <header>
-        <h1>Quran Viewer with Tajweed</h1>
+    <header class="app-header">
+        <div class="brand">
+            <span class="logo">﴿﴾</span>
+            <h1>Quran Reviser</h1>
+        </div>
+        <div class="header-actions">
+            <button id="legend-toggle" class="btn secondary" title="Toggle tajweed legend">Legend</button>
+            <button id="theme-toggle" class="btn secondary" title="Toggle theme">Dark</button>
+        </div>
     </header>
-    <nav>
-        <select id="surah-select"></select>
-        <input type="text" id="ayah-range" placeholder="Ayah range e.g. 1-10">
-        <button id="load-btn">Load</button>
+
+    <nav class="toolbar">
+        <div class="row">
+            <label>
+                <span>Surah</span>
+                <select id="surah-select" aria-label="Select Surah"></select>
+            </label>
+            <label>
+                <span>Ayahs</span>
+                <input type="text" id="ayah-range" placeholder="e.g. 1-7" aria-label="Ayah range e.g. 1-10">
+            </label>
+            <label>
+                <span>Translation</span>
+                <select id="translation-select" aria-label="Select translation">
+                    <option value="">None</option>
+                </select>
+            </label>
+            <label>
+                <span>Reciter</span>
+                <select id="reciter-select" aria-label="Select reciter">
+                    <option value="">None</option>
+                </select>
+            </label>
+            <div class="actions">
+                <button id="load-btn" class="btn primary">Load</button>
+            </div>
+        </div>
+        <div class="row">
+            <label class="grow">
+                <span>Search</span>
+                <input type="search" id="search-input" placeholder="Search Arabic or translation...">
+            </label>
+            <label>
+                <span>Font size</span>
+                <input type="range" id="font-size" min="22" max="56" step="1" value="36">
+            </label>
+        </div>
+        <div id="legend" class="legend" hidden>
+            <div class="legend-grid">
+                <span><tajweed class="madda_normal">Madda normal</tajweed></span>
+                <span><tajweed class="madda_permissible">Madda permissible</tajweed></span>
+                <span><tajweed class="madda_necessary">Madda necessary</tajweed></span>
+                <span><tajweed class="madda_obligatory">Madda obligatory</tajweed></span>
+                <span><tajweed class="qlq">Qalqalah</tajweed></span>
+                <span><tajweed class="ikhf">Ikhfa</tajweed></span>
+                <span><tajweed class="ikhf_shfw">Ikhfa Shafawi</tajweed></span>
+                <span><tajweed class="idgh_ghn">Idgham with ghunnah</tajweed></span>
+                <span><tajweed class="idgh_w_ghn">Idgham without ghunnah</tajweed></span>
+                <span><tajweed class="iqlb">Iqlab</tajweed></span>
+                <span><tajweed class="ghn">Ghunnah</tajweed></span>
+                <span><tajweed class="ham_wasl">Hamzat wasl</tajweed></span>
+                <span><tajweed class="laam_shamsiyah">Laam shamsiyah</tajweed></span>
+                <span><tajweed class="slnt">Silent letters</tajweed></span>
+            </div>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
     </nav>
-    <div id="quran-display"></div>
+
+    <main id="quran-display" class="quran"></main>
+
+    <audio id="audio" preload="none"></audio>
+
     <script src="script.js"></script>
 </body>
 </html>
