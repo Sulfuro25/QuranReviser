@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicons/favicon.svg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .settings-wrap { max-width: 800px; margin: 24px auto; padding: 0 20px; display: grid; gap: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card h2 { margin: 0 0 10px; font-size: 18px; }
+    .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .option { display: flex; gap: 10px; align-items: center; }
+    .preview { font-family: 'Amiri Quran', serif; border: 1px dashed var(--border); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+    .stack { display: grid; gap: 8px; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <a href="index.html" class="btn secondary" style="text-decoration:none">Home</a>
+      <h1>Settings</h1>
+    </div>
+    <div class="header-actions"></div>
+  </header>
+
+  <main class="settings-wrap">
+    <section class="card">
+      <h2>Theme</h2>
+      <div class="row">
+        <div class="muted">Choose a color theme</div>
+        <div class="option">
+          <label><input type="radio" name="theme" value="dark"> Dark</label>
+          <label><input type="radio" name="theme" value="light"> Light</label>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Reader Font Size</h2>
+      <div class="stack">
+        <div class="row">
+          <div class="muted">Arabic text size in Reader</div>
+          <div style="min-width:220px; display:flex; align-items:center; gap:10px;">
+            <input id="font-size" type="range" min="24" max="56" step="2" />
+            <div id="font-size-val" class="muted" style="width:40px; text-align:right">36</div>
+          </div>
+        </div>
+        <div id="font-preview" class="preview">ٱلْحَمْدُ لِلّٰهِ رَبِّ ٱلْعٰلَمِينَ</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Reciter</h2>
+      <div class="row">
+        <div class="muted">Select audio reciter</div>
+        <div class="option">
+          <select id="reciter-select"></select>
+        </div>
+      </div>
+      <div class="muted" id="reciter-status"></div>
+    </section>
+
+    <section class="card">
+      <h2>Translation</h2>
+      <div class="stack">
+        <div class="row">
+          <label class="option"><input type="checkbox" id="translation-toggle"> Show translation in Reader</label>
+          <div class="option" style="margin-left:auto;">
+            <label for="translation-select" class="muted" style="margin-right:6px;">Source</label>
+            <select id="translation-select" disabled></select>
+          </div>
+        </div>
+        <div class="muted" id="translation-status"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>About</h2>
+      <div class="muted">Configure preferences for the app. More options coming soon.</div>
+    </section>
+  </main>
+
+  <script>
+    const API_BASE = 'https://api.quran.com/api/v4';
+    const PREFS_KEY = 'qr_prefs';
+    function readPrefs(){ try { return JSON.parse(localStorage.getItem(PREFS_KEY)||'{}'); } catch { return {}; } }
+    function writePrefs(p){ try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch {} }
+    function setTheme(theme){ document.body.setAttribute('data-theme', theme); }
+    function loadTheme(){ const p = readPrefs(); const theme = p.theme||'dark'; setTheme(theme); document.querySelectorAll('input[name="theme"]').forEach(r => r.checked = (r.value===theme)); }
+    function saveTheme(theme){ const p = readPrefs(); p.theme = theme; writePrefs(p); setTheme(theme); }
+
+    function loadFont(){ const p = readPrefs(); const v = parseInt(p.font_px||'36', 10); const size = (!Number.isNaN(v)) ? v : 36; document.getElementById('font-size').value = size; document.getElementById('font-size-val').textContent = size; document.documentElement.style.setProperty('--arabic-size', size + 'px'); document.getElementById('font-preview').style.fontSize = size + 'px'; }
+    function saveFont(size){ const p = readPrefs(); p.font_px = size; writePrefs(p); document.documentElement.style.setProperty('--arabic-size', size + 'px'); document.getElementById('font-preview').style.fontSize = size + 'px'; document.getElementById('font-size-val').textContent = size; }
+
+    async function loadReciters(){
+      const sel = document.getElementById('reciter-select');
+      const status = document.getElementById('reciter-status');
+      try {
+        status.textContent = 'Loading reciters…';
+        const res = await fetch(`${API_BASE}/resources/recitations?language=en`);
+        const data = await res.json();
+        const reciters = (data.recitations||[]).map(r => ({ id: r.id, name: r.reciter_name || (r.translated_name?.name) || r.name || ('Reciter '+r.id) }));
+        sel.replaceChildren(...reciters.map(r => { const o = document.createElement('option'); o.value = r.id; o.textContent = `${r.name}`; return o; }));
+        const p = readPrefs(); const cur = parseInt(p.reciter_id||'7', 10); sel.value = String(cur);
+        status.textContent = '';
+      } catch(e){ status.textContent = 'Failed to load reciters. Using default.'; const p = readPrefs(); const cur = parseInt(p.reciter_id||'7', 10); const o = document.createElement('option'); o.value = String(cur); o.textContent = `Reciter ${cur}`; sel.replaceChildren(o); sel.value = String(cur); }
+    }
+    function saveReciter(id){ const p = readPrefs(); p.reciter_id = parseInt(id,10)||7; writePrefs(p); }
+
+    async function loadTranslations(){
+      const sel = document.getElementById('translation-select');
+      const status = document.getElementById('translation-status');
+      try {
+        status.textContent = 'Loading translations…';
+        const res = await fetch(`${API_BASE}/resources/translations?language=en`);
+        const data = await res.json();
+        const translations = (data.translations||[]).map(t => ({ 
+          id: t.id,
+          name: t.name || t.translated_name?.name || ('Translation '+t.id),
+          lang: t.language_name || t.language || t.locale || t.language_name_code || 'Unknown',
+          author: t.author_name || ''
+        }));
+        translations.sort((a,b)=> String(a.lang+" "+a.name).localeCompare(String(b.lang+" "+b.name)));
+        sel.replaceChildren(...translations.map(t => { 
+          const o = document.createElement('option'); 
+          o.value = t.id; 
+          const meta = t.author ? ` – ${t.author}` : '';
+          o.textContent = `[${t.lang}] ${t.name}${meta}`; 
+          return o; 
+        }));
+        const p = readPrefs(); const cur = parseInt(p.translation_id||'0', 10); if (cur) sel.value = String(cur);
+        status.textContent = '';
+      } catch(e){ status.textContent = 'Failed to load translations.'; sel.replaceChildren(); }
+    }
+    function saveTranslation(id){ const p = readPrefs(); p.translation_id = parseInt(id,10)||0; writePrefs(p); }
+    function saveTranslationToggle(on){ const p = readPrefs(); p.translation_on = !!on; writePrefs(p); document.getElementById('translation-select').disabled = !on; }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      loadTheme();
+      loadFont();
+      await loadReciters();
+      await loadTranslations();
+      document.querySelectorAll('input[name="theme"]').forEach(r => r.addEventListener('change', () => saveTheme(r.value)));
+      const fs = document.getElementById('font-size');
+      fs.addEventListener('input', () => saveFont(parseInt(fs.value,10)));
+      document.getElementById('reciter-select').addEventListener('change', (e)=> saveReciter(e.target.value));
+      // Init translation prefs
+      const p = readPrefs();
+      const toggle = document.getElementById('translation-toggle');
+      toggle.checked = !!p.translation_on;
+      document.getElementById('translation-select').disabled = !toggle.checked;
+      toggle.addEventListener('change', ()=> saveTranslationToggle(toggle.checked));
+      document.getElementById('translation-select').addEventListener('change', (e)=> saveTranslation(e.target.value));
+    });
+  </script>
+</body>
+</html>

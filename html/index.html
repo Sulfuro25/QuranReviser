@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quran Reviser â€” Home</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicons/favicon.svg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <meta name="description" content="Quran Reviser home">
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    .home { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+    .hero { text-align: center; margin-bottom: 24px; }
+    .hero h1 { margin: 0; font-size: 28px; }
+    .hero p { color: var(--muted); margin-top: 8px; }
+    .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+    .menu-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; text-decoration: none; color: var(--text); }
+    .menu-card:hover { outline: 2px solid var(--ring); }
+    .menu-card h2 { margin: 0 0 6px; font-size: 18px; }
+    .menu-card p { margin: 0; color: var(--muted); font-size: 14px; }
+    /* Hide Juz and Hizb cards per request */
+    .menu-grid a[href="juz.html"], .menu-grid a[href="hizb.html"] { display: none !important; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <span class="logo">ï·½</span>
+      <h1>Quran Reviser</h1>
+    </div>
+    <div class="header-actions">
+      <a href="settings.html" class="btn secondary" title="Open settings">Settings</a>
+    </div>
+  </header>
+
+  <main class="home">
+    <div class="hero">
+      <h1>What would you like to revise?</h1>
+      <p>Choose a section to get started.</p>
+    </div>
+    <div class="menu-grid">
+      <a class="menu-card" href="surahs.html">
+        <h2>Quran</h2>
+        <p>Browse Surahs, Juz, and Hizb</p>
+      </a>
+      <a class="menu-card" href="hifdh.html">
+        <h2>Hifdh Progress</h2>
+        <p>Track memorization and plan finish time</p>
+      </a>
+      
+      <a class="menu-card" href="juz.html">
+        <h2>Juz</h2>
+        <p>30 Juzâ€™ in order</p>
+      </a>
+      <a class="menu-card" href="hizb.html">
+        <h2>Hizb</h2>
+        <p>60 Hizb blocks</p>
+      </a>
+      <a class="menu-card" href="#" aria-disabled="true" onclick="return false;">
+        <h2>Coming Soon</h2>
+        <p>More practice modes</p>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Apply saved theme
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        const prefs = JSON.parse(localStorage.getItem('qr_prefs') || '{}');
+        const theme = prefs.theme || 'dark';
+        document.body.setAttribute('data-theme', theme);
+      } catch { document.body.setAttribute('data-theme', 'dark'); }
+    });
+  </script>
+</body>
+</html>
+

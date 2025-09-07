@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tajwid Mushaf — Pages</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicons/favicon.svg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    /* Picker styles, similar to Quran list */
+    .picker { max-width: 1000px; margin: 12px auto 0; padding: 0 20px; }
+    .picker .head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+    .picker .grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .picker .block { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; text-decoration: none; color: var(--text); }
+    .picker .block:hover { outline: 2px solid var(--ring); }
+    .picker .names { display: flex; flex-direction: column; }
+    .picker .id { width: 40px; text-align: center; font-weight: 600; color: var(--text-dim); }
+    .picker .en { font-weight: 600; }
+    .picker .ar { font-family: 'Amiri Quran', serif; color: var(--muted); font-size: 20px; }
+    .picker .search { width: 100%; padding: 10px 12px; border-radius: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .segmented { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; gap: 4px; }
+    .segmented button { border: 0; background: transparent; color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+    .segmented button[aria-pressed="true"] { background: var(--bg); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <a href="index.html" class="btn secondary" style="text-decoration:none">← Home</a>
+      <h1>Tajwid Mushaf</h1>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn secondary" title="Back to menu">Menu</a>
+    </div>
+  </header>
+
+  <nav class="toolbar">
+    <div class="row" id="player" aria-label="Page audio player">
+      <div class="actions" style="margin-left:0; gap: 10px;">
+        <button id="prev-ayah" class="btn secondary" title="Previous ayah">⏮ Prev</button>
+        <button id="play-pause" class="btn primary" title="Play or pause">▶ Play</button>
+        <button id="next-ayah" class="btn secondary" title="Next ayah">⏭ Next</button>
+      </div>
+      <div id="player-info" class="status" style="margin-left:12px;">Not loaded</div>
+    </div>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+  </nav>
+
+  <!-- Picker panel: Surah/Juz/Hizb -->
+  <section id="picker" class="picker">
+    <div class="head">
+      <div class="segmented" role="tablist" aria-label="List type">
+        <button id="pk-surahs" role="tab" aria-selected="true" aria-pressed="true">Surahs</button>
+        <button id="pk-juz" role="tab" aria-selected="false" aria-pressed="false">Juz</button>
+        <button id="pk-hizb" role="tab" aria-selected="false" aria-pressed="false">Hizb</button>
+      </div>
+      <input id="pk-filter" class="search" placeholder="Search by number or name..." />
+    </div>
+    <div id="pk-list" class="grid" role="list"></div>
+  </section>
+
+  <main class="mushaf-wrap">
+    <canvas id="mushaf-canvas" class="mushaf-img" style="display:none;"></canvas>
+    <img id="mushaf-img" class="mushaf-img" alt="Quran page" style="display:none;" />
+    <div id="quran-display" class="mushaf-text" hidden></div>
+    <button id="nav-prev" class="nav-arrow left" title="Previous page" aria-label="Previous page">◀</button>
+    <button id="nav-next" class="nav-arrow right" title="Next page" aria-label="Next page">▶</button>
+  </main>
+  <audio id="audio" preload="none"></audio>
+
+  <script src="../js/mushaf.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // theme init from saved prefs
+      try { const prefs = JSON.parse(localStorage.getItem('qr_prefs')||'{}'); const t = prefs.theme || 'dark'; document.body.setAttribute('data-theme', t); } catch { document.body.setAttribute('data-theme', 'dark'); }
+      // keep toolbar/header visible for navigation
+    });
+  </script>
+</body>
+</html>

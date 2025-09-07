@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Juz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicons/favicon.svg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .list-shell { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+    .list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    .block { display: block; text-decoration: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; color: var(--text); text-align: center; }
+    .block:hover { outline: 2px solid var(--ring); }
+    .block h2 { margin: 0 0 6px; font-size: 18px; }
+    .block p { margin: 0; color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <a href="index.html" class="btn secondary" style="text-decoration:none">← Home</a>
+      <h1>All Juz</h1>
+    </div>
+    <div class="header-actions"></div>
+  </header>
+
+  <main class="list-shell">
+    <div id="list" class="list-grid" role="list"></div>
+  </main>
+
+  <script>
+    const list = document.getElementById('list');
+    function render() {
+      const frag = document.createDocumentFragment();
+      for (let i = 1; i <= 30; i++) {
+        const a = document.createElement('a');
+        a.href = `reader.html?juz=${i}`;
+        a.className = 'block';
+        a.setAttribute('role', 'listitem');
+        a.innerHTML = `<h2>Juz ${i}</h2><p>Click to open (range view coming soon)</p>`;
+        frag.appendChild(a);
+      }
+      list.replaceChildren(frag);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      try { const prefs = JSON.parse(localStorage.getItem('qr_prefs')||'{}'); const t = prefs.theme || 'dark'; document.body.setAttribute('data-theme', t); } catch { document.body.setAttribute('data-theme', 'dark'); }
+      render();
+    });
+  </script>
+</body>
+</html>

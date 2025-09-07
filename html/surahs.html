@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quran</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicons/favicon.svg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .list-shell { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+    .list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 12px; flex-wrap: wrap; }
+    .list-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .block { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; text-decoration: none; color: var(--text); }
+    .block:hover { outline: 2px solid var(--ring); }
+    .block .names { display: flex; flex-direction: column; }
+    .block .id { width: 40px; text-align: center; font-weight: 600; color: var(--text-dim); }
+    .block .en { font-weight: 600; }
+    .block .ar { font-family: 'Amiri Quran', serif; color: var(--muted); font-size: 20px; }
+    .search { width: 100%; padding: 10px 12px; border-radius: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+    .segmented { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; gap: 4px; }
+    .segmented button { border: 0; background: transparent; color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+    .segmented button[aria-pressed="true"] { background: var(--bg); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <a href="index.html" class="btn secondary" style="text-decoration:none">â† Home</a>
+      
+      <h1>Quran</h1>
+    </div>
+    <div class="header-actions"><button id="view-toggle" class="btn secondary" title="Toggle Reader/Mushaf view">Mushaf</button></div>
+  </header>
+
+  <main class="list-shell">
+    <div class="list-head">
+      <div class="segmented" role="tablist" aria-label="List type">
+        <button id="tab-surahs" role="tab" aria-selected="true" aria-pressed="true">Surahs</button>
+        <button id="tab-juz" role="tab" aria-selected="false" aria-pressed="false">Juz</button>
+        <button id="tab-hizb" role="tab" aria-selected="false" aria-pressed="false">Hizb</button>
+      </div>
+      <input id="filter" class="search" placeholder="Search by number or name..." />
+    </div>
+    <div id="list" class="list-grid" role="list"></div>
+  </main>
+
+  <script>
+    const API_BASE = 'https://api.quran.com/api/v4';
+    const listEl = document.getElementById('list');
+    const filterEl = document.getElementById('filter');
+    const tabSurahs = document.getElementById('tab-surahs');
+    const tabJuz = document.getElementById('tab-juz');
+    const tabHizb = document.getElementById('tab-hizb');
+    const viewToggle = document.getElementById('view-toggle');
+    const MODE_KEY = 'quran_list_mode';
+    const VIEW_KEY = 'qr_view_mode'; // 'reader' | 'mushaf'
+    let mode = 'surahs'; // 'surahs' | 'juz' | 'hizb'
+    let chapters = [];
+    let viewMode = 'reader';
+
+    function loadViewMode(){
+      try { const v = (localStorage.getItem(VIEW_KEY)||'').toLowerCase(); if (v==='reader'||v==='mushaf') viewMode=v; } catch {}
+      updateViewToggle();
+    }
+    function saveViewMode(){ try { localStorage.setItem(VIEW_KEY, viewMode); } catch {} }
+    function toggleView(){ viewMode = (viewMode==='reader') ? 'mushaf' : 'reader'; saveViewMode(); updateViewToggle(); renderAccordingToMode(); }
+    function updateViewToggle(){ if(viewToggle){ viewToggle.textContent = (viewMode==='reader') ? 'Mushaf' : 'Reader'; } }
+    function targetHref(query){
+      const base = (viewMode==='mushaf') ? 'mushaf.html' : 'reader.html';
+      return `${base}?${query}`;
+    }
+    function renderAccordingToMode(){
+      if (mode === 'surahs') renderSurahs(filterEl.value);
+      else if (mode === 'juz') renderJuz();
+      else renderHizb();
+    }
+
+    function renderSurahs(filter='') {
+      const term = (filter||'').trim().toLowerCase();
+      const norm = s => (s||'').toString().toLowerCase();
+      const frag = document.createDocumentFragment();
+      (chapters||[]).filter(ch => {
+        if (!term) return true;
+        return norm(ch.id).startsWith(term) || norm(ch.name_simple).includes(term) || norm(ch.name_arabic).includes(term);
+      }).forEach(ch => {
+        const a = document.createElement('a');
+        a.className = 'block';
+        a.href = targetHref(`surah=${ch.id}&mode=surahs`);
+        a.setAttribute('role', 'listitem');
+
+        const id = document.createElement('div');
+        id.className = 'id';
+        id.textContent = ch.id;
+
+        const names = document.createElement('div');
+        names.className = 'names';
+        const en = document.createElement('div');
+        en.className = 'en';
+        en.textContent = ch.name_simple;
+        const ar = document.createElement('div');
+        ar.className = 'ar';
+        ar.textContent = ch.name_arabic;
+        names.appendChild(en);
+        names.appendChild(ar);
+
+        a.appendChild(id);
+        a.appendChild(names);
+        frag.appendChild(a);
+      });
+      listEl.replaceChildren(frag);
+    }
+    function renderJuz() {
+      const frag = document.createDocumentFragment();
+      for (let i = 1; i <= 30; i++) {
+        const a = document.createElement('a');
+        a.href = targetHref(`juz=${i}&mode=juz`);
+        a.className = 'block';
+        a.setAttribute('role', 'listitem');
+        const id = document.createElement('div');
+        id.className = 'id';
+        id.textContent = i;
+        const names = document.createElement('div');
+        names.className = 'names';
+        const en = document.createElement('div');
+        en.className = 'en';
+        en.textContent = `Juz ${i}`;
+        const ar = document.createElement('div');
+        ar.className = 'ar';
+        ar.textContent = '';
+        names.appendChild(en);
+        names.appendChild(ar);
+        a.appendChild(id);
+        a.appendChild(names);
+        frag.appendChild(a);
+      }
+      listEl.replaceChildren(frag);
+    }
+    function renderHizb() {
+      const frag = document.createDocumentFragment();
+      for (let i = 1; i <= 60; i++) {
+        const a = document.createElement('a');
+        a.href = targetHref(`hizb=${i}&mode=hizb`);
+        a.className = 'block';
+        a.setAttribute('role', 'listitem');
+        const id = document.createElement('div');
+        id.className = 'id';
+        id.textContent = i;
+        const names = document.createElement('div');
+        names.className = 'names';
+        const en = document.createElement('div');
+        en.className = 'en';
+        en.textContent = `Hizb ${i}`;
+        const ar = document.createElement('div');
+        ar.className = 'ar';
+        ar.textContent = '';
+        names.appendChild(en);
+        names.appendChild(ar);
+        a.appendChild(id);
+        a.appendChild(names);
+        frag.appendChild(a);
+      }
+      listEl.replaceChildren(frag);
+    }
+    function setMode(next) {
+      mode = next;
+      const setPressed = (btn, on) => { if (!btn) return; btn.setAttribute('aria-pressed', on ? 'true' : 'false'); btn.setAttribute('aria-selected', on ? 'true' : 'false'); };
+      setPressed(tabSurahs, mode === 'surahs');
+      setPressed(tabJuz, mode === 'juz');
+      setPressed(tabHizb, mode === 'hizb');
+      if (filterEl) filterEl.style.display = (mode === 'surahs') ? 'block' : 'none';
+      try { localStorage.setItem(MODE_KEY, mode); } catch {}
+      try {
+        const url = new URL(location.href);
+        url.searchParams.set('mode', mode);
+        history.replaceState(null, '', url);
+      } catch {}
+      if (mode === 'surahs') renderSurahs(filterEl.value);
+      else if (mode === 'juz') renderJuz();
+      else renderHizb();
+    }
+
+    async function load() {
+      try {
+        const res = await fetch(`${API_BASE}/chapters?language=en`);
+        const data = await res.json();
+        chapters = data.chapters || [];
+        const params = new URLSearchParams(location.search);
+        const urlMode = (params.get('mode')||'').toLowerCase();
+        let initial = 'surahs';
+        if (["surahs","juz","hizb"].includes(urlMode)) initial = urlMode;
+        else {
+          try {
+            const saved = localStorage.getItem(MODE_KEY) || '';
+            if (["surahs","juz","hizb"].includes(saved)) initial = saved;
+          } catch {}
+        }
+        loadViewMode();
+        setMode(initial);
+      } catch (e) {
+        listEl.textContent = 'Failed to load chapters. Check your connection.';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!document.body.getAttribute('data-theme')) document.body.setAttribute('data-theme', 'dark');
+      load();
+    });
+    filterEl.addEventListener('input', () => { if (mode === 'surahs') renderSurahs(filterEl.value); });
+    tabSurahs.addEventListener('click', () => setMode('surahs'));
+    tabJuz.addEventListener('click', () => setMode('juz'));
+    tabHizb.addEventListener('click', () => setMode('hizb'));
+    if (viewToggle) viewToggle.addEventListener('click', toggleView);
+    // Apply saved theme (no toggle here; use Settings on home)
+    try { const prefs = JSON.parse(localStorage.getItem('qr_prefs')||'{}'); if (prefs.theme) document.body.setAttribute('data-theme', prefs.theme); } catch {}
+  </script>
+</body>
+</html>
+

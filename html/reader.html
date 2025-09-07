@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quran Reviser — Reader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" href="../favicons/favicon.svg">
+    <link rel="stylesheet" href="../css/styles.css">
+    <meta name="description" content="Beautiful Quran viewer with tajweed colors, audio, and translations.">
+    <meta name="theme-color" content="#0f172a">
+    <style>
+      .back-link { text-decoration: none; color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px; }
+      .back-link:hover { background: var(--bg); }
+    </style>
+    <script>
+      // Redirect old deep links if someone still hits index.html?surah=... later
+    </script>
+    
+    
+</head>
+<body>
+    <header class="app-header">
+        <div class="brand">
+            <a href="index.html" class="back-link" aria-label="Back to home">← Home</a>
+            <h1>Quran Reviser</h1>
+        </div>
+        <div class="header-actions"></div>
+    </header>
+
+    <nav class="toolbar" id="reader-toolbar">
+        <div class="row" id="player" aria-label="Surah audio player">
+            <div class="actions" style="margin-left:0; gap: 10px;">
+                <button id="prev-ayah" class="btn secondary" title="Previous ayah">⏮ Prev</button>
+                <button id="play-pause" class="btn primary" title="Play or pause">▶ Play</button>
+                <button id="next-ayah" class="btn secondary" title="Next ayah">⏭ Next</button>
+            </div>
+            <div id="player-info" class="status" style="margin-left:12px;">Not loaded</div>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+    </nav>
+
+    <main id="quran-display" class="quran"></main>
+
+    <audio id="audio" preload="none"></audio>
+
+    <script src="../js/script.js"></script>
+    <script>/* inline boot removed; handled in script.js */</script>
+</body>
+</html>

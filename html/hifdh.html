@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hifdh Progress</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicons/favicon.svg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .wrap { max-width: 1000px; margin: 20px auto; padding: 0 20px; display: grid; gap: 16px; }
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+    .card h2 { margin: 0 0 10px; font-size: 18px; }
+    .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .muted { color: var(--muted); font-size: 14px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+    .stat { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+    .stat .k { color: var(--muted); font-size: 12px; }
+    .stat .v { font-weight: 600; font-size: 16px; }
+    .list { display: grid; gap: 10px; max-height: 60vh; overflow: auto; padding-right: 4px; }
+    .surah { display: grid; grid-template-columns: 44px 1fr 320px; gap: 10px; align-items: center; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 10px 12px; }
+    .sid { width: 44px; text-align: center; font-weight: 600; color: var(--text-dim); }
+    .names { display: flex; flex-direction: column; }
+    .names .en { font-weight: 600; }
+    .names .ar { font-family: 'Amiri Quran', serif; color: var(--muted); font-size: 18px; }
+    .ctrls { display: grid; gap: 6px; }
+    .ctrls .top { display: flex; align-items: center; gap: 8px; }
+    .ctrls .top .perc { min-width: 70px; text-align: right; }
+    .ctrls input[type="range"] { width: 100%; }
+    .quick { display: flex; gap: 6px; }
+    .quick button { cursor: pointer; border-radius: 8px; border: 1px solid var(--border); padding: 6px 10px; background: var(--bg); color: var(--text); font-size: 12px; }
+    .quick button:hover { filter: brightness(1.05); }
+    .calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+    .field { display: grid; gap: 6px; }
+    .field input { padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+    .field select { padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+    .sep { height: 1px; background: var(--border); margin: 8px 0; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <a href="index.html" class="btn secondary" style="text-decoration:none">Home</a>
+      <h1>Hifdh Progress</h1>
+    </div>
+    <div class="header-actions">
+      <a href="surahs.html" class="btn secondary">Quran List</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card" id="summary">
+      <h2>Summary</h2>
+      <div class="stats">
+        <div class="stat"><div class="k">Total Ayah Memorized</div><div class="v" id="s-ayah">0</div></div>
+        <div class="stat"><div class="k">Overall Progress</div><div class="v" id="s-perc">0%</div></div>
+        <div class="stat"><div class="k">Approx Pages Memorized</div><div class="v" id="s-pages">0 / 604</div></div>
+        <div class="stat"><div class="k">Pages Left</div><div class="v" id="s-left">604</div></div>
+      </div>
+      <div class="muted" style="margin-top:8px;">Pages are approximated proportionally unless per-surah page data is available.</div>
+    </section>
+
+    <section class="card">
+      <h2>Your Surahs</h2>
+      <div class="row" style="justify-content: space-between;">
+        <div class="muted">Slide to set ayah memorized per surah. Quick-sets: 0/25/50/75/100%.</div>
+        <div>
+          <button class="btn secondary" id="reset-progress">Reset All</button>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div id="list" class="list"></div>
+    </section>
+
+    <section class="card">
+      <h2>Hifdh Calculator</h2>
+      <div class="calc-grid">
+        <div class="field">
+          <label class="muted">Use current progress</label>
+          <select id="calc-mode">
+            <option value="current" selected>Current tracked progress</option>
+            <option value="custom">Custom % progress</option>
+          </select>
+        </div>
+        <div class="field" id="custom-progress-field" hidden>
+          <label class="muted">Custom progress (%)</label>
+          <input id="custom-progress" type="number" min="0" max="100" value="0">
+        </div>
+        <div class="field">
+          <label class="muted">Memorization rate (pages/day)</label>
+          <input id="rate-pages" type="number" min="0.1" step="0.1" value="1">
+        </div>
+        <div class="field">
+          <label class="muted">Minutes per page (optional)</label>
+          <input id="mins-per-page" type="number" min="1" step="1" value="20">
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="stats">
+        <div class="stat"><div class="k">Pages Left</div><div class="v" id="c-pages-left">0</div></div>
+        <div class="stat"><div class="k">Days to Finish</div><div class="v" id="c-days">0</div></div>
+        <div class="stat"><div class="k">Finish Date</div><div class="v" id="c-date">—</div></div>
+        <div class="stat"><div class="k">Total Time</div><div class="v" id="c-time">—</div></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="../js/hifdh.js"></script>
+</body>
+</html>
+
