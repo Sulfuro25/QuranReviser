@@ -48,6 +48,10 @@ body {
 .brand h1 { font-size: 18px; font-weight: 600; margin: 0; }
 .header-actions { display: flex; gap: 8px; }
 
+/* Back link helper */
+.back-link { text-decoration: none; border-radius: 8px; border: 1px solid var(--border); padding: 8px 10px; color: var(--text); }
+.back-link:hover { background: var(--bg); }
+
 .toolbar { padding: 14px 20px; border-bottom: 1px solid var(--border); background: var(--surface); }
 .toolbar .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
 .toolbar label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--muted); }
@@ -63,7 +67,40 @@ body {
 .toolbar .grow { flex: 1 1 320px; }
 
 /* player */
-#player { justify-content: center; }
+/* Improve layout and spacing for the Reader/Mushaf toolbar */
+#player {
+  display: flex !important;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+}
+#player .actions { display: inline-flex; gap: 8px; justify-content: center; }
+#page-nav { display: inline-flex; align-items: center; gap: 10px; justify-content: center; }
+#page-nav #page-info { min-width: 88px; text-align: center; }
+#page-nav .btn { min-width: 96px; }
+#player-info { margin-left: 0 !important; text-align: center; }
+@media (max-width: 720px) {
+  #player { gap: 10px; }
+}
+
+/* Right slide-out drawer for controls */
+.drawer {
+  position: fixed;
+  top: 0; right: 0; height: 100vh; width: min(420px, 92vw);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  box-shadow: -6px 0 20px rgba(0,0,0,.35);
+  transform: translateX(100%);
+  transition: transform .25s ease;
+  z-index: 20;
+  display: flex; flex-direction: column;
+}
+.drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.drawer-head h2 { margin: 0; font-size: 16px; }
+.drawer-body { padding: 16px; }
+.drawer-open #control-drawer { transform: translateX(0); }
+.drawer-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 19; }
+.drawer-open #drawer-backdrop { display: block; background: transparent; }
 
 .btn { cursor: pointer; border-radius: 10px; border: 1px solid var(--border); padding: 10px 14px; background: var(--bg); color: var(--text); }
 .btn.primary { background: var(--primary); color: #0d1b1f; border-color: transparent; }
@@ -71,6 +108,25 @@ body {
 .btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 
 /* legend removed */
+/* Shared lists/cards */
+.list-shell { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+.list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 12px; flex-wrap: wrap; }
+.list-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.block { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; text-decoration: none; color: var(--text); }
+.block:hover { outline: 2px solid var(--ring); }
+.block .names { display: flex; flex-direction: column; }
+.block .id { width: 40px; text-align: center; font-weight: 600; color: var(--text-dim); }
+.block .en { font-weight: 600; }
+.block .ar { font-family: 'Amiri Quran', serif; color: var(--muted); font-size: 20px; }
+.search { width: 100%; padding: 10px 12px; border-radius: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+.segmented { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; gap: 4px; }
+.segmented button { border: 0; background: transparent; color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+.segmented button[aria-pressed="true"] { background: var(--bg); font-weight: 600; }
+
+/* Generic card */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.muted { color: var(--muted); }
+.row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
 .status { margin-top: 6px; color: var(--muted); font-size: 12px; }
 
@@ -96,7 +152,7 @@ body.mushaf-clean .toolbar { display: none !important; }
 .icon-btn { cursor: pointer; background: transparent; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 12px; }
 .icon-btn:hover { background: var(--bg); }
 .arabic { font-family: 'Amiri Quran', serif; font-size: var(--arabic-size, 36px); line-height: 1.9; display: block; }
-.translation { direction: ltr; margin-top: 10px; color: var(--text-dim); font-size: 16px; line-height: 1.6; }
+.translation { direction: ltr; margin-top: 10px; color: var(--text-dim); font-size: var(--translation-size, 16px); line-height: 1.6; }
 .end { opacity: 0.8; font-size: 0.7em; padding: 0 6px; }
 
 /* Tajweed CSS classes with colors (QDC compatible) */
@@ -121,4 +177,14 @@ tajweed.laa_shamsiyah, tajweed.laam_shamsiyah { color: #22c55e; }
 /* Responsive design */
 @media (max-width: 720px) {
   .arabic { font-size: 28px; }
+}
+
+/* Reader follow mode highlight */
+.verse.active { outline: 2px solid var(--ring); border-color: var(--ring); }
+
+/* Reader mode: disable tajweed coloring */
+body.reader-no-tajweed tajweed,
+body.reader-no-tajweed tajweed * {
+  color: inherit !important;
+  font-weight: inherit !important;
 }

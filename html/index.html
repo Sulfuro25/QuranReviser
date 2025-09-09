@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran Reviser â€” Home</title>
+  <title>Quran Reviser — Home</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@
 <body>
   <header class="app-header">
     <div class="brand">
-      <span class="logo">ï·½</span>
+      <span class="logo">Q</span>
       <h1>Quran Reviser</h1>
     </div>
     <div class="header-actions">
@@ -53,7 +53,7 @@
       
       <a class="menu-card" href="juz.html">
         <h2>Juz</h2>
-        <p>30 Juzâ€™ in order</p>
+        <p>30 Juz’ in order</p>
       </a>
       <a class="menu-card" href="hizb.html">
         <h2>Hizb</h2>
@@ -66,16 +66,7 @@
     </div>
   </main>
 
-  <script>
-    // Apply saved theme
-    document.addEventListener('DOMContentLoaded', () => {
-      try {
-        const prefs = JSON.parse(localStorage.getItem('qr_prefs') || '{}');
-        const theme = prefs.theme || 'dark';
-        document.body.setAttribute('data-theme', theme);
-      } catch { document.body.setAttribute('data-theme', 'dark'); }
-    });
-  </script>
+  <script src="../js/init-theme.js"></script>
 </body>
 </html>
 

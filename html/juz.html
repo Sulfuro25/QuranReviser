@@ -21,7 +21,7 @@
 <body>
   <header class="app-header">
     <div class="brand">
-      <a href="index.html" class="btn secondary" style="text-decoration:none">← Home</a>
+      <a href="index.html" class="back-link" style="text-decoration:none">Home</a>
       <h1>All Juz</h1>
     </div>
     <div class="header-actions"></div>
@@ -31,24 +31,7 @@
     <div id="list" class="list-grid" role="list"></div>
   </main>
 
-  <script>
-    const list = document.getElementById('list');
-    function render() {
-      const frag = document.createDocumentFragment();
-      for (let i = 1; i <= 30; i++) {
-        const a = document.createElement('a');
-        a.href = `reader.html?juz=${i}`;
-        a.className = 'block';
-        a.setAttribute('role', 'listitem');
-        a.innerHTML = `<h2>Juz ${i}</h2><p>Click to open (range view coming soon)</p>`;
-        frag.appendChild(a);
-      }
-      list.replaceChildren(frag);
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-      try { const prefs = JSON.parse(localStorage.getItem('qr_prefs')||'{}'); const t = prefs.theme || 'dark'; document.body.setAttribute('data-theme', t); } catch { document.body.setAttribute('data-theme', 'dark'); }
-      render();
-    });
-  </script>
+  <script src="../js/init-theme.js"></script>
+  <script src="../js/juz.js"></script>
 </body>
 </html>

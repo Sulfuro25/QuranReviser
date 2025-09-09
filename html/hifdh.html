@@ -42,7 +42,7 @@
 <body>
   <header class="app-header">
     <div class="brand">
-      <a href="index.html" class="btn secondary" style="text-decoration:none">Home</a>
+      <a href="index.html" class="back-link" style="text-decoration:none">Home</a>
       <h1>Hifdh Progress</h1>
     </div>
     <div class="header-actions">
@@ -78,15 +78,25 @@
       <h2>Hifdh Calculator</h2>
       <div class="calc-grid">
         <div class="field">
-          <label class="muted">Use current progress</label>
-          <select id="calc-mode">
-            <option value="current" selected>Current tracked progress</option>
-            <option value="custom">Custom % progress</option>
+          <label class="muted">Scope</label>
+          <select id="calc-scope">
+            <option value="all" selected>All (current tracked)</option>
+            <option value="surahs">Selected Surahs</option>
+            <option value="juz">Juz</option>
+            <option value="hizb">Hizb</option>
           </select>
         </div>
-        <div class="field" id="custom-progress-field" hidden>
-          <label class="muted">Custom progress (%)</label>
-          <input id="custom-progress" type="number" min="0" max="100" value="0">
+        <div class="field" id="scope-surahs-field" hidden>
+          <label class="muted">Surahs (e.g., 1, 36, 67-70)</label>
+          <input id="scope-surahs-input" type="text" placeholder="1, 36, 67-70">
+        </div>
+        <div class="field" id="scope-juz-field" hidden>
+          <label class="muted">Juz number</label>
+          <input id="scope-juz-input" type="number" min="1" max="30" step="1">
+        </div>
+        <div class="field" id="scope-hizb-field" hidden>
+          <label class="muted">Hizb number</label>
+          <input id="scope-hizb-input" type="number" min="1" max="60" step="1">
         </div>
         <div class="field">
           <label class="muted">Memorization rate (pages/day)</label>
@@ -101,12 +111,13 @@
       <div class="stats">
         <div class="stat"><div class="k">Pages Left</div><div class="v" id="c-pages-left">0</div></div>
         <div class="stat"><div class="k">Days to Finish</div><div class="v" id="c-days">0</div></div>
-        <div class="stat"><div class="k">Finish Date</div><div class="v" id="c-date">—</div></div>
-        <div class="stat"><div class="k">Total Time</div><div class="v" id="c-time">—</div></div>
+        <div class="stat"><div class="k">Finish Date</div><div class="v" id="c-date">-</div></div>
+        <div class="stat"><div class="k">Total Time</div><div class="v" id="c-time">-</div></div>
       </div>
     </section>
   </main>
 
+  <script src="../js/chapters-data.js"></script>
   <script src="../js/hifdh.js"></script>
 </body>
 </html>
