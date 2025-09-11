@@ -67,6 +67,98 @@ async function computeCoveredPagesSet(){
   return set;
 }
 
+// Parse ranges like: "1, 36, 67-70" with a max bound
+function parseRangeList(input, max){
+  if (!input || typeof input !== 'string') return [];
+  const out = new Set();
+  input.split(',').map(s => s.trim()).filter(Boolean).forEach(chunk => {
+    const m = chunk.match(/^([0-9]{1,3})(?:\s*-\s*([0-9]{1,3}))?$/);
+    if (!m) return;
+    const a = Math.max(1, Math.min(max, parseInt(m[1],10)||0));
+    const b = m[2] ? Math.max(1, Math.min(max, parseInt(m[2],10)||0)) : a;
+    const start = Math.min(a,b), end = Math.max(a,b);
+    for(let i=start;i<=end;i++) out.add(i);
+  });
+  return Array.from(out.values()).sort((x,y)=>x-y);
+}
+
+// Cached helpers for Juz/Hizb pages (as sets)
+const juzPagesCache = new Map(); // j -> Set(pages)
+const hizbPagesCache = new Map(); // h -> Set(pages)
+
+async function fetchVersesPaged(urlBase){
+  try {
+    const firstRes = await fetch(`${urlBase}&page=1`);
+    const first = await firstRes.json();
+    const totalPages = (first && first.pagination && first.pagination.total_pages) ? first.pagination.total_pages : 1;
+    const allVerses = Array.isArray(first.verses) ? first.verses.slice() : [];
+    const tasks = [];
+    for(let p=2; p<=totalPages; p++){
+      tasks.push(fetch(`${urlBase}&page=${p}`).then(r=>r.json()).then(d=>{ if (Array.isArray(d.verses)) allVerses.push(...d.verses); }).catch(()=>{}));
+    }
+    if (tasks.length) await Promise.all(tasks);
+    return allVerses;
+  } catch { return []; }
+}
+
+async function getJuzPages(j){
+  const jj = Math.max(1, Math.min(30, parseInt(String(j),10)||0));
+  if (juzPagesCache.has(jj)) return juzPagesCache.get(jj);
+  try {
+    const cached = JSON.parse(localStorage.getItem(`qr_juz_pages_${jj}`)||'null');
+    if (cached && Array.isArray(cached)) { const s = new Set(cached.filter(p=>p>=1&&p<=604)); juzPagesCache.set(jj, s); return s; }
+  } catch {}
+  const verses = await fetchVersesPaged(`${API_BASE}/verses/by_juz/${jj}?per_page=300&words=false`);
+  const pages = new Set(verses.map(v=>v && v.page_number).filter(p=>typeof p==='number' && p>=1 && p<=604));
+  juzPagesCache.set(jj, pages);
+  try { localStorage.setItem(`qr_juz_pages_${jj}`, JSON.stringify(Array.from(pages))); } catch {}
+  return pages;
+}
+
+async function getHizbPages(h){
+  const hh = Math.max(1, Math.min(60, parseInt(String(h),10)||0));
+  if (hizbPagesCache.has(hh)) return hizbPagesCache.get(hh);
+  try {
+    const cached = JSON.parse(localStorage.getItem(`qr_hizb_pages_${hh}`)||'null');
+    if (cached && Array.isArray(cached)) { const s = new Set(cached.filter(p=>p>=1&&p<=604)); hizbPagesCache.set(hh, s); return s; }
+  } catch {}
+  const verses = await fetchVersesPaged(`${API_BASE}/verses/by_hizb/${hh}?per_page=300&words=false`);
+  const pages = new Set(verses.map(v=>v && v.page_number).filter(p=>typeof p==='number' && p>=1 && p<=604));
+  hizbPagesCache.set(hh, pages);
+  try { localStorage.setItem(`qr_hizb_pages_${hh}`, JSON.stringify(Array.from(pages))); } catch {}
+  return pages;
+}
+
+async function computeScopePagesSet(){
+  const kind = els.calcScope ? els.calcScope.value : 'all';
+  if (kind === 'all'){
+    // In 'all', scope is the entire mushaf
+    const s = new Set(); for(let p=1;p<=604;p++) s.add(p); return s;
+  }
+  if (kind === 'surahs'){
+    const ids = parseRangeList(els.scopeSurahsInput && els.scopeSurahsInput.value || '', 114);
+    const set = new Set();
+    await Promise.all(ids.map(async sid => {
+      const pagesArr = await getSurahPageNumbers(sid);
+      pagesArr.forEach(p=>{ if(p>=1 && p<=604) set.add(p); });
+    }));
+    return set;
+  }
+  if (kind === 'juz'){
+    const js = parseRangeList(els.scopeJuzInput && els.scopeJuzInput.value || '', 30);
+    const set = new Set();
+    for (const j of js){ const s = await getJuzPages(j); s.forEach(p=>set.add(p)); }
+    return set;
+  }
+  if (kind === 'hizb'){
+    const hs = parseRangeList(els.scopeHizbInput && els.scopeHizbInput.value || '', 60);
+    const set = new Set();
+    for (const h of hs){ const s = await getHizbPages(h); s.forEach(p=>set.add(p)); }
+    return set;
+  }
+  return new Set();
+}
+
 function makeSurahRow(ch){
   const row = document.createElement('div'); row.className='surah'; row.dataset.sid=String(ch.id);
   const sid = document.createElement('div'); sid.className='sid'; sid.textContent = ch.id;
@@ -111,8 +203,17 @@ async function updateSummary(){
 }
 
 async function updateCalculator(){
-  const set = await computeCoveredPagesSet();
-  const pagesLeft = Math.max(0, 604 - set.size);
+  const kind = els.calcScope ? els.calcScope.value : 'all';
+  let pagesLeft = 0;
+  if (kind === 'all'){
+    // Use fine-grained tracked progress
+    const covered = await computeCoveredPagesSet();
+    pagesLeft = Math.max(0, 604 - covered.size);
+  } else {
+    // Treat selected units as already memorized (full units)
+    const covered = await computeScopePagesSet();
+    pagesLeft = Math.max(0, 604 - covered.size);
+  }
   const rate = Math.max(0, parseFloat(els.ratePages && els.ratePages.value || '0')) || 0;
   if (els.cPagesLeft) els.cPagesLeft.textContent = String(pagesLeft);
   if (rate <= 0){ if (els.cDays) els.cDays.textContent = '-'; if (els.cDate) els.cDate.textContent = '-'; if (els.cTime) els.cTime.textContent = '-'; return; }
@@ -132,11 +233,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   await updateSummary();
   await updateCalculator();
   if (els.reset) els.reset.addEventListener('click', async () => { if (confirm('Reset all memorization progress?')) { progress = {}; writeProgress(progress); render(); await updateSummary(); await updateCalculator(); } });
-  if (els.calcScope) els.calcScope.addEventListener('change', () => {
+  if (els.calcScope) els.calcScope.addEventListener('change', async () => {
     const v = els.calcScope.value;
     if (els.scopeSurahsField) els.scopeSurahsField.hidden = (v!=='surahs');
     if (els.scopeJuzField) els.scopeJuzField.hidden = (v!=='juz');
     if (els.scopeHizbField) els.scopeHizbField.hidden = (v!=='hizb');
+    await updateCalculator();
   });
-  ['input','change'].forEach(ev => { if (els.ratePages) els.ratePages.addEventListener(ev, ()=>updateCalculator()); if (els.minsPerPage) els.minsPerPage.addEventListener(ev, ()=>updateCalculator()); });
+  ['input','change'].forEach(ev => {
+    if (els.ratePages) els.ratePages.addEventListener(ev, ()=>updateCalculator());
+    if (els.minsPerPage) els.minsPerPage.addEventListener(ev, ()=>updateCalculator());
+    if (els.scopeSurahsInput) els.scopeSurahsInput.addEventListener(ev, ()=>updateCalculator());
+    if (els.scopeJuzInput) els.scopeJuzInput.addEventListener(ev, ()=>updateCalculator());
+    if (els.scopeHizbInput) els.scopeHizbInput.addEventListener(ev, ()=>updateCalculator());
+  });
 });

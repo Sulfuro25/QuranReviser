@@ -32,7 +32,8 @@ const state = {
   translationEnabled: false,
   translationId: 0,
   pageIndex: 0,
-  pageSize: 20,
+  pageSize: 20, // fallback when page_number is unavailable
+  pageNumbers: [], // sorted unique mushaf page numbers within current context
   isLoading: false,
   followMode: false,
 };
@@ -107,9 +108,24 @@ function applyTranslationFontSize(px) {
   document.documentElement.style.setProperty('--translation-size', px + 'px');
 }
 
+function recomputePageNumbers() {
+  try {
+    const pages = Array.from(new Set((state.verses || []).map(v => v && v.page_number).filter(p => typeof p === 'number' && p >= 1 && p <= 604))).sort((a, b) => a - b);
+    state.pageNumbers = pages;
+    if (state.pageIndex >= pages.length) state.pageIndex = Math.max(0, pages.length - 1);
+  } catch { state.pageNumbers = []; }
+}
+
 function getVisibleVerses() {
+  // Prefer strict mushaf page grouping when page_number is present
+  const pages = state.pageNumbers || [];
+  if (pages.length) {
+    const p = pages[Math.max(0, Math.min(state.pageIndex, pages.length - 1))];
+    return (state.verses || []).filter(v => v && v.page_number === p);
+  }
+  // Fallback to fixed-size paging if page_number unavailable
   const start = state.pageIndex * state.pageSize;
-  return state.verses.slice(start, start + state.pageSize);
+  return (state.verses || []).slice(start, start + state.pageSize);
 }
 
 
@@ -254,7 +270,8 @@ async function nextAyah() {
     return;
   }
   // Go to next page if available
-  if ((state.pageIndex + 1) * state.pageSize < state.verses.length) {
+  const hasPageGroups = (state.pageNumbers && state.pageNumbers.length > 0);
+  if ((hasPageGroups && state.pageIndex < state.pageNumbers.length - 1) || (!hasPageGroups && (state.pageIndex + 1) * state.pageSize < state.verses.length)) {
     state.pageIndex++;
     state.playIndex = 0;
     renderVerses();
@@ -299,8 +316,9 @@ async function prevAyah() {
     const cur = parseInt(state.currentContext.id, 10) || 0;
     if (cur > 1) {
       await loadSurah(cur - 1);
-      const pages = Math.max(1, Math.ceil(state.verses.length / state.pageSize));
-      state.pageIndex = pages - 1;
+      const hasPageGroups = (state.pageNumbers && state.pageNumbers.length > 0);
+      const pages = hasPageGroups ? state.pageNumbers.length : Math.max(1, Math.ceil(state.verses.length / state.pageSize));
+      state.pageIndex = Math.max(0, pages - 1);
       renderVerses();
       const lastIdx = Math.max(0, getVisibleVerses().length - 1);
       state.playIndex = lastIdx;
@@ -314,7 +332,9 @@ async function prevAyah() {
 
 async function nextPage() {
   const wasPlaying = els.audio && !els.audio.paused;
-  if ((state.pageIndex + 1) * state.pageSize < state.verses.length) {
+  const hasPageGroups = (state.pageNumbers && state.pageNumbers.length > 0);
+  const hasNext = hasPageGroups ? (state.pageIndex < state.pageNumbers.length - 1) : ((state.pageIndex + 1) * state.pageSize < state.verses.length);
+  if (hasNext) {
     if (els.audio) { els.audio.pause(); els.audio.currentTime = 0; els.audio.removeAttribute('src'); delete els.audio.dataset.current; }
     state.pageIndex++;
     state.playIndex = 0;
@@ -340,7 +360,8 @@ async function fetchVersesByRange(range, id, withTr) {
   const collected = [];
   let page = 1;
   while (true) {
-    const url = `${API_BASE}/verses/by_${range}/${id}?words=false&fields=text_uthmani&per_page=300&page=${page}${withTr ? `&translations=${state.translationId}` : ''}`;
+    // Include page_number to allow strict page grouping in reader view
+    const url = `${API_BASE}/verses/by_${range}/${id}?words=false&fields=text_uthmani,page_number&per_page=300&page=${page}${withTr ? `&translations=${state.translationId}` : ''}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`${range} HTTP ${res.status}`);
     const data = await res.json();
@@ -370,8 +391,9 @@ async function prevPage() {
     if (cur > 1) {
       if (els.audio) { els.audio.pause(); els.audio.currentTime = 0; els.audio.removeAttribute('src'); delete els.audio.dataset.current; }
       await loadSurah(cur - 1);
-      const pages = Math.max(1, Math.ceil(state.verses.length / state.pageSize));
-      state.pageIndex = pages - 1;
+      const hasPageGroups = (state.pageNumbers && state.pageNumbers.length > 0);
+      const pages = hasPageGroups ? state.pageNumbers.length : Math.max(1, Math.ceil(state.verses.length / state.pageSize));
+      state.pageIndex = Math.max(0, pages - 1);
       renderVerses();
       const lastIdx = Math.max(0, getVisibleVerses().length - 1);
       state.playIndex = lastIdx;
@@ -384,8 +406,10 @@ async function prevPage() {
 function renderVerses() {
   const verses = getVisibleVerses();
   const totalAll = state.verses.length;
-  const start = state.pageIndex * state.pageSize;
-  const end = start + verses.length;
+  const hasPageGroups = (state.pageNumbers && state.pageNumbers.length > 0);
+  const currentPageNumber = hasPageGroups ? state.pageNumbers[Math.max(0, Math.min(state.pageIndex, state.pageNumbers.length - 1))] : null;
+  const start = hasPageGroups ? 0 : (state.pageIndex * state.pageSize);
+  const end = hasPageGroups ? verses.length : (start + verses.length);
   if (!totalAll) { els.display.innerHTML = ''; updatePlayerInfo(); return; }
 
   const frag = document.createDocumentFragment();
@@ -435,11 +459,18 @@ function renderVerses() {
 
   els.display.innerHTML = '';
   els.display.appendChild(frag);
-  if (els.pageInfo) els.pageInfo.textContent = `${start + 1}-${end} / ${totalAll}`;
+  if (els.pageInfo) {
+    if (hasPageGroups && currentPageNumber) {
+      const localIndex = Math.max(0, Math.min(state.pageIndex, state.pageNumbers.length - 1)) + 1;
+      els.pageInfo.textContent = `Page ${currentPageNumber} (${localIndex}/${state.pageNumbers.length})`;
+    } else {
+      els.pageInfo.textContent = `${start + 1}-${end} / ${totalAll}`;
+    }
+  }
   const inSurah = state.currentContext && state.currentContext.type === 'surah';
   const curSid = inSurah ? parseInt(state.currentContext.id, 10) || 0 : 0;
-  const canPrev = (start > 0) || (inSurah && curSid > 1);
-  const canNext = (end < totalAll) || (inSurah && curSid < 114);
+  const canPrev = hasPageGroups ? (state.pageIndex > 0 || (inSurah && curSid > 1)) : ((start > 0) || (inSurah && curSid > 1));
+  const canNext = hasPageGroups ? (state.pageIndex < Math.max(0, state.pageNumbers.length - 1) || (inSurah && curSid < 114)) : ((end < totalAll) || (inSurah && curSid < 114));
   if (els.prevPage) els.prevPage.disabled = !canPrev;
   if (els.nextPage) els.nextPage.disabled = !canNext;
   state.playIndex = 0;
@@ -483,7 +514,8 @@ async function loadSurah(surahId) {
     await ensureTranslationSource();
     // Build URL to include translations inline when enabled + id present
     const withTr = state.translationEnabled && !!state.translationId;
-    const versesUrl = `${API_BASE}/verses/by_chapter/${surahId}?words=false&fields=text_uthmani&per_page=300${withTr ? `&translations=${state.translationId}` : ''}`;
+    // Include page_number so we can group strictly by mushaf page
+    const versesUrl = `${API_BASE}/verses/by_chapter/${surahId}?words=false&fields=text_uthmani,page_number&per_page=300${withTr ? `&translations=${state.translationId}` : ''}`;
     const [versesRes, audioMap] = await Promise.all([
       fetch(versesUrl).then(r => { if(!r.ok) throw new Error(`Verses HTTP ${r.status}`); return r.json(); }),
       fetchAudioMap(state.currentReciterId, surahId),
@@ -494,6 +526,7 @@ async function loadSurah(surahId) {
     state.translations = trMap || new Map();
     state.audioMap = audioMap;
     state.pageIndex = 0;
+    recomputePageNumbers();
     state.playIndex = 0;
     renderVerses();
     setStatus(`Loaded ${verses.length} ayah(s).`);
@@ -502,8 +535,8 @@ async function loadSurah(surahId) {
     alert('Failed to load data: ' + e.message);
     setStatus('Failed to load.');
   } finally { state.isLoading = false; }
-  // update mushaf link to this surah
-  if (els.toMushaf) els.toMushaf.href = `mushaf.html?surah=${surahId}`;
+  // update mushaf link to this surah (keep controls open on arrival)
+  if (els.toMushaf) els.toMushaf.href = `mushaf.html?surah=${surahId}&controls=open`;
 }
 
 async function loadJuz(juzNumber) {
@@ -523,13 +556,12 @@ async function loadJuz(juzNumber) {
     state.audioMap = audioMap;
     state.translations = trMap;
     state.pageIndex = 0;
+    recomputePageNumbers();
     state.playIndex = 0;
     renderVerses();
     setStatus(`Loaded Juz ${juzNumber} (${verses.length} ayah).`);
-    // Update Mushaf link to first verse's surah
-    const first = verses[0];
-    const sid = first && String(first.verse_key).split(':')[0];
-    if (els.toMushaf && sid) els.toMushaf.href = `mushaf.html?surah=${sid}`;
+    // Update Mushaf link to this Juz context (keep controls open on arrival)
+    if (els.toMushaf) els.toMushaf.href = `mushaf.html?juz=${juzNumber}&controls=open`;
   } catch (e) {
     console.error(e);
     alert('Failed to load Juz: ' + e.message);
@@ -552,12 +584,12 @@ async function loadHizb(hizbNumber) {
     state.audioMap = audioMap;
     state.translations = trMap;
     state.pageIndex = 0;
+    recomputePageNumbers();
     state.playIndex = 0;
     renderVerses();
     setStatus(`Loaded Hizb ${hizbNumber} (${verses.length} ayah).`);
-    const first = verses[0];
-    const sid = first && String(first.verse_key).split(':')[0];
-    if (els.toMushaf && sid) els.toMushaf.href = `mushaf.html?surah=${sid}`;
+    // Update Mushaf link to this Hizb context (keep controls open on arrival)
+    if (els.toMushaf) els.toMushaf.href = `mushaf.html?hizb=${hizbNumber}&controls=open`;
   } catch (e) {
     console.error(e);
     alert('Failed to load Hizb: ' + e.message);
@@ -642,6 +674,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
     if (backdrop) backdrop.addEventListener('click', closeDrawer);
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+    // Auto-open drawer on load if requested via query param
+    try {
+      const qp = new URLSearchParams(location.search);
+      const want = (qp.get('controls') || qp.get('drawer') || '').toLowerCase();
+      if (want === 'open' || want === '1' || want === 'true') openDrawer();
+    } catch {}
   } catch {}
   const params = new URLSearchParams(location.search);
   const surahParam = parseInt(params.get('surah') || '', 10);

@@ -30,6 +30,7 @@ const state = {
   playIndex: 0,
   reciterId: 7,
   imageProviders: [ { base: '../mushaf_pages/', exts: ['png'], padded: true } ],
+  ctx: null, // { type: 'surah'|'juz'|'hizb', id: number }
 };
 
 // Load saved reciter from shared preferences
@@ -163,7 +164,14 @@ async function loadPage(pageNum){
     if (els.display) { els.display.hidden = true; els.display.innerHTML = ''; }
     if (els.toReader && verses[0]) {
       const sid = String(verses[0].verse_key).split(':')[0];
-      els.toReader.href = 'reader.html?surah=' + sid;
+      // Prefer preserving initial context (juz/hizb) if present
+      if (state.ctx && state.ctx.type === 'juz') {
+        els.toReader.href = 'reader.html?juz=' + state.ctx.id + '&controls=open';
+      } else if (state.ctx && state.ctx.type === 'hizb') {
+        els.toReader.href = 'reader.html?hizb=' + state.ctx.id + '&controls=open';
+      } else {
+        els.toReader.href = 'reader.html?surah=' + sid + '&controls=open';
+      }
     }
     loadPageImage(pageNum);
     setStatus(`Loaded page ${pageNum}`);
@@ -176,6 +184,9 @@ async function initFromQuery(){
   const surahParam = parseInt(params.get('surah')||'', 10);
   const juzParam = parseInt(params.get('juz')||'', 10);
   const hizbParam = parseInt(params.get('hizb')||'', 10);
+  if (!Number.isNaN(juzParam) && juzParam >= 1 && juzParam <= 30) state.ctx = { type: 'juz', id: juzParam };
+  else if (!Number.isNaN(hizbParam) && hizbParam >= 1 && hizbParam <= 60) state.ctx = { type: 'hizb', id: hizbParam };
+  else if (!Number.isNaN(surahParam) && surahParam >= 1 && surahParam <= 114) state.ctx = { type: 'surah', id: surahParam };
   if(pageParam && pageParam >=1 && pageParam <=604){ await loadPage(pageParam); return; }
   if(surahParam){ try{ const r = await fetch(`${API_BASE}/verses/by_chapter/${surahParam}?per_page=1&page=1`); const j = await r.json(); const p = j?.verses?.[0]?.page_number; if(p){ await loadPage(p); return; } }catch{}
   }
@@ -202,10 +213,15 @@ try {
   if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
   if (backdrop) backdrop.addEventListener('click', closeDrawer);
   document.addEventListener('keydown', (e)=>{ if (e.key==='Escape') closeDrawer(); });
+  // Auto-open drawer on load if requested via query param
+  try {
+    const qp = new URLSearchParams(location.search);
+    const want = (qp.get('controls') || qp.get('drawer') || '').toLowerCase();
+    if (want === 'open' || want === '1' || want === 'true') openDrawer();
+  } catch {}
 } catch {}
 if (els.prevPage) els.prevPage.addEventListener('click', ()=>{ const was = els.audio && !els.audio.paused; const n = Math.max(1, state.currentPage-1); loadPage(n).then(()=>{ if (was) setAudioForIndex(0, true); }); });
 if (els.nextPage) els.nextPage.addEventListener('click', ()=>{ const was = els.audio && !els.audio.paused; const n = Math.min(604, state.currentPage+1); loadPage(n).then(()=>{ if (was) setAudioForIndex(0, true); }); });
 
 document.addEventListener('DOMContentLoaded', () => { adjustImageFit(); initFromQuery(); updatePlayerInfo(); });
 window.addEventListener('resize', () => { adjustImageFit(); if (state.currentPage) { loadPageImage(state.currentPage); } });
-
