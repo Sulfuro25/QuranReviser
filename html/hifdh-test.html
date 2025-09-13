@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hifdh Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" href="../favicons/favicon.svg">
+  <link rel="stylesheet" href="../css/styles.css">
+  <style>
+    .shell { max-width: 1100px; margin: 16px auto; padding: 0 20px; }
+    .panel { background: var(--surface); border:1px solid var(--border); border-radius: 12px; padding: 14px; margin: 12px 0; }
+    .row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .field { display:flex; flex-direction:column; gap:6px; min-width: 220px; }
+    .field input[type="text"], .field input[type="number"], .field select { background: var(--bg); color: var(--text); border:1px solid var(--border); border-radius:8px; padding:8px 10px; }
+    .options { display:flex; gap:10px; flex-wrap:wrap; }
+    .question { direction: rtl; font-family: 'Amiri Quran', serif; font-size: var(--arabic-size, 34px); line-height:2.1; padding: 12px; }
+    .choices { display:grid; grid-template-columns: 1fr; gap: 10px; }
+    .choices button { text-align:right; }
+    .muted { color: var(--muted); font-size: 12px; }
+    .draggable-list { list-style: none; padding: 0; margin: 0; }
+    .draggable-list li { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin: 8px 0; cursor: move; direction: rtl; font-family: 'Amiri Quran', serif; font-size: var(--arabic-size, 30px); }
+    .draggable-list li.locked { background: var(--surface); cursor: default; border-style: dashed; }
+    .draggable-list li.correct { border-color: var(--primary); outline: 2px solid var(--ring); background: rgba(34,197,94,0.08); }
+    .hidden { display:none !important; }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <a href="surahs.html" class="back-link" style="text-decoration:none">List</a>
+      <h1>Hifdh Test</h1>
+    </div>
+    <div class="header-actions">
+      <a class="btn secondary" href="settings.html">Settings</a>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="panel" id="setup-section" aria-label="Test setup">
+      <div class="row">
+        <div class="field">
+          <label class="muted">Scope</label>
+          <select id="scope-kind">
+            <option value="progress">My Hifdh Progress</option>
+            <option value="surahs">Surah range</option>
+            <option value="juz">Juz range</option>
+            <option value="hizb">Hizb range</option>
+          </select>
+        </div>
+        <div class="field" id="scope-surahs" hidden>
+          <label class="muted">Surahs (e.g., 1, 36, 67-70)</label>
+          <input id="scope-surahs-input" type="text" placeholder="1, 36, 67-70">
+        </div>
+        <div class="field" id="scope-juz" hidden>
+          <label class="muted">Juz (e.g., 1-3)</label>
+          <input id="scope-juz-input" type="text" placeholder="1-3">
+        </div>
+        <div class="field" id="scope-hizb" hidden>
+          <label class="muted">Hizb (e.g., 1, 10-15)</label>
+          <input id="scope-hizb-input" type="text" placeholder="1, 10-15">
+        </div>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <div class="field">
+          <label class="muted">Mode</label>
+          <select id="mode">
+            <option value="recite">1) Recite next X verses</option>
+            <option value="mcq">2) Pick the next verse (5 choices)</option>
+            <option value="order">3) Order the page</option>
+          </select>
+        </div>
+        <div class="field" id="x-wrapper">
+          <label class="muted">How many verses (X)</label>
+          <input id="x-count" type="number" min="1" max="20" value="3">
+        </div>
+        <div class="field" id="font-wrapper">
+          <label class="muted">Arabic font size</label>
+          <input id="font-px" type="number" min="18" max="60" value="36">
+        </div>
+        <div class="field">
+          <label class="muted">Tajweed coloring</label>
+          <select id="tajweed">
+            <option value="off">Off</option>
+            <option value="on">On (if available)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="muted">Random seed (optional)</label>
+          <input id="seed" type="text" placeholder="e.g., 1234">
+        </div>
+        <div class="field" style="align-self:flex-end;">
+          <button id="start" class="btn primary">Start</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="recite-section" hidden>
+      <div class="muted">Prompt</div>
+      <div id="recite-prompt" class="question">—</div>
+      <div class="row">
+        <button id="rec-start" class="btn secondary">Record</button>
+        <button id="rec-stop" class="btn secondary" disabled>Stop</button>
+        <audio id="rec-audio" controls class="hidden"></audio>
+      </div>
+      <div class="row">
+        <button id="rec-show-answer" class="btn primary">Show Answer</button>
+        <button id="rec-next" class="btn secondary">Next</button>
+      </div>
+      <div id="rec-answer" class="question hidden"></div>
+    </section>
+
+    <section class="panel" id="mcq-section" hidden>
+      <div class="muted">Prompt</div>
+      <div id="mcq-prompt" class="question">—</div>
+      <div class="choices" id="mcq-choices"></div>
+      <div class="row">
+        <button id="mcq-next" class="btn secondary">Next</button>
+      </div>
+    </section>
+
+    <section class="panel" id="order-section" hidden>
+      <div class="muted">Arrange the verses to correct page order</div>
+      <ol class="draggable-list" id="order-list"></ol>
+      <div class="row">
+        <button id="order-check" class="btn primary">Check Order</button>
+        <button id="order-next" class="btn secondary">Next Page</button>
+      </div>
+      <div id="order-result" class="muted"></div>
+    </section>
+  </main>
+
+  <audio id="audio" preload="none" class="hidden"></audio>
+
+  <script src="../js/hifdh-test.js"></script>
+</body>
+</html>
