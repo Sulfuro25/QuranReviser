@@ -626,6 +626,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!document.body.getAttribute('data-theme')) document.body.setAttribute('data-theme', 'dark');
   loadPrefs();
   updatePlayerInfo();
+  // Move primary controls into the right-side drawer for a cleaner UI
+  try {
+    const drawerBody = document.querySelector('#control-drawer .drawer-body .card') || document.querySelector('#control-drawer .drawer-body');
+    if (drawerBody) {
+      // Move the ayah control button group (container of #prev-ayah)
+      try {
+        const pa = document.getElementById('prev-ayah');
+        if (pa && pa.parentElement) drawerBody.appendChild(pa.parentElement);
+      } catch {}
+      // Move the page nav group (#page-nav)
+      try {
+        const pn = document.getElementById('page-nav');
+        if (pn) drawerBody.appendChild(pn);
+      } catch {}
+      // Move the mode toggle link (#to-mushaf) into the drawer and hide its original container
+      try {
+        const toM = document.getElementById('to-mushaf');
+        if (toM) {
+          const wrapRow = toM.closest('.row');
+          drawerBody.appendChild(toM);
+          if (wrapRow && wrapRow.parentElement && wrapRow.parentElement.classList.contains('list-shell')) {
+            wrapRow.parentElement.setAttribute('hidden', '');
+          }
+        }
+      } catch {}
+    }
+  } catch {}
   // Back link behavior: go to the list
   try {
     const back = document.querySelector('.back-link');

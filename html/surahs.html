@@ -1,38 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="../favicons/favicon.svg">
-  <link rel="stylesheet" href="../css/styles.css">
-  <style>
-    .list-shell { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
-    .list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 12px; flex-wrap: wrap; }
-    .list-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
-    .block { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; text-decoration: none; color: var(--text); }
-    .block:hover { outline: 2px solid var(--ring); }
-    .block .names { display: flex; flex-direction: column; }
-    .block .id { width: 40px; text-align: center; font-weight: 600; color: var(--text-dim); }
-    .block .en { font-weight: 600; }
-    .block .ar { font-family: 'Amiri Quran', serif; color: var(--muted); font-size: 20px; }
-    .search { width: 100%; padding: 10px 12px; border-radius: 10px; background: var(--bg); color: var(--text); border: 1px solid var(--border); }
-    .segmented { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 4px; gap: 4px; }
-    .segmented button { border: 0; background: transparent; color: var(--text); padding: 8px 12px; border-radius: 8px; cursor: pointer; }
-    .segmented button[aria-pressed="true"] { background: var(--bg); font-weight: 600; }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quran — Surahs / Juz / Hizb</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap"
+    rel="stylesheet" />
+  <link rel="icon" href="../favicons/favicon.svg" />
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
 </head>
+
 <body>
   <header class="app-header">
     <div class="brand">
       <a href="index.html" class="back-link" style="text-decoration:none">Home</a>
-      
       <h1>Quran</h1>
     </div>
-    <div class="header-actions"><button id="view-toggle" class="btn secondary" title="Toggle Reader/Mushaf view">Mushaf</button></div>
+    <div class="header-actions">
+      <!-- Switch list links between Reader and Mushaf -->
+      <button id="view-toggle" class="btn secondary" title="Toggle Reader/Mushaf view">Mushaf</button>
+    </div>
   </header>
 
   <main class="list-shell">
@@ -47,8 +38,12 @@
     <div id="list" class="list-grid" role="list"></div>
   </main>
 
-  <script src="../js/init-theme.js"></script>
-  <script src="../js/surahs.js"></script>
+  <!-- Theme, local chapter metadata, and unified list logic -->
+<script src="../assets/js/core/prefs.js"></script>
+<script src="../assets/js/core/utils.js"></script>
+<script src="../assets/js/core/api.js"></script>
+<script src="../assets/js/chapters-data.js"></script>
+<script src="../assets/js/surahs.js"></script>
 </body>
-</html>
 
+</html>

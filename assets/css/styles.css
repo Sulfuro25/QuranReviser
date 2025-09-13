@@ -65,6 +65,11 @@ body {
 }
 .toolbar .actions { margin-left: auto; display: flex; gap: 8px; }
 .toolbar .grow { flex: 1 1 320px; }
+/* Compact toolbar variant */
+.toolbar.compact { padding: 8px 14px; }
+.toolbar.compact .row { margin-bottom: 6px; }
+/* Ensure actions look good inside the drawer as well */
+.drawer .actions { display: flex; gap: 8px; justify-content: center; }
 
 /* player */
 /* Improve layout and spacing for the Reader/Mushaf toolbar */

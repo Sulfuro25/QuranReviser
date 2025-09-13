@@ -1,71 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quran Reviser — Reader</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="icon" href="../favicons/favicon.svg">
-    <link rel="stylesheet" href="../css/styles.css">
-    <meta name="description" content="Beautiful Quran viewer with tajweed colors, audio, and translations.">
-    <meta name="theme-color" content="#0f172a">
-    <style>
-      .back-link { text-decoration: none; color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px; }
-      .back-link:hover { background: var(--bg); }
-    </style>
-    
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quran Reader</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/pages.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body class="reader-no-tajweed">
-    <header class="app-header">
-        <div class="brand">
-            <a href="surahs.html" class="back-link" aria-label="Back to list">List</a>
-            <h1>Quran Reviser</h1>
-        </div>
-        <div class="header-actions"></div>
-    </header>
+<body>
+  <header class="app-header">
+    <a class="back-link" href="surahs.html">List</a>
+    <div class="brand">
+      <div class="logo">﷽</div>
+      <h1>Quran Reader</h1>
+    </div>
+    <div class="header-actions">
+      <button id="theme-toggle" class="btn">Light</button>
+    </div>
+  </header>
 
-    <nav class="toolbar" id="reader-toolbar">
-      <div class="row" style="justify-content: space-between">
-        <div id="status" class="status" role="status" aria-live="polite"></div>
-        <button id="controls-open" class="btn secondary" title="Open player and page controls">Controls</button>
+  <div class="toolbar compact">
+    <div class="row" id="player">
+      <div id="page-nav" class="actions">
+        <button id="prev-page" class="btn">Prev Page</button>
+        <span id="page-info">—</span>
+        <button id="next-page" class="btn">Next Page</button>
       </div>
-    </nav>
-
-    <aside id="control-drawer" class="drawer" aria-hidden="true" aria-label="Reader controls" tabindex="-1">
-      <div class="drawer-head">
-        <h2>Controls</h2>
-        <button id="drawer-close" class="btn secondary" aria-label="Close controls">Close</button>
+      <div class="actions">
+        <button id="prev-ayah" class="btn">◀ Ayah</button>
+        <button id="play-pause" class="btn primary">Play</button>
+        <button id="next-ayah" class="btn">Ayah ▶</button>
       </div>
-      <div class="drawer-body">
-        <div class="row" id="player" aria-label="Surah audio player">
-          <div class="actions">
-            <button id="prev-ayah" class="btn secondary" title="Previous ayah">Prev</button>
-            <button id="play-pause" class="btn primary" title="Play or pause">Play</button>
-            <button id="next-ayah" class="btn secondary" title="Next ayah">Next</button>
-          </div>
-          <div class="row" id="page-nav">
-            <button id="prev-page" class="btn secondary">Prev Page</button>
-            <div id="page-info" class="status"></div>
-            <button id="next-page" class="btn secondary">Next Page</button>
-          </div>
-          <div id="player-info" class="status">Not loaded</div>
-          <div class="row" id="follow-row">
-            <label class="option"><input type="checkbox" id="follow-mode"> Follow audio (auto-scroll & highlight)</label>
-          </div>
-          <div class="row" id="view-switch-row">
-            <a id="to-mushaf" href="mushaf.html" class="btn secondary" title="Open Mushaf view">Mushaf</a>
-          </div>
-        </div>
+      <div id="player-info" class="status">Not loaded</div>
+      <div class="actions">
+        <button id="controls-open" class="btn">Controls</button>
       </div>
-    </aside>
-    <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+    </div>
+    
+  </div>
 
-    <main id="quran-display" class="quran"></main>
+  <main class="quran" id="quran-display"></main>
 
-    <audio id="audio" preload="none"></audio>
+  <!-- footer quick links (wired by script) -->
+  <div class="list-shell" style="padding-top:0;">
+    <div class="row">
+      <a id="to-mushaf" class="back-link" href="mushaf.html">Open Mushaf</a>
+    </div>
+  </div>
 
-    <script src="../js/script.js"></script>
+  <!-- Drawer -->
+  <aside id="control-drawer" class="drawer" aria-hidden="true" tabindex="-1">
+    <div class="drawer-head">
+      <h2>Controls</h2>
+      <button id="drawer-close" class="btn">Close</button>
+    </div>
+    <div class="drawer-body">
+      <div class="card stack">
+        <label class="option"><input type="checkbox" id="follow-mode"> Follow active ayah</label>
+      </div>
+    </div>
+  </aside>
+  <div id="drawer-backdrop" class="drawer-backdrop" hidden></div>
+
+  <audio id="audio" preload="none"></audio>
+
+  <!-- core -->
+  <script src="../assets/js/core/prefs.js"></script>
+  <script src="../assets/js/core/utils.js"></script>
+  <script src="../assets/js/core/api.js"></script>
+  <!-- page -->
+  <script src="../assets/js/script.js"></script>
 </body>
 </html>

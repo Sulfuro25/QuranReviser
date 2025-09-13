@@ -1,0 +1,90 @@
+/* ===========================
+   HOME (html/index.html)
+   =========================== */
+.home { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+.hero { text-align: center; margin-bottom: 24px; }
+.hero h1 { margin: 0; font-size: 28px; }
+.hero p { color: var(--muted); margin-top: 8px; }
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.menu-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; text-decoration: none; color: var(--text); }
+.menu-card:hover { outline: 2px solid var(--ring); }
+.menu-card h2 { margin: 0 0 6px; font-size: 18px; }
+.menu-card p { margin: 0; color: var(--muted); font-size: 14px; }
+/* original “hide Juz/Hizb” rule (keep if still desired) */
+.menu-grid a[href="juz.html"], .menu-grid a[href="hizb.html"] { display: none !important; }
+
+/* ===========================
+   HIFDH PROGRESS (html/hifdh.html)
+   =========================== */
+.wrap { max-width: 1000px; margin: 20px auto; padding: 0 20px; display: grid; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.card h2 { margin: 0 0 10px; font-size: 18px; }
+.row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.muted { color: var(--muted); font-size: 14px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+.stat { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; }
+.stat .k { color: var(--muted); font-size: 12px; }
+.stat .v { font-weight: 600; font-size: 16px; }
+.list { display: grid; gap: 10px; max-height: 60vh; overflow: auto; padding-right: 4px; }
+.surah { display: grid; grid-template-columns: 44px 1fr 320px; gap: 10px; align-items: center; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 10px 12px; }
+.sid { width: 44px; text-align: center; font-weight: 600; color: var(--text-dim); }
+.names { display: flex; flex-direction: column; }
+.names .en { font-weight: 600; }
+.names .ar { font-family: 'Amiri Quran', serif; color: var(--muted); font-size: 18px; }
+.ctrls { display: grid; gap: 6px; }
+.ctrls .top { display: flex; align-items: center; gap: 8px; }
+.ctrls .top .perc { min-width: 70px; text-align: right; }
+.ctrls input[type="range"] { width: 100%; }
+.quick { display: flex; gap: 6px; }
+.quick button { cursor: pointer; border-radius: 8px; border: 1px solid var(--border); padding: 6px 10px; background: var(--bg); color: var(--text); font-size: 12px; }
+.quick button:hover { filter: brightness(1.05); }
+.calc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.field { display: grid; gap: 6px; }
+.field input, .field select { padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+.sep { height: 1px; background: var(--border); margin: 8px 0; }
+
+/* ===========================
+   HIFDH TEST (html/hifdh-test.html)
+   =========================== */
+.shell { max-width: 1100px; margin: 16px auto; padding: 0 20px; }
+.panel { background: var(--surface); border:1px solid var(--border); border-radius: 12px; padding: 14px; margin: 12px 0; }
+.row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.field { display:flex; flex-direction:column; gap:6px; min-width: 220px; }
+.field input[type="text"], .field input[type="number"], .field select { background: var(--bg); color: var(--text); border:1px solid var(--border); border-radius:8px; padding:8px 10px; }
+.options { display:flex; gap:10px; flex-wrap:wrap; }
+.question { direction: rtl; font-family: 'Amiri Quran', serif; font-size: var(--arabic-size, 34px); line-height:2.1; padding: 12px; }
+.choices { display:grid; grid-template-columns: 1fr; gap: 10px; }
+.choices button { text-align:right; }
+.muted { color: var(--muted); font-size: 12px; }
+.draggable-list { list-style: none; padding: 0; margin: 0; }
+.draggable-list li { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; margin: 8px 0; cursor: move; direction: rtl; font-family: 'Amiri Quran', serif; font-size: var(--arabic-size, 30px); }
+.draggable-list li.locked { background: var(--surface); cursor: default; border-style: dashed; }
+.draggable-list li.correct { border-color: var(--primary); outline: 2px solid var(--ring); background: rgba(34,197,94,0.08); }
+.hidden { display:none !important; }
+
+/* ===========================
+   SETTINGS (html/settings.html)
+   =========================== */
+.settings-wrap { max-width: 800px; margin: 24px auto; padding: 0 20px; display: grid; gap: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.card h2 { margin: 0 0 10px; font-size: 18px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.muted { color: var(--muted); font-size: 14px; }
+.option { display: flex; gap: 10px; align-items: center; }
+.preview { font-family: 'Amiri Quran', serif; border: 1px dashed var(--border); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+.preview-tr { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial; direction: ltr; color: var(--text-dim); }
+.stack { display: grid; gap: 8px; }
+
+/* ===========================
+   SURAHS LIST (html/surahs.html)
+   ===========================
+   NOTE: The global styles.css already defines .list-shell, .list-head,
+   .list-grid, .block, .id, .names, .en, .ar, .search, .segmented, etc.
+   No extra page-specific rules needed here.
+*/
+
+/* ===========================
+   READER (html/reader.html)
+   =========================== */
+.back-link { text-decoration: none; color: var(--text); border: 1px solid var(--border); padding: 8px 10px; border-radius: 8px; }
+.back-link:hover { background: var(--bg); }
