@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tajwid Colors Guide</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
+  <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/img/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/img/favicon/web-app-manifest-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/img/favicon/web-app-manifest-512x512.png">
+  <link rel="manifest" href="../assets/img/favicon/site.webmanifest">
+  <meta name="theme-color" content="#0c3e18">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body>
+    <header class="app-header">
+    <div class="brand">
+      <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
+        <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
+      </a>
+      <h1>Tajwid Colors</h1>
+    </div>
+    <div class="header-actions">
+      <a class="back-link" href="index.html">Home</a>
+    </div>
+  </header>
+
+  <main class="list-shell">
+    <div class="list-head">
+      <h2 class="muted" style="margin:0;">Tajwīd rules and examples</h2>
+    </div>
+    <div id="rules" class="list-grid" style="margin-top:14px;"></div>
+  </main>
+
+  <audio id="audio" preload="none"></audio>
+
+  <!-- core -->
+  <script src="../assets/js/core/prefs.js"></script>
+  <script src="../assets/js/core/utils.js"></script>
+  <script src="../assets/js/core/api.js"></script>
+  <!-- page -->
+  <script src="../assets/js/tajwid.js"></script>
+</body>
+</html>

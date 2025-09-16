@@ -1,11 +1,11 @@
 const API_BASE = 'https://api.quran.com/api/v4';
-const PREFS_KEY = 'qr_prefs';
+const PREFS_KEY = (window.QR && QR.prefs && QR.prefs.storageKey && QR.prefs.storageKey()) || 'qr_prefs';
 
 function readPrefs() {
-  try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { return {}; }
+  try { return (window.QR && QR.prefs) ? QR.prefs.read() : JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch { return {}; }
 }
 function writePrefs(p) {
-  try { localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch {}
+  try { return (window.QR && QR.prefs) ? QR.prefs.write(p) : localStorage.setItem(PREFS_KEY, JSON.stringify(p)); } catch {}
 }
 
 function setTheme(theme) { document.body.setAttribute('data-theme', theme); }
@@ -166,4 +166,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (trSel) trSel.disabled = !(toggle && toggle.checked);
   if (toggle) toggle.addEventListener('change', () => saveTranslationToggle(toggle.checked));
   if (trSel) trSel.addEventListener('change', (e) => saveTranslation(e.target.value));
+
+  // Cloud sync wiring (auto after connect)
+  try {
+    const connectBtn = document.getElementById('sync-connect');
+    const disconnectBtn = document.getElementById('sync-disconnect');
+    function refresh(){ try { document.getElementById('sync-status').textContent = (window.QR && QR.sync && QR.sync.isConnected()) ? 'Connected' : 'Not connected'; } catch {} }
+    if (connectBtn) connectBtn.addEventListener('click', async ()=>{ try { await QR.sync.connect(); alert('Connected and synced. Changes will auto-save.'); } catch(e){ alert(e.message||String(e)); } finally { refresh(); } });
+    if (disconnectBtn) disconnectBtn.addEventListener('click', ()=>{ try { QR.sync.disconnect(); } catch {}; refresh(); });
+    refresh();
+  } catch {}
 });

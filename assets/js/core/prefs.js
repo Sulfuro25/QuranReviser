@@ -2,10 +2,10 @@
 window.QR = window.QR || {};
 
 QR.prefs = (function(){
-  const KEY = 'qr_prefs';
+  function storageKey(){ try { return (QR.profiles && QR.profiles.key('qr_prefs')) || 'qr_prefs'; } catch { return 'qr_prefs'; } }
 
-  function read(){ try { return JSON.parse(localStorage.getItem(KEY)||'{}')||{}; } catch { return {}; } }
-  function write(p){ try { localStorage.setItem(KEY, JSON.stringify(p||{})); } catch {} }
+  function read(){ try { return JSON.parse((QR.profiles ? QR.profiles.getItem('qr_prefs') : localStorage.getItem('qr_prefs'))||'{}')||{}; } catch { return {}; } }
+  function write(p){ try { const s = JSON.stringify(p||{}); if (QR.profiles) QR.profiles.setItem('qr_prefs', s); else localStorage.setItem('qr_prefs', s); } catch {} }
   function get(k, fallback){ const p = read(); return (k in p) ? p[k] : fallback; }
   function set(obj){ const p = read(); Object.assign(p, obj||{}); write(p); }
 
@@ -20,5 +20,5 @@ QR.prefs = (function(){
 
   document.addEventListener('DOMContentLoaded', ensureTheme);
 
-  return { read, write, get, set, ensureTheme };
+  return { read, write, get, set, ensureTheme, storageKey };
 })();

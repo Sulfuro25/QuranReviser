@@ -22,7 +22,7 @@ const els = {
   xCount: document.getElementById('x-count'),
   fontPx: document.getElementById('font-px'),
   tajweed: document.getElementById('tajweed'),
-  seed: document.getElementById('seed'),
+  // seed removed
   start: document.getElementById('start'),
 
   // Recite mode
@@ -47,16 +47,42 @@ const els = {
 
   // Optional wrapper used in original file; keep if present
   reciteMetaWrapper: document.getElementById('recite-meta-wrapper'),
+  // Fill-in-the-blank
+  fillSection: document.getElementById('fill-section'),
+  fillQuestion: document.getElementById('fill-question'),
+  fillCheck: document.getElementById('fill-check'),
+  fillNext: document.getElementById('fill-next'),
+  fillResult: document.getElementById('fill-result'),
+  // Audio-only
+  audioOnlySection: document.getElementById('audioonly-section'),
+  audioPlay: document.getElementById('audio-play'),
+  audioReplay: document.getElementById('audio-replay'),
+  audioReveal: document.getElementById('audio-reveal'),
+  audioNext: document.getElementById('audio-next'),
+  audioStatus: document.getElementById('audio-status'),
+  audioAnswer: document.getElementById('audio-answer'),
+  // Timer
+  timerView: document.getElementById('timer-view'),
+  timerOn: document.getElementById('timer-on'),
+  timerSec: document.getElementById('timer-sec'),
 };
 
-const PREFS_KEY = 'qr_prefs';
-const HIFDH_KEY = 'hifdh_progress';
+const PREFS_KEY = (window.QR && QR.prefs && QR.prefs.storageKey && QR.prefs.storageKey()) || 'qr_prefs';
+const HIFDH_KEY = (window.QR && QR.profiles && QR.profiles.key && QR.profiles.key('hifdh_progress')) || 'hifdh_progress';
 
 const state = {
   rng: Math.random,
   versesFlat: [],     // array of { verse_key, text_uthmani, page_number }
   orderCorrect: [],   // correct order keys for Order mode
   orderUser: [],      // current user order keys
+  // fill
+  fillCurrent: null,
+  // audio-only
+  audioPrompt: null,
+  audioEl: null,
+  // timer
+  tRemain: 0,
+  tId: null,
 };
 
 // ---------- utilities bound to UI ----------
@@ -72,20 +98,26 @@ function pickRandom(arr){ if(!arr||!arr.length) return undefined; const i = Math
 
 function ensureFont(){
   try {
-    const prefs = JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');
+    const prefs = (window.QR && QR.prefs) ? QR.prefs.read() : JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');
     const px = prefs.font_px || 36;
     applyFontSize(px);
   } catch { applyFontSize(36); }
 }
 
 function setVisible(section){
-  [els.reciteSection, els.mcqSection, els.orderSection].forEach(el => { if (el) el.hidden = (el !== section); });
+  [els.reciteSection, els.mcqSection, els.orderSection, els.fillSection, els.audioOnlySection].forEach(el => { if (el) el.hidden = (el !== section); });
 }
 
 function shuffle(arr){
   for(let i=arr.length-1;i>0;i--){ const j = Math.floor(state.rng()*(i+1)); [arr[i],arr[j]] = [arr[j],arr[i]]; }
   return arr;
 }
+
+function stripDiacritics(s){ try { return String(s||'').replace(/[\u0610-\u061A\u064B-\u065F\u06D6-\u06DC\u06DF-\u06E8\u06EA-\u06ED]/g,''); } catch { return s; } }
+function tokenizeArabic(s){ return String(s||'').trim().split(/\s+/).filter(Boolean); }
+
+function stopTimer(){ if (state.tId){ clearInterval(state.tId); state.tId=null; } state.tRemain=0; if (els.timerView) els.timerView.style.display='none'; }
+function startTimer(seconds, onTimeout){ stopTimer(); const sec = Math.max(5, parseInt(seconds,10)||30); state.tRemain = sec; const update=()=>{ if (els.timerView){ els.timerView.style.display='block'; els.timerView.textContent = `⏳ ${state.tRemain}s`; } if (state.tRemain<=0){ stopTimer(); try { onTimeout&&onTimeout(); } catch {} } state.tRemain--; }; update(); state.tId = setInterval(update, 1000); }
 
 // ---------- scope building ----------
 
@@ -95,7 +127,7 @@ async function buildScopeVerses(){
   if (kind === 'progress'){
     // Read saved hifdh progress: sid -> memorized count
     let progress = {};
-    try { progress = JSON.parse(localStorage.getItem(HIFDH_KEY)||'{}')||{}; } catch {}
+    try { progress = JSON.parse((QR.profiles?QR.profiles.getItem('hifdh_progress'):localStorage.getItem(HIFDH_KEY))||'{}')||{}; } catch {}
     const chapters = Object.keys(progress).map(k=>parseInt(k,10)).filter(n=>n>=1&&n<=114);
     const all = [];
     for (const sid of chapters){
@@ -212,6 +244,7 @@ function runRecite(){
 // Mode 2: MCQ Next Verse
 function runMcq(){
   setVisible(els.mcqSection);
+  if (els.timerOn && els.timerOn.checked) startTimer(els.timerSec && els.timerSec.value, ()=>{ try { els.mcqPrompt.textContent += ' (Time up)'; } catch {}; try { els.mcqNext.style.display=''; } catch {}; }); else stopTimer();
   const list = state.versesFlat;
   if (list.length < 2) { els.mcqPrompt.textContent = 'Not enough verses in scope.'; els.mcqChoices.innerHTML=''; return; }
 
@@ -276,6 +309,7 @@ function runMcq(){
 async function runOrder(){
   ensureFont();
   setVisible(els.orderSection);
+  if (els.timerOn && els.timerOn.checked) startTimer(els.timerSec && els.timerSec.value, ()=>{ try { checkOrder(); els.orderResult.textContent += ' (Time up)'; } catch {} }); else stopTimer();
 
   const pages = Array.from(new Set((state.versesFlat||[]).map(v=>v.page_number).filter(p=>typeof p==='number' && p>=1 && p<=604)));
   if (!pages.length) { els.orderList.innerHTML=''; els.orderResult.textContent='No page in scope.'; return; }
@@ -341,7 +375,7 @@ function checkOrder(){
 
 async function startTest(){
   ensureFont();
-  state.rng = QR.utils.seededRng((els.seed && els.seed.value)||'');
+  // use default RNG (seed input removed)
   const verses = await buildScopeVerses();
   state.versesFlat = verses;
 
@@ -350,7 +384,9 @@ async function startTest(){
   const mode = els.mode.value;
   if (mode === 'recite') runRecite();
   else if (mode === 'mcq') runMcq();
-  else runOrder();
+  else if (mode === 'order') runOrder();
+  else if (mode === 'fill') runFill();
+  else runAudioOnly();
 }
 
 // ---------- wiring ----------
@@ -378,6 +414,78 @@ if (els.fontPx) els.fontPx.addEventListener('change', ()=> ensureFont());
 els.start.addEventListener('click', ()=> startTest());
 if (els.orderCheck) els.orderCheck.addEventListener('click', checkOrder);
 if (els.orderNext) els.orderNext.addEventListener('click', ()=> runOrder());
+
+// ---- Fill-in-the-blank ----
+function runFill(){
+  ensureFont();
+  setVisible(els.fillSection);
+  if (!state.versesFlat || !state.versesFlat.length){ els.fillQuestion.textContent='No verses in scope.'; return; }
+  const v = pickRandom(state.versesFlat);
+  const tokens = tokenizeArabic(v.text_uthmani||'');
+  const count = Math.max(1, Math.min(3, Math.floor(tokens.length/7)));
+  const idxs = new Set();
+  let guard=0;
+  while (idxs.size < count && guard++<200){ const i = Math.floor(state.rng()*tokens.length); if (tokens[i] && stripDiacritics(tokens[i]).length>0) idxs.add(i); }
+  els.fillQuestion.innerHTML='';
+  const inputs=[];
+  tokens.forEach((tok,i)=>{
+    if (idxs.has(i)){
+      const inp = document.createElement('input'); inp.type='text'; inp.style.minWidth='80px'; inp.style.margin='0 6px'; inp.dataset.answer = tok;
+      els.fillQuestion.appendChild(inp); inputs.push(inp);
+    } else {
+      const span = document.createElement('span'); span.textContent = tok + ' '; els.fillQuestion.appendChild(span);
+    }
+  });
+  state.fillCurrent = { verse: v, blanks: Array.from(idxs.values()).sort((a,b)=>a-b), inputs };
+  els.fillResult.textContent='';
+  if (els.fillCheck) els.fillCheck.onclick = checkFill;
+  if (els.fillNext) els.fillNext.onclick = runFill;
+  if (els.timerOn && els.timerOn.checked) startTimer(els.timerSec && els.timerSec.value, ()=>{ try { els.fillResult.textContent='Time up'; revealFillAnswer(); } catch {} }); else stopTimer();
+}
+
+function checkFill(){
+  const cur = state.fillCurrent; if (!cur) return;
+  let ok = 0;
+  cur.inputs.forEach(inp => {
+    const a = stripDiacritics(inp.dataset.answer||'').replace(/\s+/g,'').toLowerCase();
+    const v = stripDiacritics(inp.value||'').replace(/\s+/g,'').toLowerCase();
+    const pass = a && v && a===v;
+    inp.style.borderColor = pass ? 'var(--primary)' : '#ef4444';
+    if (pass) ok++;
+  });
+  els.fillResult.textContent = `${ok}/${cur.inputs.length} correct.`;
+}
+
+function revealFillAnswer(){ const cur=state.fillCurrent; if (!cur) return; cur.inputs.forEach(inp=>{ inp.value = inp.dataset.answer||''; inp.style.borderColor='var(--primary)'; }); }
+
+// ---- Audio-only prompt ----
+async function runAudioOnly(){
+  ensureFont();
+  setVisible(els.audioOnlySection);
+  const list = state.versesFlat||[];
+  if (!list.length){ if (els.audioStatus) els.audioStatus.textContent='No verses in scope.'; return; }
+  // pick a verse that has a next verse in same surah
+  let idx = 0; let tries=0;
+  for(;tries<50;tries++){
+    const j = Math.floor(state.rng()*list.length);
+    const [sj,vj]=verseKeyToTuple(list[j].verse_key);
+    const hasNext = list.some(x=>{ const [sx,vx]=verseKeyToTuple(x.verse_key); return sx===sj && vx===vj+1; });
+    if (hasNext){ idx=j; break; }
+  }
+  const prev = list[idx]; const [sid,vid]=verseKeyToTuple(prev.verse_key);
+  const next = list.find(x=>{ const [sx,vx]=verseKeyToTuple(x.verse_key); return sx===sid && vx===vid+1; });
+  let url='';
+  try { const prefs = (window.QR && QR.prefs) ? QR.prefs.read() : {}; const rid = prefs.reciter_id||7; const map = await QR.api.fetchAudioMap(rid, sid); url = map.get(prev.verse_key)||''; } catch {}
+  state.audioPrompt = { prev, next, audioUrl: url };
+  if (els.audioStatus) els.audioStatus.textContent = `Prompt: ${prev.verse_key}`;
+  if (els.audioAnswer){ els.audioAnswer.classList.add('hidden'); els.audioAnswer.textContent = next ? (next.text_uthmani||'') : '(no next ayah)'; }
+  if (!state.audioEl){ try { state.audioEl = document.getElementById('audio'); } catch {} }
+  if (els.audioPlay) els.audioPlay.onclick = ()=>{ try { state.audioEl.src = state.audioPrompt.audioUrl||''; state.audioEl.play().catch(()=>{}); } catch {} };
+  if (els.audioReplay) els.audioReplay.onclick = ()=>{ try { state.audioEl.currentTime=0; state.audioEl.play().catch(()=>{}); } catch {} };
+  if (els.audioReveal) els.audioReveal.onclick = ()=>{ try { els.audioAnswer.classList.remove('hidden'); } catch {} };
+  if (els.audioNext) els.audioNext.onclick = runAudioOnly;
+  if (els.timerOn && els.timerOn.checked) startTimer(els.timerSec && els.timerSec.value, ()=>{ try { els.audioStatus.textContent += ' (Time up)'; els.audioAnswer.classList.remove('hidden'); } catch {} }); else stopTimer();
+}
 
 // Initial UI
 try {

@@ -5,23 +5,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hifdh Test</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
+  <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/img/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/img/favicon/web-app-manifest-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/img/favicon/web-app-manifest-512x512.png">
+  <link rel="manifest" href="../assets/img/favicon/site.webmanifest">
+  <meta name="theme-color" content="#0c3e18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap"
-    rel="stylesheet">
-  <link rel="icon" href="../favicons/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
 </head>
 
 <body>
-  <header class="app-header">
+    <header class="app-header">
     <div class="brand">
-      <a href="index.html" class="back-link" style="text-decoration:none">Home</a>
+      <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
+        <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
+      </a>
       <h1>Hifdh Test</h1>
     </div>
     <div class="header-actions">
-      <a class="btn secondary" href="settings.html">Settings</a>
+      <a class="btn secondary" href="settings.html" title="Open settings" aria-label="Settings">⚙️</a>
     </div>
   </header>
 
@@ -57,6 +65,8 @@
             <option value="recite">1) Recite next X verses</option>
             <option value="mcq">2) Pick the next verse (5 choices)</option>
             <option value="order">3) Order the page</option>
+            <option value="fill">4) Fill in the blanks</option>
+            <option value="audio">5) Audio-only prompt</option>
           </select>
         </div>
         <div class="field" id="x-wrapper">
@@ -79,14 +89,20 @@
           </select>
         </div>
         <div class="field">
-          <label class="muted">Random seed (optional)</label>
-          <input id="seed" type="text" placeholder="e.g., 1234">
+          <label class="muted">Timer per question (seconds)</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <label class="option"><input type="checkbox" id="timer-on"> Enable</label>
+            <input id="timer-sec" type="number" min="5" step="5" value="30" style="width:100px;">
+          </div>
         </div>
+        
         <div class="field" style="align-self:flex-end;">
           <button id="start" class="btn primary">Start</button>
         </div>
       </div>
     </section>
+
+    <div id="timer-view" class="muted" style="text-align:right; display:none;"></div>
 
     <section class="panel" id="recite-section" hidden>
       <div class="muted">Prompt</div>
@@ -116,10 +132,33 @@
       </div>
       <div id="order-result" class="muted"></div>
     </section>
+
+    <section class="panel" id="fill-section" hidden>
+      <div class="muted">Fill in the missing word(s)</div>
+      <div id="fill-question" class="question"></div>
+      <div class="row">
+        <button id="fill-check" class="btn primary">Check</button>
+        <button id="fill-next" class="btn secondary">Next</button>
+      </div>
+      <div id="fill-result" class="muted"></div>
+    </section>
+
+    <section class="panel" id="audioonly-section" hidden>
+      <div class="muted">Listen, then continue with the next ayah</div>
+      <div class="row">
+        <button id="audio-play" class="btn primary">Play Prompt</button>
+        <button id="audio-replay" class="btn secondary">Replay</button>
+        <button id="audio-reveal" class="btn">Reveal Answer</button>
+        <button id="audio-next" class="btn secondary">Next</button>
+      </div>
+      <div id="audio-status" class="muted"></div>
+      <div id="audio-answer" class="question hidden"></div>
+    </section>
   </main>
 
   <audio id="audio" preload="none" class="hidden"></audio>
 
+<script src="../assets/js/core/profiles.js"></script>
 <script src="../assets/js/core/prefs.js"></script>
 <script src="../assets/js/core/utils.js"></script>
 <script src="../assets/js/core/api.js"></script>

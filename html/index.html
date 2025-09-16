@@ -1,29 +1,36 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran Reviser — Home</title>
+  <title>Quran Reviser â€“ Home</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
+  <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/img/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/img/favicon/web-app-manifest-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/img/favicon/web-app-manifest-512x512.png">
+  <link rel="manifest" href="../assets/img/favicon/site.webmanifest">
+  <meta name="theme-color" content="#0c3e18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap"
-    rel="stylesheet">
-  <link rel="icon" href="../favicons/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
   <meta name="description" content="Quran Reviser home">
-  <meta name="theme-color" content="#0f172a">
 </head>
 
 <body>
-  <header class="app-header">
+    <header class="app-header">
     <div class="brand">
-      <span class="logo">Q</span>
+      <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
+        <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
+      </a>
       <h1>Quran Reviser</h1>
     </div>
     <div class="header-actions">
-      <a href="settings.html" class="btn secondary" title="Open settings">Settings</a>
+      <a href="settings.html" class="btn secondary" title="Open settings" aria-label="Settings">ï¿½sTï¿½ï¿½?</a>
     </div>
   </header>
 
@@ -48,22 +55,24 @@
 
       <a class="menu-card" href="juz.html">
         <h2>Juz</h2>
-        <p>30 Juz’ in order</p>
+        <p>30 Juzâ€™ in order</p>
       </a>
       <a class="menu-card" href="hizb.html">
         <h2>Hizb</h2>
         <p>60 Hizb blocks</p>
       </a>
-      <a class="menu-card" href="#" aria-disabled="true" onclick="return false;">
-        <h2>Coming Soon</h2>
-        <p>More practice modes</p>
+      <a class="menu-card" href="tajwid.html">
+        <h2>TajwÄ«d Colors</h2>
+        <p>Rule guide with colored examples</p>
       </a>
     </div>
   </main>
 
+<script src="../assets/js/core/profiles.js"></script>
 <script src="../assets/js/core/prefs.js"></script>
 <script src="../assets/js/core/utils.js"></script>
 <script src="../assets/js/core/api.js"></script>
 </body>
 
 </html>
+

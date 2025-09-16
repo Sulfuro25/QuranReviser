@@ -5,19 +5,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Settings</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
+  <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="../assets/img/favicon/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/img/favicon/web-app-manifest-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="../assets/img/favicon/web-app-manifest-512x512.png">
+  <link rel="manifest" href="../assets/img/favicon/site.webmanifest">
+  <meta name="theme-color" content="#0c3e18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap"
-    rel="stylesheet">
-  <link rel="icon" href="../favicons/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
 </head>
 
 <body>
-  <header class="app-header">
+    <header class="app-header">
     <div class="brand">
-      <a href="index.html" class="back-link" style="text-decoration:none">Home</a>
+      <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
+        <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
+      </a>
       <h1>Settings</h1>
     </div>
     <div class="header-actions"></div>
@@ -31,6 +39,7 @@
         <div class="option">
           <label><input type="radio" name="theme" value="dark"> Dark</label>
           <label><input type="radio" name="theme" value="light"> Light</label>
+          <label><input type="radio" name="theme" value="sepia"> Sepia</label>
         </div>
       </div>
     </section>
@@ -84,11 +93,26 @@
     </section>
 
     <section class="card">
+      <h2>Cloud Sync</h2>
+      <div class="stack">
+        <div class="muted">Connect Google to back up your data (prefs, progress, bookmarks, notes, confidence, review, streaks). After connecting, sync runs automatically.</div>
+        <div class="row">
+          <button id="sync-connect" class="btn primary">Connect Google</button>
+          <button id="sync-disconnect" class="btn secondary">Disconnect</button>
+          <div id="sync-status" class="muted"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>About</h2>
       <div class="muted">Configure preferences for the app. More options coming soon.</div>
     </section>
   </main>
 
+<meta name="google-client-id" content="459121148063-mtbt0jt72pu2qghc0c4um2t6m2krnqmv.apps.googleusercontent.com">
+<script src="../assets/js/core/profiles.js"></script>
+<script src="../assets/js/core/sync.js"></script>
 <script src="../assets/js/core/prefs.js"></script>
 <script src="../assets/js/core/utils.js"></script>
 <script src="../assets/js/core/api.js"></script>
