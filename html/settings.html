@@ -1,6 +1,5 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,108 +14,370 @@
   <meta name="theme-color" content="#0c3e18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="../assets/css/modern.css">
+  <link rel="stylesheet" href="../assets/css/settings.css">
 </head>
-
-<body>
-    <header class="app-header">
+<body class="page-settings">
+  <header class="app-header">
     <div class="brand">
       <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
-      <h1>Settings</h1>
+      <div class="brand-copy">
+        <h1>Settings</h1>
+        <p class="brand-tagline">Fine tune themes, fonts, reciters, and sync</p>
+      </div>
     </div>
-    <div class="header-actions"></div>
+    <nav class="primary-nav" aria-label="Primary">
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
+      <a class="nav-link active" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn ghost" href="reader.html">
+        <ion-icon name="book-outline"></ion-icon>
+        Reader
+      </a>
+      <a class="btn secondary" href="hifdh.html">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        Hifdh
+      </a>
+    </div>
   </header>
 
   <main class="settings-wrap">
-    <section class="card">
-      <h2>Theme</h2>
+    <section class="page-hero settings-hero">
+      <div class="hero-body">
+        <span class="eyebrow">PERSONALIZE YOUR EXPERIENCE</span>
+        <h2>Configure your<br>perfect reading<br>environment</h2>
+        <p>Customize themes, fonts, audio preferences, and sync your data seamlessly across all your devices.</p>
+        <div class="quick-settings">
+          <a href="#theme-card" class="quick-setting">
+            <span class="quick-icon">
+              <ion-icon name="color-palette-outline"></ion-icon>
+            </span>
+            <div class="quick-info">
+              <div class="quick-label">Theme Options</div>
+              <div class="quick-value" id="quick-theme-display">3 themes available</div>
+            </div>
+            <span class="quick-action">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </span>
+          </a>
+          <a href="#reciter-card" class="quick-setting">
+            <span class="quick-icon">
+              <ion-icon name="headset-outline"></ion-icon>
+            </span>
+            <div class="quick-info">
+              <div class="quick-label">Audio Reciter</div>
+              <div class="quick-value" id="quick-reciter-display">Loading...</div>
+            </div>
+            <span class="quick-action">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </span>
+          </a>
+          <a href="#cloud-sync-card" class="quick-setting">
+            <span class="quick-icon">
+              <ion-icon name="cloud-upload-outline"></ion-icon>
+            </span>
+            <div class="quick-info">
+              <div class="quick-label">Cloud Sync</div>
+              <div class="quick-value" id="quick-sync-display">Not connected</div>
+            </div>
+            <span class="quick-action">
+              <ion-icon name="chevron-forward-outline"></ion-icon>
+            </span>
+          </a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-inner glass">
+          <div class="status-display">
+            <div class="status-section">
+              <div class="status-label">ACTIVE THEME</div>
+              <div class="status-value" id="current-theme-display">Light</div>
+            </div>
+            <div class="status-section">
+              <div class="status-label">PREFERENCES</div>
+              <div class="status-bar">
+                <div class="status-progress" id="prefs-progress" style="width: 60%"></div>
+              </div>
+              <div class="status-sublabel" id="prefs-count">3 of 5 configured</div>
+            </div>
+            <div class="status-note">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
+              All settings are automatically saved to your browser
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="menu-card" id="theme-card">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="color-palette-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Theme</h2>
+          <p>Choose a color scheme optimized for comfortable reading sessions</p>
+        </div>
+      </div>
+      <div class="theme-grid">
+        <label class="theme-option">
+          <input type="radio" name="theme" value="light">
+          <div class="theme-card">
+            <div class="theme-preview light-preview">
+              <div class="theme-sample"></div>
+            </div>
+            <div class="theme-info">
+              <ion-icon name="sunny-outline"></ion-icon>
+              <span class="theme-name">Light</span>
+              <span class="theme-desc">Bright & clear</span>
+            </div>
+          </div>
+        </label>
+        <label class="theme-option">
+          <input type="radio" name="theme" value="dark">
+          <div class="theme-card">
+            <div class="theme-preview dark-preview">
+              <div class="theme-sample"></div>
+            </div>
+            <div class="theme-info">
+              <ion-icon name="moon-outline"></ion-icon>
+              <span class="theme-name">Dark</span>
+              <span class="theme-desc">Easy on eyes</span>
+            </div>
+          </div>
+        </label>
+        <label class="theme-option">
+          <input type="radio" name="theme" value="sepia">
+          <div class="theme-card">
+            <div class="theme-preview sepia-preview">
+              <div class="theme-sample"></div>
+            </div>
+            <div class="theme-info">
+              <ion-icon name="book-outline"></ion-icon>
+              <span class="theme-name">Sepia</span>
+              <span class="theme-desc">Classic warmth</span>
+            </div>
+          </div>
+        </label>
+      </div>
+      <div class="menu-meta">
+        <span>
+          <ion-icon name="sparkles-outline"></ion-icon>
+          Changes apply instantly
+        </span>
+      </div>
+    </section>
+
+    <section class="menu-card">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="text-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Arabic Font Size</h2>
+          <p>Adjust text size for comfortable Quranic text reading</p>
+        </div>
+      </div>
+      <div class="stack">
+        <div class="slider-container">
+          <div class="slider-labels">
+            <span class="slider-label">Small</span>
+            <span class="slider-label">Medium</span>
+            <span class="slider-label">Large</span>
+          </div>
+          <div class="slider-wrapper">
+            <input id="font-size" type="range" min="24" max="56" step="2" class="modern-range">
+          </div>
+          <div class="slider-value">
+            <span id="font-size-val">36</span>
+            <span class="slider-unit">px</span>
+          </div>
+        </div>
+        <div id="font-preview" class="preview arabic-preview">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+      </div>
+    </section>
+
+    <section class="menu-card" id="reciter-card">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Quran Reciter</h2>
+          <p>Select your preferred reciter for audio playback and memorization</p>
+        </div>
+      </div>
       <div class="row">
-        <div class="muted">Choose a color theme</div>
-        <div class="option">
-          <label><input type="radio" name="theme" value="dark"> Dark</label>
-          <label><input type="radio" name="theme" value="light"> Light</label>
-          <label><input type="radio" name="theme" value="sepia"> Sepia</label>
+        <div class="select-wrapper">
+          <select id="reciter-select" class="modern-select">
+            <option>Loading reciters...</option>
+          </select>
         </div>
+      </div>
+      <div class="menu-meta">
+        <span>
+          <ion-icon name="musical-notes-outline"></ion-icon>
+          High-quality audio from Quran.com
+        </span>
       </div>
     </section>
 
-    <section class="card">
-      <h2>Reader Font Size</h2>
+    <section class="menu-card">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="language-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Translation Settings</h2>
+          <p>Enable and customize translation display in Reader view</p>
+        </div>
+      </div>
       <div class="stack">
-        <div class="row">
-          <div class="muted">Arabic text size in Reader</div>
-          <div style="min-width:220px; display:flex; align-items:center; gap:10px;">
-            <input id="font-size" type="range" min="24" max="56" step="2" />
-            <div id="font-size-val" class="muted" style="width:40px; text-align:right">36</div>
+        <label class="toggle-option">
+          <input type="checkbox" id="translation-toggle" class="modern-toggle">
+          <div class="toggle-content">
+            <div class="toggle-icon">
+              <ion-icon name="eye-outline"></ion-icon>
+            </div>
+            <div class="toggle-text">
+              <div class="toggle-label">Show Translation</div>
+              <div class="toggle-desc">Display translation below Arabic text</div>
+            </div>
+          </div>
+          <div class="toggle-switch"></div>
+        </label>
+        
+        <div class="select-wrapper">
+          <label class="input-label">Translation Source</label>
+          <select id="translation-select" class="modern-select" disabled>
+            <option>Loading translations...</option>
+          </select>
+        </div>
+
+        <div class="slider-container">
+          <label class="input-label">Translation Font Size</label>
+          <div class="slider-wrapper">
+            <input id="tr-font-size" type="range" min="12" max="24" step="1" class="modern-range">
+          </div>
+          <div class="slider-value">
+            <span id="tr-font-size-val">16</span>
+            <span class="slider-unit">px</span>
           </div>
         </div>
-        <div id="font-preview" class="preview">ٱلْحَمْدُ لِلّٰهِ رَبِّ ٱلْعٰلَمِينَ</div>
-      </div>
-    </section>
 
-    <section class="card">
-      <h2>Reciter</h2>
-      <div class="row">
-        <div class="muted">Select audio reciter</div>
-        <div class="option">
-          <select id="reciter-select"></select>
+        <div id="tr-font-preview" class="preview translation-preview">This is a sample translation text. The translation will appear below the Arabic verses in the Reader.</div>
+        
+        <div class="menu-meta">
+          <span>
+            <ion-icon name="globe-outline"></ion-icon>
+            Multiple languages available
+          </span>
         </div>
       </div>
-      <div class="muted" id="reciter-status"></div>
     </section>
 
-    <section class="card">
-      <h2>Translation</h2>
+    <section class="menu-card" id="cloud-sync-card">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="cloud-upload-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Cloud Synchronization</h2>
+          <p>Back up your progress and sync across all your devices with Google</p>
+        </div>
+      </div>
       <div class="stack">
-        <div class="row">
-          <label class="option"><input type="checkbox" id="translation-toggle"> Show translation in Reader</label>
-          <div class="option" style="margin-left:auto;">
-            <label for="translation-select" class="muted" style="margin-right:6px;">Source</label>
-            <select id="translation-select" disabled></select>
+        <div class="sync-status-box">
+          <div class="sync-icon" id="sync-icon-status">
+            <ion-icon name="cloud-offline-outline"></ion-icon>
+          </div>
+          <div class="sync-info">
+            <div class="sync-label" id="sync-status-label">Not Connected</div>
+            <div class="sync-desc" id="sync-status-desc">Connect your Google account to enable cloud backup</div>
           </div>
         </div>
-        <div class="row">
-          <div class="muted">Translation font size</div>
-          <div style="min-width:220px; display:flex; align-items:center; gap:10px;">
-            <input id="tr-font-size" type="range" min="12" max="24" step="1" />
-            <div id="tr-font-size-val" class="muted" style="width:40px; text-align:right">16</div>
+        
+        <div class="sync-features">
+          <div class="sync-feature">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Preferences & themes</span>
+          </div>
+          <div class="sync-feature">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Reading progress</span>
+          </div>
+          <div class="sync-feature">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Bookmarks & notes</span>
+          </div>
+          <div class="sync-feature">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Memorization data</span>
+          </div>
+          <div class="sync-feature">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            <span>Confidence scores & streaks</span>
           </div>
         </div>
-        <div id="tr-font-preview" class="preview preview-tr">This is a translation preview. The quick brown fox jumps
-          over the lazy dog.</div>
-        <div class="muted" id="translation-status"></div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2>Cloud Sync</h2>
-      <div class="stack">
-        <div class="muted">Connect Google to back up your data (prefs, progress, bookmarks, notes, confidence, review, streaks). After connecting, sync runs automatically.</div>
-        <div class="row">
-          <button id="sync-connect" class="btn primary">Connect Google</button>
-          <button id="sync-disconnect" class="btn secondary">Disconnect</button>
-          <div id="sync-status" class="muted"></div>
+        
+        <div class="sync-actions">
+          <button id="sync-connect" class="btn primary">
+            <ion-icon name="logo-google"></ion-icon>
+            Connect with Google
+          </button>
+          <button id="sync-disconnect" class="btn ghost" style="display: none;">
+            <ion-icon name="log-out-outline"></ion-icon>
+            Disconnect Account
+          </button>
+        </div>
+        
+        <div class="menu-meta">
+          <span>
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            Your data is encrypted and secure
+          </span>
         </div>
       </div>
-    </section>
-
-    <section class="card">
-      <h2>About</h2>
-      <div class="muted">Configure preferences for the app. More options coming soon.</div>
     </section>
   </main>
 
-<meta name="google-client-id" content="459121148063-mtbt0jt72pu2qghc0c4um2t6m2krnqmv.apps.googleusercontent.com">
-<script src="../assets/js/core/profiles.js"></script>
-<script src="../assets/js/core/sync.js"></script>
-<script src="../assets/js/core/prefs.js"></script>
-<script src="../assets/js/core/utils.js"></script>
-<script src="../assets/js/core/api.js"></script>
-<script src="../assets/js/settings.js"></script>
-</body>
+  <footer class="app-footer">
+    <div class="app-footer-content">
+      <div>
+        <h2>Set the experience you need today</h2>
+        <p>Choose your preferred theme, font, and reciter, then return to Reader or Mushaf to continue revising.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="reader.html">Reader</a>
+        <a href="mushaf.html">Mushaf</a>
+        <a href="hifdh.html">Hifdh</a>
+        <a href="hifdh-test.html">Hifdh Test</a>
+        <a href="tajwid.html">Tajwid</a>
+      </nav>
+    </div>
+  </footer>
 
+  <meta name="google-client-id" content="459121148063-mtbt0jt72pu2qghc0c4um2t6m2krnqmv.apps.googleusercontent.com">
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/core/profiles.js"></script>
+  <script src="../assets/js/core/sync.js"></script>
+  <script src="../assets/js/core/prefs.js"></script>
+  <script src="../assets/js/core/utils.js"></script>
+  <script src="../assets/js/core/api.js"></script>
+  <script src="../assets/js/settings.js"></script>
+</body>
 </html>
+
+
+
+

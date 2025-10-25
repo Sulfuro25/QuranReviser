@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,151 +17,177 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="../assets/css/hifdh-test.css">
 </head>
-
-<body>
-    <header class="app-header">
+<body class="page-hifdh-test">
+  <header class="app-header">
     <div class="brand">
       <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
-      <h1>Hifdh Test</h1>
+      <div class="brand-copy">
+        <h1>Hifdh Test</h1>
+        <p class="brand-tagline">Challenge your memorisation with guided prompts</p>
+      </div>
     </div>
+    <nav class="primary-nav" aria-label="Primary">
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+    </nav>
     <div class="header-actions">
-      <a class="btn secondary" href="settings.html" title="Open settings" aria-label="Settings">⚙️</a>
+      <a class="btn ghost" href="hifdh.html">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        View Progress
+      </a>
+      <a class="btn secondary" href="settings.html" title="Open settings" aria-label="Settings">
+        <ion-icon name="settings-outline"></ion-icon>
+        Settings
+      </a>
     </div>
   </header>
 
-  <main class="shell">
-    <section class="panel" id="setup-section" aria-label="Test setup">
-      <div class="row">
-        <div class="field">
-          <label class="muted">Scope</label>
-          <select id="scope-kind">
-            <option value="progress">My Hifdh Progress</option>
-            <option value="surahs">Surah range</option>
-            <option value="juz">Juz range</option>
-            <option value="hizb">Hizb range</option>
-          </select>
-        </div>
-        <div class="field" id="scope-surahs" hidden>
-          <label class="muted">Surahs (e.g., 1, 36, 67-70)</label>
-          <input id="scope-surahs-input" type="text" placeholder="1, 36, 67-70">
-        </div>
-        <div class="field" id="scope-juz" hidden>
-          <label class="muted">Juz (e.g., 1-3)</label>
-          <input id="scope-juz-input" type="text" placeholder="1-3">
-        </div>
-        <div class="field" id="scope-hizb" hidden>
-          <label class="muted">Hizb (e.g., 1, 10-15)</label>
-          <input id="scope-hizb-input" type="text" placeholder="1, 10-15">
-        </div>
+  <!-- Landing Page: Test Mode Selection -->
+  <section id="test-landing" class="test-landing">
+    <div class="landing-hero">
+      <div class="hero-icon">
+        <ion-icon name="school"></ion-icon>
       </div>
-      <div class="row" style="margin-top:8px;">
-        <div class="field">
-          <label class="muted">Mode</label>
-          <select id="mode">
-            <option value="recite">1) Recite next X verses</option>
-            <option value="mcq">2) Pick the next verse (5 choices)</option>
-            <option value="order">3) Order the page</option>
-            <option value="fill">4) Fill in the blanks</option>
-            <option value="audio">5) Audio-only prompt</option>
-          </select>
-        </div>
-        <div class="field" id="x-wrapper">
-          <label class="muted">How many verses (X)</label>
-          <input id="x-count" type="number" min="1" max="20" value="3">
-        </div>
-        <div class="field" id="recite-meta-wrapper">
-          <label class="option"><input type="checkbox" id="recite-show-meta" checked> Show verse number and surah name
-            for first verse</label>
-        </div>
-        <div class="field" id="font-wrapper">
-          <label class="muted">Arabic font size</label>
-          <input id="font-px" type="number" min="18" max="60" value="36">
-        </div>
-        <div class="field">
-          <label class="muted">Tajweed coloring</label>
-          <select id="tajweed">
-            <option value="off">Off</option>
-            <option value="on">On (if available)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label class="muted">Timer per question (seconds)</label>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <label class="option"><input type="checkbox" id="timer-on"> Enable</label>
-            <input id="timer-sec" type="number" min="5" step="5" value="30" style="width:100px;">
+      <h1>Hifdh Test</h1>
+      <p>Challenge your memorization with 5 interactive test modes. Choose your scope, select a mode, and strengthen your recall.</p>
+    </div>
+
+    <div class="test-modes">
+      <div class="mode-card" data-mode="recite">
+        <div class="mode-header">
+          <div class="mode-icon">
+            <ion-icon name="mic"></ion-icon>
           </div>
+          <h3 class="mode-title">Recite Mode</h3>
         </div>
-        
-        <div class="field" style="align-self:flex-end;">
-          <button id="start" class="btn primary">Start</button>
+        <p class="mode-description">Get prompted with a verse, then recite the next X verses from memory using voice recording.</p>
+        <div class="mode-features">
+          <span class="feature-tag"><ion-icon name="mic-outline"></ion-icon> Voice recording</span>
+          <span class="feature-tag"><ion-icon name="list-outline"></ion-icon> Custom verse count</span>
         </div>
       </div>
-    </section>
 
-    <div id="timer-view" class="muted" style="text-align:right; display:none;"></div>
-
-    <section class="panel" id="recite-section" hidden>
-      <div class="muted">Prompt</div>
-      <div id="recite-prompt" class="question">—</div>
-      <div class="row">
-        <button id="rec-main-btn" class="btn primary">Start Recording</button>
-        <audio id="rec-audio" controls class="hidden"></audio>
+      <div class="mode-card" data-mode="mcq">
+        <div class="mode-header">
+          <div class="mode-icon">
+            <ion-icon name="checkmark-circle"></ion-icon>
+          </div>
+          <h3 class="mode-title">Multiple Choice</h3>
+        </div>
+        <p class="mode-description">Given a verse, identify the correct next verse from 5 choices to test your sequence knowledge.</p>
+        <div class="mode-features">
+          <span class="feature-tag"><ion-icon name="shuffle-outline"></ion-icon> Randomized</span>
+          <span class="feature-tag"><ion-icon name="checkmark-outline"></ion-icon> Instant feedback</span>
+        </div>
       </div>
-      <div id="rec-answer" class="question hidden"></div>
-    </section>
 
-    <section class="panel" id="mcq-section" hidden>
-      <div class="muted">Prompt</div>
-      <div id="mcq-prompt" class="question">—</div>
-      <div class="choices" id="mcq-choices"></div>
-      <div class="row">
-        <button id="mcq-next" class="btn secondary">Next</button>
+      <div class="mode-card" data-mode="order">
+        <div class="mode-header">
+          <div class="mode-icon">
+            <ion-icon name="swap-vertical"></ion-icon>
+          </div>
+          <h3 class="mode-title">Order the Page</h3>
+        </div>
+        <p class="mode-description">Drag and drop shuffled verses into their correct order to reconstruct the page sequence.</p>
+        <div class="mode-features">
+          <span class="feature-tag"><ion-icon name="move-outline"></ion-icon> Drag & drop</span>
+          <span class="feature-tag"><ion-icon name="layers-outline"></ion-icon> Full page</span>
+        </div>
       </div>
-    </section>
 
-    <section class="panel" id="order-section" hidden>
-      <div class="muted">Arrange the verses to correct page order</div>
-      <ol class="draggable-list" id="order-list"></ol>
-      <div class="row">
-        <button id="order-check" class="btn primary">Check Order</button>
-        <button id="order-next" class="btn secondary">Next Page</button>
+      <div class="mode-card" data-mode="fill">
+        <div class="mode-header">
+          <div class="mode-icon">
+            <ion-icon name="create"></ion-icon>
+          </div>
+          <h3 class="mode-title">Fill in the Blanks</h3>
+        </div>
+        <p class="mode-description">Complete verses by filling in missing words to test your detailed word-level recall.</p>
+        <div class="mode-features">
+          <span class="feature-tag"><ion-icon name="text-outline"></ion-icon> Word recall</span>
+          <span class="feature-tag"><ion-icon name="star-outline"></ion-icon> Precision test</span>
+        </div>
       </div>
-      <div id="order-result" class="muted"></div>
-    </section>
 
-    <section class="panel" id="fill-section" hidden>
-      <div class="muted">Fill in the missing word(s)</div>
-      <div id="fill-question" class="question"></div>
-      <div class="row">
-        <button id="fill-check" class="btn primary">Check</button>
-        <button id="fill-next" class="btn secondary">Next</button>
+      <div class="mode-card" data-mode="audio">
+        <div class="mode-header">
+          <div class="mode-icon">
+            <ion-icon name="headset"></ion-icon>
+          </div>
+          <h3 class="mode-title">Audio Prompt</h3>
+        </div>
+        <p class="mode-description">Listen to a verse, then verbally continue with the next verse to practice audio-based recall.</p>
+        <div class="mode-features">
+          <span class="feature-tag"><ion-icon name="volume-high-outline"></ion-icon> Audio only</span>
+          <span class="feature-tag"><ion-icon name="ear-outline"></ion-icon> Listening test</span>
+        </div>
       </div>
-      <div id="fill-result" class="muted"></div>
-    </section>
+    </div>
+  </section>
 
-    <section class="panel" id="audioonly-section" hidden>
-      <div class="muted">Listen, then continue with the next ayah</div>
-      <div class="row">
-        <button id="audio-play" class="btn primary">Play Prompt</button>
-        <button id="audio-replay" class="btn secondary">Replay</button>
-        <button id="audio-reveal" class="btn">Reveal Answer</button>
-        <button id="audio-next" class="btn secondary">Next</button>
+  <!-- Test Viewer -->
+  <div id="test-viewer" class="test-viewer">
+    <!-- Toolbar -->
+    <div class="test-toolbar">
+      <div class="toolbar-left">
+        <button id="back-to-landing" class="btn-icon" title="Back to test selection">
+          <ion-icon name="arrow-back"></ion-icon>
+        </button>
       </div>
-      <div id="audio-status" class="muted"></div>
-      <div id="audio-answer" class="question hidden"></div>
-    </section>
-  </main>
+      <div class="toolbar-center">
+        <div class="test-mode-name" id="current-mode-name">Recite Mode</div>
+        <div class="test-scope-info" id="current-scope-info">Surah Al-Fatiha</div>
+      </div>
+      <div class="toolbar-right">
+        <div class="progress-indicator" id="progress-indicator">
+          <ion-icon name="clipboard-outline"></ion-icon>
+          <span id="progress-text">0 / 0</span>
+        </div>
+        <div class="timer-display" id="timer-display" style="display: none;">
+          <ion-icon name="time-outline"></ion-icon>
+          <span id="timer-text">00:30</span>
+        </div>
+        <button id="options-btn" class="btn-icon" title="Test options">
+          <ion-icon name="settings-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
 
-  <audio id="audio" preload="none" class="hidden"></audio>
+    <!-- Test Content -->
+    <div class="test-content" id="test-content">
+      <!-- Content will be dynamically inserted here based on test mode -->
+    </div>
+  </div>
 
-<script src="../assets/js/core/profiles.js"></script>
-<script src="../assets/js/core/prefs.js"></script>
-<script src="../assets/js/core/utils.js"></script>
-<script src="../assets/js/core/api.js"></script>
-<script src="../assets/js/hifdh-test.js"></script>
+  <audio id="audio" preload="none" style="display: none;"></audio>  <footer class="app-footer">
+    <div class="app-footer-content">
+      <div>
+        <h2>Rotate between recall and revision</h2>
+        <p>Use testing modes to surface the gaps, then switch to Reader or Mushaf to review the tricky verses.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="reader.html">Reader</a>
+        <a href="mushaf.html">Mushaf</a>
+        <a href="hifdh.html">Hifdh</a>
+        <a href="tajwid.html">Tajwid</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/core/profiles.js"></script>
+  <script src="../assets/js/core/prefs.js"></script>
+  <script src="../assets/js/core/utils.js"></script>
+  <script src="../assets/js/core/api.js"></script>
+  <script src="../assets/js/hifdh-test.js"></script>
 </body>
-
 </html>

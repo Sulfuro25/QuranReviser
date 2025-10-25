@@ -1,10 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quran â€“ Surahs / Juz / Hizb</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quran - Surahs / Juz / Hizb</title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
   <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
@@ -13,23 +12,36 @@
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/img/favicon/web-app-manifest-512x512.png">
   <link rel="manifest" href="../assets/img/favicon/site.webmanifest">
   <meta name="theme-color" content="#0c3e18">
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
 </head>
-
-<body>
-    <header class="app-header">
+<body class="page-surahs">
+  <header class="app-header">
     <div class="brand">
       <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
-      <h1>Quran</h1>
+      <div class="brand-copy">
+        <h1>Quran Explorer</h1>
+        <p class="brand-tagline">Browse Surahs, Juz, and Hizb in one workspace</p>
+      </div>
     </div>
+    <nav class="primary-nav" aria-label="Primary">
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
+      <a class="nav-link active" href="surahs.html"><ion-icon name="compass-outline"></ion-icon>Quran</a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+    </nav>
     <div class="header-actions">
-      <button id="view-toggle" class="btn secondary" title="Toggle Reader/Mushaf view">Mushaf</button>
+      <button id="view-toggle" class="btn ghost" title="Toggle Reader/Mushaf view">
+        <ion-icon name="layers-outline"></ion-icon>
+        Mushaf
+      </button>
     </div>
   </header>
 
@@ -45,14 +57,29 @@
     <div id="list" class="list-grid" role="list"></div>
   </main>
 
-  <!-- Theme, local chapter metadata, and unified list logic -->
-<script src="../assets/js/core/profiles.js"></script>
-<script src="../assets/js/core/prefs.js"></script>
-<script src="../assets/js/core/utils.js"></script>
-<script src="../assets/js/core/api.js"></script>
-<script src="../assets/js/chapters-data.js"></script>
-<script src="../assets/js/surahs.js"></script>
+  <footer class="app-footer">
+    <div class="app-footer-content">
+      <div>
+        <h2>Ready to recite what you find?</h2>
+        <p>Jump into Reader for audio assisted recitation or open the Mushaf view for the classic layout.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="reader.html">Reader</a>
+        <a href="mushaf.html">Mushaf</a>
+        <a href="hifdh.html">Hifdh</a>
+        <a href="hifdh-test.html">Hifdh Test</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/core/profiles.js"></script>
+  <script src="../assets/js/core/prefs.js"></script>
+  <script src="../assets/js/core/utils.js"></script>
+  <script src="../assets/js/core/api.js"></script>
+  <script src="../assets/js/chapters-data.js"></script>
+  <script src="../assets/js/surahs.js"></script>
 </body>
-
 </html>
-

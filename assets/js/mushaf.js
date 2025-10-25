@@ -2,8 +2,6 @@
 
 // Elements
 const els = {
-  status: document.getElementById('status'),
-  display: document.getElementById('quran-display'),
   canvas: document.getElementById('mushaf-canvas'),
   img: document.getElementById('mushaf-img'),
   audio: document.getElementById('audio'),
@@ -17,11 +15,21 @@ const els = {
   prevPage: document.getElementById('prev-page'),
   nextPage: document.getElementById('next-page'),
   pageInfo: document.getElementById('page-info'),
+  currentPageNum: document.getElementById('current-page-num'),
+  currentSurahName: document.getElementById('current-surah-name'),
+  pageRangeText: document.getElementById('page-range-text'),
   drawer: document.getElementById('control-drawer'),
   drawerOpen: document.getElementById('controls-open'),
   drawerClose: document.getElementById('drawer-close'),
   drawerBackdrop: document.getElementById('drawer-backdrop'),
-  // Loop & bookmarks UI
+  header: document.getElementById('mushaf-header'),
+  // Landing page elements
+  landing: document.getElementById('mushaf-landing'),
+  toolbar: document.getElementById('mushaf-toolbar'),
+  viewer: document.getElementById('mushaf-viewer'),
+  surahGridLanding: document.getElementById('surah-grid-landing'),
+  landingSearch: document.getElementById('landing-search'),
+  backToLanding: document.getElementById('back-to-landing'),
 };
 
 // State
@@ -50,6 +58,406 @@ catch {}
 // Helpers
 const SURAH_VERSE_MAP = new Map();
 const SURAH_PAGE_CACHE = new Map();
+const SURAH_META = (() => {
+  if (Array.isArray(window.CHAPTERS_DATA)) {
+    return window.CHAPTERS_DATA
+      .map((entry, idx) => {
+        if (!entry) return null;
+        const id = Number(entry.id || idx + 1);
+        if (!id || Number.isNaN(id)) return null;
+        const label = `${id}. ${entry.name_simple || entry.name_arabic || `Surah ${id}`}`;
+        return { id, label };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.id - b.id);
+  }
+  return Array.from({ length: 114 }, (_, i) => {
+    const id = i + 1;
+    return { id, label: `Surah ${id}` };
+  });
+})();
+
+// Juz data (30 Juz, each with starting page)
+const JUZ_DATA = [
+  { id: 1, name: 'Juz 1', startPage: 1, startSurah: 1, startVerse: 1 },
+  { id: 2, name: 'Juz 2', startPage: 22, startSurah: 2, startVerse: 142 },
+  { id: 3, name: 'Juz 3', startPage: 42, startSurah: 2, startVerse: 253 },
+  { id: 4, name: 'Juz 4', startPage: 62, startSurah: 3, startVerse: 93 },
+  { id: 5, name: 'Juz 5', startPage: 82, startSurah: 4, startVerse: 24 },
+  { id: 6, name: 'Juz 6', startPage: 102, startSurah: 4, startVerse: 148 },
+  { id: 7, name: 'Juz 7', startPage: 122, startSurah: 5, startVerse: 82 },
+  { id: 8, name: 'Juz 8', startPage: 142, startSurah: 6, startVerse: 111 },
+  { id: 9, name: 'Juz 9', startPage: 162, startSurah: 7, startVerse: 88 },
+  { id: 10, name: 'Juz 10', startPage: 182, startSurah: 8, startVerse: 41 },
+  { id: 11, name: 'Juz 11', startPage: 202, startSurah: 9, startVerse: 93 },
+  { id: 12, name: 'Juz 12', startPage: 222, startSurah: 11, startVerse: 6 },
+  { id: 13, name: 'Juz 13', startPage: 242, startSurah: 12, startVerse: 53 },
+  { id: 14, name: 'Juz 14', startPage: 262, startSurah: 15, startVerse: 1 },
+  { id: 15, name: 'Juz 15', startPage: 282, startSurah: 17, startVerse: 1 },
+  { id: 16, name: 'Juz 16', startPage: 302, startSurah: 18, startVerse: 75 },
+  { id: 17, name: 'Juz 17', startPage: 322, startSurah: 21, startVerse: 1 },
+  { id: 18, name: 'Juz 18', startPage: 342, startSurah: 23, startVerse: 1 },
+  { id: 19, name: 'Juz 19', startPage: 362, startSurah: 25, startVerse: 21 },
+  { id: 20, name: 'Juz 20', startPage: 382, startSurah: 27, startVerse: 56 },
+  { id: 21, name: 'Juz 21', startPage: 402, startSurah: 29, startVerse: 46 },
+  { id: 22, name: 'Juz 22', startPage: 422, startSurah: 33, startVerse: 31 },
+  { id: 23, name: 'Juz 23', startPage: 442, startSurah: 36, startVerse: 28 },
+  { id: 24, name: 'Juz 24', startPage: 462, startSurah: 39, startVerse: 32 },
+  { id: 25, name: 'Juz 25', startPage: 482, startSurah: 41, startVerse: 47 },
+  { id: 26, name: 'Juz 26', startPage: 502, startSurah: 46, startVerse: 1 },
+  { id: 27, name: 'Juz 27', startPage: 522, startSurah: 51, startVerse: 31 },
+  { id: 28, name: 'Juz 28', startPage: 542, startSurah: 58, startVerse: 1 },
+  { id: 29, name: 'Juz 29', startPage: 562, startSurah: 67, startVerse: 1 },
+  { id: 30, name: 'Juz 30', startPage: 582, startSurah: 78, startVerse: 1 }
+];
+
+// Hizb data (60 Hizb, each half of a Juz)
+const HIZB_DATA = [
+  { id: 1, name: 'Hizb 1', startPage: 1, juz: 1 },
+  { id: 2, name: 'Hizb 2', startPage: 11, juz: 1 },
+  { id: 3, name: 'Hizb 3', startPage: 22, juz: 2 },
+  { id: 4, name: 'Hizb 4', startPage: 32, juz: 2 },
+  { id: 5, name: 'Hizb 5', startPage: 42, juz: 3 },
+  { id: 6, name: 'Hizb 6', startPage: 52, juz: 3 },
+  { id: 7, name: 'Hizb 7', startPage: 62, juz: 4 },
+  { id: 8, name: 'Hizb 8', startPage: 72, juz: 4 },
+  { id: 9, name: 'Hizb 9', startPage: 82, juz: 5 },
+  { id: 10, name: 'Hizb 10', startPage: 92, juz: 5 },
+  { id: 11, name: 'Hizb 11', startPage: 102, juz: 6 },
+  { id: 12, name: 'Hizb 12', startPage: 112, juz: 6 },
+  { id: 13, name: 'Hizb 13', startPage: 122, juz: 7 },
+  { id: 14, name: 'Hizb 14', startPage: 132, juz: 7 },
+  { id: 15, name: 'Hizb 15', startPage: 142, juz: 8 },
+  { id: 16, name: 'Hizb 16', startPage: 152, juz: 8 },
+  { id: 17, name: 'Hizb 17', startPage: 162, juz: 9 },
+  { id: 18, name: 'Hizb 18', startPage: 172, juz: 9 },
+  { id: 19, name: 'Hizb 19', startPage: 182, juz: 10 },
+  { id: 20, name: 'Hizb 20', startPage: 192, juz: 10 },
+  { id: 21, name: 'Hizb 21', startPage: 202, juz: 11 },
+  { id: 22, name: 'Hizb 22', startPage: 212, juz: 11 },
+  { id: 23, name: 'Hizb 23', startPage: 222, juz: 12 },
+  { id: 24, name: 'Hizb 24', startPage: 232, juz: 12 },
+  { id: 25, name: 'Hizb 25', startPage: 242, juz: 13 },
+  { id: 26, name: 'Hizb 26', startPage: 252, juz: 13 },
+  { id: 27, name: 'Hizb 27', startPage: 262, juz: 14 },
+  { id: 28, name: 'Hizb 28', startPage: 272, juz: 14 },
+  { id: 29, name: 'Hizb 29', startPage: 282, juz: 15 },
+  { id: 30, name: 'Hizb 30', startPage: 292, juz: 15 },
+  { id: 31, name: 'Hizb 31', startPage: 302, juz: 16 },
+  { id: 32, name: 'Hizb 32', startPage: 312, juz: 16 },
+  { id: 33, name: 'Hizb 33', startPage: 322, juz: 17 },
+  { id: 34, name: 'Hizb 34', startPage: 332, juz: 17 },
+  { id: 35, name: 'Hizb 35', startPage: 342, juz: 18 },
+  { id: 36, name: 'Hizb 36', startPage: 352, juz: 18 },
+  { id: 37, name: 'Hizb 37', startPage: 362, juz: 19 },
+  { id: 38, name: 'Hizb 38', startPage: 372, juz: 19 },
+  { id: 39, name: 'Hizb 39', startPage: 382, juz: 20 },
+  { id: 40, name: 'Hizb 40', startPage: 392, juz: 20 },
+  { id: 41, name: 'Hizb 41', startPage: 402, juz: 21 },
+  { id: 42, name: 'Hizb 42', startPage: 412, juz: 21 },
+  { id: 43, name: 'Hizb 43', startPage: 422, juz: 22 },
+  { id: 44, name: 'Hizb 44', startPage: 432, juz: 22 },
+  { id: 45, name: 'Hizb 45', startPage: 442, juz: 23 },
+  { id: 46, name: 'Hizb 46', startPage: 452, juz: 23 },
+  { id: 47, name: 'Hizb 47', startPage: 462, juz: 24 },
+  { id: 48, name: 'Hizb 48', startPage: 472, juz: 24 },
+  { id: 49, name: 'Hizb 49', startPage: 482, juz: 25 },
+  { id: 50, name: 'Hizb 50', startPage: 492, juz: 25 },
+  { id: 51, name: 'Hizb 51', startPage: 502, juz: 26 },
+  { id: 52, name: 'Hizb 52', startPage: 512, juz: 26 },
+  { id: 53, name: 'Hizb 53', startPage: 522, juz: 27 },
+  { id: 54, name: 'Hizb 54', startPage: 532, juz: 27 },
+  { id: 55, name: 'Hizb 55', startPage: 542, juz: 28 },
+  { id: 56, name: 'Hizb 56', startPage: 552, juz: 28 },
+  { id: 57, name: 'Hizb 57', startPage: 562, juz: 29 },
+  { id: 58, name: 'Hizb 58', startPage: 572, juz: 29 },
+  { id: 59, name: 'Hizb 59', startPage: 582, juz: 30 },
+  { id: 60, name: 'Hizb 60', startPage: 592, juz: 30 }
+];
+
+function populateSurahSelect(select) {
+  if (!select || select.dataset.populated === 'true') return;
+  select.innerHTML = '';
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = 'Select surah...';
+  select.appendChild(placeholder);
+  SURAH_META.forEach((meta) => {
+    const opt = document.createElement('option');
+    opt.value = String(meta.id);
+    opt.textContent = meta.label;
+    select.appendChild(opt);
+  });
+  select.dataset.populated = 'true';
+}
+
+function setSurahSelectValue(select, value) {
+  if (!select) return;
+  if (!value) {
+    select.value = '';
+    return;
+  }
+  const str = String(value);
+  if (!select.dataset.populated || !select.querySelector(`option[value="${str}"]`)) {
+    populateSurahSelect(select);
+  }
+  select.value = str;
+}
+
+// Landing page functions
+function showLanding() {
+  if (els.landing) els.landing.style.display = 'flex';
+  if (els.toolbar) els.toolbar.style.display = 'none';
+  if (els.viewer) els.viewer.style.display = 'none';
+  if (els.header) els.header.style.removeProperty('transform');
+  document.body.classList.remove('viewer-mode');
+}
+
+function hideLanding() {
+  if (els.landing) els.landing.style.display = 'none';
+  if (els.toolbar) els.toolbar.style.display = 'block';
+  if (els.viewer) els.viewer.style.display = 'block';
+  document.body.classList.add('viewer-mode');
+}
+
+function createSurahCard(meta) {
+  const card = document.createElement('div');
+  card.className = 'surah-card';
+  card.dataset.surahId = meta.id;
+  card.dataset.searchText = `${meta.id} ${meta.label.toLowerCase()}`;
+  
+  // Get verse count and page info
+  const verseCount = getSurahVerseCount(meta.id);
+  const startPage = getSurahStartPage(meta.id);
+  const pageInfo = startPage ? `Page ${startPage}` : '';
+  
+  card.innerHTML = `
+    <div class="surah-card-header">
+      <div class="surah-number">${meta.id}</div>
+      <div class="surah-card-title">
+        <h3 class="surah-name">${meta.label.split('. ')[1] || meta.label}</h3>
+        <p class="surah-arabic">${getArabicName(meta.id)}</p>
+      </div>
+    </div>
+    <div class="surah-card-meta">
+      <span class="surah-meta-item">
+        <ion-icon name="document-text-outline"></ion-icon>
+        ${verseCount} verses
+      </span>
+      ${pageInfo ? `<span class="surah-meta-item">
+        <ion-icon name="bookmark-outline"></ion-icon>
+        ${pageInfo}
+      </span>` : ''}
+    </div>
+  `;
+  
+  card.addEventListener('click', async () => {
+    await selectSurah(meta.id);
+  });
+  
+  return card;
+}
+
+function getArabicName(surahId) {
+  const list = Array.isArray(window.CHAPTERS_DATA) ? window.CHAPTERS_DATA : [];
+  const entry = list.find(ch => ch && Number(ch.id) === surahId);
+  return entry && entry.name_arabic ? entry.name_arabic : '';
+}
+
+function populateSurahGrid(container) {
+  if (!container) return;
+  container.innerHTML = '';
+  SURAH_META.forEach(meta => {
+    const card = createSurahCard(meta);
+    container.appendChild(card);
+  });
+}
+
+function filterSurahCards(searchText, container) {
+  if (!container) return;
+  const query = searchText.toLowerCase().trim();
+  const cards = container.querySelectorAll('.surah-card');
+  
+  cards.forEach(card => {
+    const searchable = card.dataset.searchText || '';
+    if (!query || searchable.includes(query)) {
+      card.dataset.hidden = 'false';
+    } else {
+      card.dataset.hidden = 'true';
+    }
+  });
+}
+
+async function selectSurah(surahId) {
+  const sid = Number(surahId);
+  if (!sid || Number.isNaN(sid)) return;
+  
+  const startPage = getSurahStartPage(sid) || 1;
+  state.ctx = { type: 'surah', id: sid };
+  
+  hideLanding();
+  await loadPage(startPage);
+  
+  try {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {}
+}
+
+// Juz and Hizb grid functions
+function createJuzCard(juz) {
+  const card = document.createElement('div');
+  card.className = 'juz-card';
+  card.dataset.juzId = juz.id;
+  card.dataset.searchText = `${juz.id} juz ${juz.id}`;
+  
+  const surahInfo = SURAH_META.find(s => s.id === juz.startSurah);
+  const surahName = surahInfo ? surahInfo.label.split('. ')[1] : '';
+  
+  card.innerHTML = `
+    <div class="juz-card-header">
+      <div class="juz-number">${juz.id}</div>
+      <div class="juz-title">Juz ${juz.id}</div>
+    </div>
+    <div class="juz-info">
+      Starts at page ${juz.startPage}<br>
+      ${surahName ? `${surahName} (${juz.startSurah}:${juz.startVerse})` : ''}
+    </div>
+  `;
+  
+  card.addEventListener('click', async () => {
+    await selectJuz(juz.id);
+  });
+  
+  return card;
+}
+
+function createHizbCard(hizb) {
+  const card = document.createElement('div');
+  card.className = 'hizb-card';
+  card.dataset.hizbId = hizb.id;
+  card.dataset.searchText = `${hizb.id} hizb ${hizb.id} juz ${hizb.juz}`;
+  
+  card.innerHTML = `
+    <div class="hizb-card-header">
+      <div class="hizb-number">${hizb.id}</div>
+      <div class="hizb-title">Hizb ${hizb.id}</div>
+    </div>
+    <div class="hizb-info">
+      Part of Juz ${hizb.juz}<br>
+      Starts at page ${hizb.startPage}
+    </div>
+  `;
+  
+  card.addEventListener('click', async () => {
+    await selectHizb(hizb.id);
+  });
+  
+  return card;
+}
+
+function populateJuzGrid(container) {
+  if (!container) return;
+  container.innerHTML = '';
+  JUZ_DATA.forEach(juz => {
+    const card = createJuzCard(juz);
+    container.appendChild(card);
+  });
+}
+
+function populateHizbGrid(container) {
+  if (!container) return;
+  container.innerHTML = '';
+  HIZB_DATA.forEach(hizb => {
+    const card = createHizbCard(hizb);
+    container.appendChild(card);
+  });
+}
+
+function filterJuzCards(searchText, container) {
+  if (!container) return;
+  const query = searchText.toLowerCase().trim();
+  const cards = container.querySelectorAll('.juz-card');
+  
+  cards.forEach(card => {
+    const searchable = card.dataset.searchText || '';
+    if (!query || searchable.includes(query)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function filterHizbCards(searchText, container) {
+  if (!container) return;
+  const query = searchText.toLowerCase().trim();
+  const cards = container.querySelectorAll('.hizb-card');
+  
+  cards.forEach(card => {
+    const searchable = card.dataset.searchText || '';
+    if (!query || searchable.includes(query)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+async function selectJuz(juzId) {
+  const juz = JUZ_DATA.find(j => j.id === Number(juzId));
+  if (!juz) return;
+  
+  state.ctx = { type: 'juz', id: juz.id };
+  
+  hideLanding();
+  await loadPage(juz.startPage);
+  
+  try {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {}
+}
+
+async function selectHizb(hizbId) {
+  const hizb = HIZB_DATA.find(h => h.id === Number(hizbId));
+  if (!hizb) return;
+  
+  state.ctx = { type: 'hizb', id: hizb.id };
+  
+  hideLanding();
+  await loadPage(hizb.startPage);
+  
+  try {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch {}
+}
+
+function updateViewerInfo() {
+  // Update current surah name
+  if (els.currentSurahName && state.verses && state.verses[0]) {
+    const sid = parseInt(String(state.verses[0].verse_key).split(':')[0], 10);
+    if (!Number.isNaN(sid)) {
+      const meta = SURAH_META.find(m => m.id === sid);
+      if (meta) {
+        const name = meta.label.split('. ')[1] || meta.label;
+        els.currentSurahName.textContent = name;
+      }
+    }
+  }
+  
+  // Update page info
+  if (els.currentPageNum) {
+    els.currentPageNum.textContent = state.currentPage || '1';
+  }
+  
+  if (els.pageRangeText) {
+    els.pageRangeText.textContent = `Page ${state.currentPage || 1}`;
+  }
+}
+
+function setStatus(txt) {
+  // Status messages now silent or shown in console
+  if (txt) console.log('Mushaf:', txt);
+}
 
 let controls = null;
 let activeRange = { start: null, end: null };
@@ -66,6 +474,18 @@ function getSurahVerseCount(id){
     SURAH_VERSE_MAP.set(sid, count);
   }
   return SURAH_VERSE_MAP.get(sid) || 0;
+}
+
+function getSurahStartPage(id){
+  const sid = Number(id);
+  if (!sid || Number.isNaN(sid)) return null;
+  const list = Array.isArray(window.CHAPTERS_DATA) ? window.CHAPTERS_DATA : [];
+  const entry = list.find(ch => ch && Number(ch.id) === sid) || null;
+  if (entry && Array.isArray(entry.pages) && entry.pages.length){
+    const start = Number(entry.pages[0]);
+    if (!Number.isNaN(start) && start >= 1 && start <= 604) return start;
+  }
+  return null;
 }
 
 function parseVerseKey(key){
@@ -145,7 +565,7 @@ function adjustImageFit(){
 
 // Fetch page data
 async function fetchPage(page){
-  setStatus('Loading page…');
+  setStatus('Loading page...');
   const verses = await QR.api.fetchVersesByPage(page, 'text_uthmani');
   setStatus('');
   return verses || [];
@@ -168,14 +588,38 @@ function updatePlayerInfo(){
   const total = state.verses.length;
   const current = Math.min(state.playIndex+1, Math.max(1,total||1));
   const curV = (state.verses||[])[Math.max(0,Math.min(state.playIndex,(state.verses.length||1)-1))];
-  if (els.playerInfo) els.playerInfo.textContent = total ? `Ayah ${current} / ${total} (Page ${state.currentPage}${curV?` - ${curV.verse_key}`:''})` : 'Not loaded';
-  const enabled = !!total && state.audioMap.size > 0;
-  [els.prevAyah, els.playPause, els.nextAyah].forEach(b => { if(b) b.disabled = !enabled; });
+  
+  // Update player info in drawer
+  if (els.playerInfo) {
+    if (total && curV) {
+      els.playerInfo.innerHTML = `
+        <ion-icon name="radio-outline"></ion-icon>
+        <span>Playing ayah ${current} of ${total}</span>
+      `;
+    } else {
+      els.playerInfo.innerHTML = `
+        <ion-icon name="radio-outline"></ion-icon>
+        <span>No audio loaded</span>
+      `;
+    }
+  }
+  
+  // Update page info badge in drawer
   if (els.pageInfo) {
-    const v = curV; const label = state.currentPage ? `Page ${state.currentPage}${v?` - ${v.verse_key}`:''}` : '';
+    const label = state.currentPage ? `Page ${state.currentPage}` : 'Page -';
     els.pageInfo.textContent = label;
   }
-  if (els.playPause) els.playPause.textContent = (els.audio && !els.audio.paused) ? 'Pause' : 'Play';
+  
+  // Update play/pause button with icon only
+  if (els.playPause) {
+    const isPlaying = els.audio && !els.audio.paused;
+    const iconName = isPlaying ? 'pause' : 'play';
+    els.playPause.innerHTML = `<ion-icon name="${iconName}"></ion-icon>`;
+    els.playPause.title = isPlaying ? 'Pause' : 'Play';
+  }
+  
+  const enabled = !!total && state.audioMap.size > 0;
+  [els.prevAyah, els.playPause, els.nextAyah].forEach(b => { if(b) b.disabled = !enabled; });
 }
 function setAudioForIndex(index, autoplay=false){
   if (!state.verses.length || !els.audio) return false;
@@ -319,6 +763,10 @@ async function loadPage(page, autoplayFirst=false){
     state.playIndex = 0;
     setAudioForIndex(0, !!autoplayFirst);
     if (controls && typeof controls.setCurrentPage === "function") controls.setCurrentPage(page);
+    
+    // Update viewer info
+    updateViewerInfo();
+    
     const shouldRefocus = pendingRangeFocus && activeRange.start;
     if (shouldRefocus) {
       pendingRangeFocus = false;
@@ -328,7 +776,17 @@ async function loadPage(page, autoplayFirst=false){
 
     if (els.toReader && verses[0]){
       const sid = String(verses[0].verse_key).split(':')[0];
-      els.toReader.href = 'reader.html?surah=' + sid + '&controls=open';
+      const qp = new URLSearchParams();
+      if (state.ctx && state.ctx.type && state.ctx.id){
+        if (state.ctx.type === 'surah') qp.set('surah', state.ctx.id);
+        else if (state.ctx.type === 'juz') qp.set('juz', state.ctx.id);
+        else if (state.ctx.type === 'hizb') qp.set('hizb', state.ctx.id);
+      } else if (sid){
+        qp.set('surah', sid);
+      }
+      qp.set('page', page);
+      qp.set('controls', 'open');
+      els.toReader.href = `reader.html?${qp.toString()}`;
     }
 
     loadPageImage(page);
@@ -371,9 +829,145 @@ if (els.nextPage) els.nextPage.addEventListener('click', ()=> loadPage(Math.min(
 if (els.navPrev) els.navPrev.addEventListener('click', ()=> loadPage(Math.min(604,state.currentPage+1)));
 if (els.navNext) els.navNext.addEventListener('click', ()=> loadPage(Math.max(1,state.currentPage-1)));
 
-document.addEventListener("DOMContentLoaded", () => {
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (els.drawer && !els.drawer.hasAttribute('aria-hidden')) return; // Don't navigate if drawer is open
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+  
+  // Arrow keys for page navigation (RTL: left=next, right=prev)
+  if (e.key === 'ArrowLeft' && state.currentPage < 604) {
+    e.preventDefault();
+    loadPage(state.currentPage + 1);
+  } else if (e.key === 'ArrowRight' && state.currentPage > 1) {
+    e.preventDefault();
+    loadPage(state.currentPage - 1);
+  }
+  // Space bar for play/pause
+  else if (e.key === ' ' && els.playPause && !els.playPause.disabled) {
+    e.preventDefault();
+    togglePlay();
+  }
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
   adjustImageFit();
-  loadPage(1);
+  
+  // Populate landing grids
+  if (els.surahGridLanding) {
+    populateSurahGrid(els.surahGridLanding);
+  }
+  
+  const juzGrid = document.getElementById('juz-grid-landing');
+  const hizbGrid = document.getElementById('hizb-grid-landing');
+  if (juzGrid) populateJuzGrid(juzGrid);
+  if (hizbGrid) populateHizbGrid(hizbGrid);
+  
+  // Tab switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.dataset.tab;
+      
+      // Update active tab button
+      tabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Update active tab content
+      tabContents.forEach(content => {
+        if (content.id === `tab-${targetTab}`) {
+          content.classList.add('active');
+        } else {
+          content.classList.remove('active');
+        }
+      });
+      
+      // Update search placeholder
+      if (els.landingSearch) {
+        if (targetTab === 'surahs') {
+          els.landingSearch.placeholder = 'Search surahs...';
+        } else if (targetTab === 'juz') {
+          els.landingSearch.placeholder = 'Search juz...';
+        } else if (targetTab === 'hizb') {
+          els.landingSearch.placeholder = 'Search hizb...';
+        }
+        els.landingSearch.value = '';
+      }
+    });
+  });
+  
+  // Landing search - filter based on active tab
+  if (els.landingSearch) {
+    els.landingSearch.addEventListener('input', (e) => {
+      const searchText = e.target.value;
+      const activeTab = document.querySelector('.tab-btn.active');
+      const tabType = activeTab ? activeTab.dataset.tab : 'surahs';
+      
+      if (tabType === 'surahs' && els.surahGridLanding) {
+        filterSurahCards(searchText, els.surahGridLanding);
+      } else if (tabType === 'juz' && juzGrid) {
+        filterJuzCards(searchText, juzGrid);
+      } else if (tabType === 'hizb' && hizbGrid) {
+        filterHizbCards(searchText, hizbGrid);
+      }
+    });
+  }
+  
+  // Back to landing button
+  if (els.backToLanding) {
+    els.backToLanding.addEventListener('click', () => {
+      showLanding();
+      history.replaceState(null, '', location.pathname);
+    });
+  }
+  
+  // Check if we have URL parameters to skip landing
+  let shouldShowLanding = true;
+  let initialPage = state.currentPage || 1;
+  
+  try {
+    const params = new URLSearchParams(location.search);
+    const pageParam = parseInt(params.get("page") || "", 10);
+    const surahParam = parseInt(params.get("surah") || "", 10);
+    const juzParam = parseInt(params.get("juz") || "", 10);
+    const hizbParam = parseInt(params.get("hizb") || "", 10);
+    
+    if (!Number.isNaN(surahParam) && surahParam >= 1 && surahParam <= 114) {
+      state.ctx = { type: 'surah', id: surahParam };
+      shouldShowLanding = false;
+    } else if (!Number.isNaN(juzParam) && juzParam >= 1 && juzParam <= 30) {
+      state.ctx = { type: 'juz', id: juzParam };
+      shouldShowLanding = false;
+    } else if (!Number.isNaN(hizbParam) && hizbParam >= 1 && hizbParam <= 60) {
+      state.ctx = { type: 'hizb', id: hizbParam };
+      shouldShowLanding = false;
+    } else {
+      state.ctx = null;
+    }
+    
+    if (!Number.isNaN(pageParam) && pageParam >= 1 && pageParam <= 604) {
+      initialPage = pageParam;
+      shouldShowLanding = false;
+    } else if (state.ctx && state.ctx.type === 'surah') {
+      const maybePage = getSurahStartPage(state.ctx.id);
+      if (maybePage) initialPage = maybePage;
+    } else if (state.ctx && state.ctx.type === 'juz') {
+      const juz = JUZ_DATA.find(j => j.id === state.ctx.id);
+      if (juz) initialPage = juz.startPage;
+    } else if (state.ctx && state.ctx.type === 'hizb') {
+      const hizb = HIZB_DATA.find(h => h.id === state.ctx.id);
+      if (hizb) initialPage = hizb.startPage;
+    }
+  } catch {}
+  
+  // Show landing or load page based on URL params
+  if (shouldShowLanding) {
+    showLanding();
+  } else {
+    hideLanding();
+    await loadPage(initialPage);
+  }
 
   if (window.QR && QR.controlPanel && typeof QR.controlPanel.init === "function") {
     controls = QR.controlPanel.init({

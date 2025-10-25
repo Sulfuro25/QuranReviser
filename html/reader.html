@@ -17,61 +17,195 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css" />
   <link rel="stylesheet" href="../assets/css/pages.css" />
+  <link rel="stylesheet" href="../assets/css/reader.css" />
 </head>
-<body data-mode="reader">
-    <header class="app-header">
+<body class="page-reader" data-mode="reader">
+  <header class="app-header">
     <div class="brand">
       <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
-      <a class="back-link" href="surahs.html">List</a>
-      <h1>Quran Reader</h1>
+      <div class="brand-copy">
+        <h1>Quran Reader</h1>
+        <p class="brand-tagline">Scroll, listen, and note ayat with ease</p>
+      </div>
     </div>
-    <div class="header-actions"></div>
+    <nav class="primary-nav" aria-label="Primary">
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
+      <a class="nav-link active" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+    </nav>
+    <div class="header-actions">
+      <a class="btn ghost back-link" href="surahs.html">
+        <ion-icon name="compass-outline"></ion-icon>
+        <span data-label>Explorer</span>
+      </a>
+      <a class="btn secondary" href="mushaf.html">
+        <ion-icon name="layers-outline"></ion-icon>
+        Mushaf
+      </a>
+    </div>
   </header>
 
-  <div class="toolbar compact">
-    <div class="row" id="player">
-      <div class="actions">
-        <button id="controls-open" class="btn">Controls</button>
+  <!-- Landing Page: Surah/Juz/Hizb Selection -->
+  <section id="reader-landing" class="reader-landing">
+    <div class="landing-hero">
+      <div class="hero-icon">
+        <ion-icon name="book"></ion-icon>
+      </div>
+      <h1 class="hero-title">Quran Reader</h1>
+      <p class="hero-desc">Select where to start reading</p>
+      
+      <!-- Browse Tabs -->
+      <div class="browse-tabs">
+        <button class="tab-btn active" data-tab="surahs">
+          <ion-icon name="book-outline"></ion-icon>
+          <span>By Surah</span>
+        </button>
+        <button class="tab-btn" data-tab="juz">
+          <ion-icon name="bookmark-outline"></ion-icon>
+          <span>By Juz</span>
+        </button>
+        <button class="tab-btn" data-tab="hizb">
+          <ion-icon name="albums-outline"></ion-icon>
+          <span>By Hizb</span>
+        </button>
+      </div>
+      
+      <div class="landing-search">
+        <ion-icon name="search-outline"></ion-icon>
+        <input type="search" id="landing-search" placeholder="Search..." />
+      </div>
+    </div>
+    
+    <div class="browse-content">
+      <!-- Surahs Tab -->
+      <div id="tab-surahs" class="tab-content active">
+        <div class="surah-grid-container">
+          <div id="surah-grid-landing" class="surah-grid"></div>
+        </div>
+      </div>
+      
+      <!-- Juz Tab -->
+      <div id="tab-juz" class="tab-content">
+        <div class="juz-grid-container">
+          <div id="juz-grid-landing" class="juz-grid"></div>
+        </div>
+      </div>
+      
+      <!-- Hizb Tab -->
+      <div id="tab-hizb" class="tab-content">
+        <div class="hizb-grid-container">
+          <div id="hizb-grid-landing" class="hizb-grid"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reader Toolbar -->
+  <div id="reader-toolbar" class="reader-toolbar">
+    <div class="toolbar-content">
+      <div class="toolbar-left">
+        <button id="back-to-landing" class="btn-icon" title="Back to selection">
+          <ion-icon name="arrow-back"></ion-icon>
+        </button>
+        <div class="context-info">
+          <h2 id="context-name" class="context-name">-</h2>
+          <p id="context-meta" class="context-meta">-</p>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <button id="controls-open" class="btn-icon" title="Options">
+          <ion-icon name="options-outline"></ion-icon>
+        </button>
       </div>
     </div>
   </div>
 
-  <main class="quran" id="quran-display"></main>
+  <!-- Reader Viewer -->
+  <div id="reader-viewer" class="reader-viewer">
+    <div id="reader-content" class="reader-content">
+      <!-- Verses will be dynamically inserted here -->
+    </div>
+    
+    <!-- Page Navigation -->
+    <div class="page-navigation">
+      <button id="prev-page-nav" class="page-nav-btn">
+        <ion-icon name="chevron-back"></ion-icon>
+        <span>Previous</span>
+      </button>
+      <span id="page-indicator" class="page-indicator">Page 1</span>
+      <button id="next-page-nav" class="page-nav-btn">
+        <span>Next</span>
+        <ion-icon name="chevron-forward"></ion-icon>
+      </button>
+    </div>
+  </div>
 
-  <!-- footer quick links (wired by script) -->\n  <!-- Drawer -->
-    <aside id="control-drawer" class="drawer" aria-hidden="true" tabindex="-1">
+  <!-- Old toolbar (hidden, keeping for drawer compatibility) -->
+  <div class="toolbar compact" style="display: none;">
+    <div class="row quick-nav" id="reader-quick-nav">
+      <label class="muted" for="reader-surah-select">Go to Surah</label>
+      <select id="reader-surah-select" class="nav-select"></select>
+    </div>
+    <div class="row" id="player">
+      <div class="actions">
+        <button id="old-controls-open" class="btn">Controls</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="quran" id="quran-display" style="display: none;"></main>
+
+  <!-- footer quick links (wired by script) -->  
+  <!-- Drawer -->
+  <!-- Drawer -->
+  <aside id="control-drawer" class="drawer" aria-hidden="true" tabindex="-1">
     <div class="drawer-head">
-      <h2>Controls</h2>
+      <h2>Options</h2>
       <button id="drawer-close" class="btn">Close</button>
     </div>
     <div class="drawer-body stack">
-    <div class="drawer-body stack">
-      <div class="card stack" id="playback-quick">
-        <h3 class="card-title">Playback</h3>
-        <div class="row compact-row">
-          <button id="prev-page" class="btn small">Prev Page</button>
-          <span id="page-info" class="muted">-</span>
-          <button id="next-page" class="btn small">Next Page</button>
+      <!-- Audio Playback Section -->
+      <div class="drawer-section">
+        <div class="section-header">
+          <ion-icon name="play-circle-outline"></ion-icon>
+          <h3>Audio Playback</h3>
         </div>
-        <div class="row compact-row">
-          <button id="prev-ayah" class="btn small">Prev Ayah</button>
-          <button id="play-pause" class="btn primary small">Play</button>
-          <button id="next-ayah" class="btn small">Next Ayah</button>
+        <div class="audio-controls-grid">
+          <button id="prev-ayah" class="btn small">
+            <ion-icon name="play-skip-back"></ion-icon>
+            <span>Previous</span>
+          </button>
+          <button id="play-pause" class="btn primary">
+            <ion-icon name="play"></ion-icon>
+          </button>
+          <button id="next-ayah" class="btn small">
+            <span>Next</span>
+            <ion-icon name="play-skip-forward"></ion-icon>
+          </button>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <input type="checkbox" id="loop-one">
+            <span>Loop current ayah</span>
+          </label>
+          <label class="form-label">
+            <input type="checkbox" id="follow-mode">
+            <span>Auto-scroll to playing ayah</span>
+          </label>
         </div>
       </div>
 
-      <div class="row compact-row">
-          <button id="prev-ayah" class="btn small">Prev Ayah</button>
-          <button id="play-pause" class="btn primary small">Play</button>
-          <button id="next-ayah" class="btn small">Next Ayah</button>
+      <!-- Playback Range Section -->
+      <div class="drawer-section">
+        <div class="section-header">
+          <ion-icon name="repeat-outline"></ion-icon>
+          <h3>Playback Range</h3>
         </div>
-      </div>
-
-      <div class="card stack" id="playback-card">
-        <h3 class="card-title">Playback Range</h3>
-        <p class="muted small">Select any Surah and ayah to create a loop that plays across pages.</p>
+        <p class="section-desc">Select any Surah and ayah to create a loop</p>
         <div class="range-pickers">
           <div class="range-picker">
             <span class="muted">Start</span>
@@ -88,39 +222,70 @@
             </div>
           </div>
         </div>
-        <label class="option"><input type="checkbox" id="loop-one"> Loop current ayah</label>
-        <div class="row actions-tight">
-          <button class="btn" id="range-clear">Clear Range</button>
+      </div>
+
+      <!-- Page Navigation Section -->
+      <div class="drawer-section">
+        <div class="section-header">
+          <ion-icon name="navigate-outline"></ion-icon>
+          <h3>Page Navigation</h3>
         </div>
-        <div class="muted" id="range-status">Start: -, End: -</div>
-      </div>
-
-      <div class="card stack" id="page-card">
-        <h3 class="card-title">Page Notes</h3>
-        <div class="row">
-          <button class="btn" id="bm-toggle">Bookmark this page</button>
-          <div class="muted" id="bm-status"></div>
+        <div class="page-nav-grid">
+          <button id="prev-page" class="btn small">
+            <ion-icon name="chevron-back"></ion-icon>
+            <span>Previous</span>
+          </button>
+          <span id="page-info" class="page-info-text">-</span>
+          <button id="next-page" class="btn small">
+            <span>Next</span>
+            <ion-icon name="chevron-forward"></ion-icon>
+          </button>
         </div>
-        <label class="option" for="note-text"><span class="muted">Notes for this page</span></label>
-        <textarea id="note-text" rows="3" placeholder="Type your reflection or reminder"></textarea>
-        <label class="option" for="conf-select"><span class="muted">Confidence level</span></label>
-        <select id="conf-select">
-          <option value="">-</option>
-          <option value="weak">Weak</option>
-          <option value="ok">Okay</option>
-          <option value="strong">Strong</option>
-        </select>
       </div>
 
-      <div class="card stack mode-reader-only">
-        <h3 class="card-title">Reading Options</h3>
-        <label class="option"><input type="checkbox" id="follow-mode"> Follow active ayah</label>
-        <label class="option"><input type="checkbox" id="wbw-toggle"> Word-by-word meaning</label>
-        <div class="muted" id="root-status"></div>
+      <!-- Notes & Tracking Section -->
+      <div class="drawer-section">
+        <div class="section-header">
+          <ion-icon name="create-outline"></ion-icon>
+          <h3>Notes & Tracking</h3>
+        </div>
+        <div class="form-group">
+          <button class="btn small" id="bm-toggle">
+            <ion-icon name="bookmark-outline"></ion-icon>
+            <span>Bookmark this page</span>
+          </button>
+          <div id="bm-status"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="note-text">
+            <ion-icon name="pencil-outline"></ion-icon>
+            <span>Notes for this page</span>
+          </label>
+          <textarea id="note-text" class="form-textarea" rows="3" placeholder="Type your reflection or reminder..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="conf-select">
+            <ion-icon name="analytics-outline"></ion-icon>
+            <span>Confidence level</span>
+          </label>
+          <select id="conf-select" class="form-select">
+            <option value="">Not set</option>
+            <option value="weak">⚠️ Weak - Need more practice</option>
+            <option value="ok">✓ Okay - Getting there</option>
+            <option value="strong">✨ Strong - Confident</option>
+          </select>
+        </div>
       </div>
 
-      <div class="card stack">
-        <p class="muted">Prefer the page layout? <a id="to-mushaf" class="inline-link" href="mushaf.html">Open Mushaf view</a>.</p>
+      <!-- Quick Links Section -->
+      <div class="drawer-section">
+        <div class="section-header">
+          <ion-icon name="link-outline"></ion-icon>
+          <h3>Quick Links</h3>
+        </div>
+        <p class="section-desc">
+          Prefer the page layout? <a id="to-mushaf" class="inline-link" href="mushaf.html">Open Mushaf view</a>
+        </p>
       </div>
     </div>
   </aside>
@@ -128,7 +293,25 @@
 
   <audio id="audio" preload="none"></audio>
 
+  <footer class="app-footer">
+    <div class="app-footer-content">
+      <div>
+        <h2>Balance reading with memorisation</h2>
+        <p>Use playback ranges, bookmarks, and notes, then switch to the Mushaf or Hifdh planner to log your progress.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="mushaf.html">Mushaf</a>
+        <a href="surahs.html">Quran Explorer</a>
+        <a href="hifdh.html">Hifdh</a>
+        <a href="hifdh-test.html">Hifdh Test</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </footer>
+
   <!-- core -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
   <script src="../assets/js/core/profiles.js"></script>
   <script src="../assets/js/core/confidence.js"></script>
   <script src="../assets/js/core/review.js"></script>
@@ -143,6 +326,9 @@
   <script src="../assets/js/script.js"></script>
 </body>
 </html>
+
+
+
 
 
 

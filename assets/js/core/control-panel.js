@@ -1,11 +1,24 @@
-// control-panel.js – unified controls for reader & mushaf views
+// control-panel.js - unified controls for reader & mushaf views
 window.QR = window.QR || {};
 
 (function(){
-  const RANGE_KEY = 'qr_range_settings';
+  const RANGE_KEY = 'qr_playback_range';
+  const surahMetaCache = new Map();
 
-  const listeners = [];
-  const dom = {};
+  const dom = {
+    startSurah: null,
+    startAyah: null,
+    endSurah: null,
+    endAyah: null,
+    loopOne: null,
+    rangeStatus: null,
+    rangeClear: null,
+    bmToggle: null,
+    bmStatus: null,
+    note: null,
+    confSelect: null,
+  };
+
   const state = {
     rangeStartKey: null,
     rangeEndKey: null,
@@ -14,33 +27,34 @@ window.QR = window.QR || {};
     noteTimer: null,
   };
 
+  const listeners = [];
   let setupDone = false;
-  let surahMetaCache = null;
 
   function ensureSurahMeta(){
-    if (surahMetaCache) return surahMetaCache;
-    const map = new Map();
+    if (surahMetaCache.size) return surahMetaCache;
     const list = Array.isArray(window.CHAPTERS_DATA) ? window.CHAPTERS_DATA : [];
-    for (let i = 1; i <= 114; i += 1){
-      const entry = list.find(ch => ch && Number(ch.id) === i) || null;
-      const name = entry ? (entry.name_simple || entry.name_arabic || `Surah ${i}`) : `Surah ${i}`;
-      const verses = entry && Number(entry.verses_count) > 0 ? Number(entry.verses_count) : 286;
-      map.set(i, { id: i, label: `${i}. ${name}`, verses });
+    list.forEach((entry, idx) => {
+      if (!entry) return;
+      const id = Number(entry.id || idx + 1);
+      if (!id || Number.isNaN(id)) return;
+      const name = String(entry.name_simple || entry.name_arabic || `Surah ${id}`).trim();
+      const verses = Number(entry.verses_count) || 0;
+      const pages = Array.isArray(entry.pages) ? entry.pages.slice(0, 2).map(p => Number(p) || null) : [];
+      const label = `${id}. ${name}`;
+      surahMetaCache.set(id, { id, label, verses, pages });
+    });
+    if (!surahMetaCache.size) {
+      for (let i = 1; i <= 114; i += 1) {
+        surahMetaCache.set(i, { id: i, label: `Surah ${i}`, verses: 286, pages: [] });
+      }
     }
-    surahMetaCache = map;
-    return map;
+    return surahMetaCache;
   }
 
   function getVerseCount(surahId){
     const map = ensureSurahMeta();
     const meta = map.get(Number(surahId));
-    return meta ? Math.max(1, meta.verses) : 286;
-  }
-
-  function getSurahLabel(surahId){
-    const map = ensureSurahMeta();
-    const meta = map.get(Number(surahId));
-    return meta ? meta.label : `Surah ${surahId}`;
+    return meta ? Math.max(1, Number(meta.verses) || 0) : 286;
   }
 
   function populateSurahSelect(select){
@@ -52,7 +66,7 @@ window.QR = window.QR || {};
     placeholder.textContent = '--';
     select.appendChild(placeholder);
     const map = ensureSurahMeta();
-    Array.from(map.values()).forEach(meta => {
+    Array.from(map.values()).sort((a, b) => a.id - b.id).forEach(meta => {
       const opt = document.createElement('option');
       opt.value = String(meta.id);
       opt.textContent = meta.label;
@@ -156,9 +170,11 @@ window.QR = window.QR || {};
     if (dom.startSurah){
       if (state.rangeStartKey){
         const parts = parseKey(state.rangeStartKey);
-        dom.startSurah.value = String(parts.surah);
-        populateAyahSelect(dom.startAyah, parts.surah, parts.ayah);
-        dom.startAyah.value = String(parts.ayah);
+        if (parts){
+          dom.startSurah.value = String(parts.surah);
+          populateAyahSelect(dom.startAyah, parts.surah, parts.ayah);
+          dom.startAyah.value = String(parts.ayah);
+        }
       } else {
         dom.startSurah.value = '';
         populateAyahSelect(dom.startAyah, null, null);
@@ -167,9 +183,11 @@ window.QR = window.QR || {};
     if (dom.endSurah){
       if (state.rangeEndKey){
         const parts = parseKey(state.rangeEndKey);
-        dom.endSurah.value = String(parts.surah);
-        populateAyahSelect(dom.endAyah, parts.surah, parts.ayah);
-        dom.endAyah.value = String(parts.ayah);
+        if (parts){
+          dom.endSurah.value = String(parts.surah);
+          populateAyahSelect(dom.endAyah, parts.surah, parts.ayah);
+          dom.endAyah.value = String(parts.ayah);
+        }
       } else {
         dom.endSurah.value = '';
         populateAyahSelect(dom.endAyah, null, null);
@@ -200,7 +218,7 @@ window.QR = window.QR || {};
 
   function setLoopOne(on){
     state.loopOne = !!on;
-    if (dom.loopOne) dom.loopOne.checked = !!state.loopOne;
+    if (dom.loopOne) dom.loopOne.checked = state.loopOne;
     persistRange();
     listeners.forEach(l => { if (typeof l.onLoopChange === 'function') { try { l.onLoopChange(state.loopOne); } catch (err) { console.error(err); } } });
   }
@@ -210,41 +228,52 @@ window.QR = window.QR || {};
   }
 
   function disablePageControls(){
-    if (dom.bmToggle) { dom.bmToggle.disabled = true; dom.bmToggle.textContent = 'Bookmark page'; }
+    if (dom.bmToggle){
+      dom.bmToggle.disabled = true;
+      dom.bmToggle.textContent = 'Bookmark this page';
+    }
     if (dom.bmStatus) dom.bmStatus.textContent = '';
-    if (dom.note){ dom.note.value = ''; dom.note.disabled = true; }
-    if (dom.confSelect){ dom.confSelect.value = ''; dom.confSelect.disabled = true; }
+    if (dom.note){
+      dom.note.disabled = true;
+      dom.note.value = '';
+    }
+    if (dom.confSelect){
+      dom.confSelect.disabled = true;
+      dom.confSelect.value = '';
+    }
   }
 
   function updateBookmarkUI(){
     if (!state.currentPage){ disablePageControls(); return; }
-    const pageData = (window.QR && QR.pageData) ? QR.pageData.get(state.currentPage) : { bookmark: false, note: '' };
+    const data = (window.QR && QR.pageData) ? QR.pageData.get(state.currentPage) : { bookmark: false, note: '', confidence: '' };
     if (dom.bmToggle){
       dom.bmToggle.disabled = false;
-      dom.bmToggle.textContent = pageData.bookmark ? 'Remove bookmark' : 'Bookmark this page';
+      dom.bmToggle.textContent = data.bookmark ? 'Remove bookmark' : 'Bookmark this page';
     }
     if (dom.bmStatus){
-      dom.bmStatus.textContent = pageData.bookmark ? `• Page ${state.currentPage}` : '';
+      dom.bmStatus.textContent = data.bookmark ? `\u2605 Page ${state.currentPage}` : '';
     }
     if (dom.note){
       dom.note.disabled = false;
-      const current = dom.note.value;
-      if (current !== pageData.note) dom.note.value = pageData.note;
+      if (dom.note.value !== data.note) dom.note.value = data.note;
     }
     if (dom.confSelect){
       dom.confSelect.disabled = false;
-      let currentLevel = '';
-      try {
-        if (window.QR && QR.confidence && typeof QR.confidence.get === 'function'){
-          currentLevel = QR.confidence.get(`page:${state.currentPage}`);
-        }
-      } catch {}
-      if (dom.confSelect.value !== currentLevel) dom.confSelect.value = currentLevel || '';
+      let level = data.confidence || '';
+      if (!level){
+        try {
+          if (window.QR && QR.confidence && typeof QR.confidence.get === 'function'){
+            level = QR.confidence.get(`page:${state.currentPage}`) || '';
+          }
+        } catch {}
+      }
+      if (dom.confSelect.value !== level) dom.confSelect.value = level;
     }
   }
 
   function setCurrentPage(page){
-    state.currentPage = Number(page) || null;
+    const num = Number(page);
+    state.currentPage = Number.isFinite(num) && num > 0 ? Math.floor(num) : null;
     if (!state.currentPage) disablePageControls();
     else updateBookmarkUI();
   }
@@ -252,7 +281,7 @@ window.QR = window.QR || {};
   function handleBookmarkClick(){
     if (!state.currentPage || !window.QR || !QR.pageData) return;
     const on = QR.pageData.toggleBookmark(state.currentPage);
-    if (dom.bmStatus) dom.bmStatus.textContent = on ? `• Page ${state.currentPage}` : '';
+    if (dom.bmStatus) dom.bmStatus.textContent = on ? `\u2605 Page ${state.currentPage}` : '';
     if (dom.bmToggle) dom.bmToggle.textContent = on ? 'Remove bookmark' : 'Bookmark this page';
     listeners.forEach(l => { if (typeof l.onBookmarkChange === 'function') { try { l.onBookmarkChange(state.currentPage, on); } catch (err) { console.error(err); } } });
   }
@@ -279,6 +308,11 @@ window.QR = window.QR || {};
         QR.confidence.set(`page:${state.currentPage}`, value);
       }
     } catch {}
+    try {
+      if (window.QR && QR.pageData && typeof QR.pageData.set === 'function'){
+        QR.pageData.set(state.currentPage, { confidence: value });
+      }
+    } catch {}
     listeners.forEach(l => { if (typeof l.onConfidenceChange === 'function') { try { l.onConfidenceChange(state.currentPage, value); } catch (err) { console.error(err); } } });
   }
 
@@ -292,6 +326,7 @@ window.QR = window.QR || {};
     if (dom.bmToggle) dom.bmToggle.addEventListener('click', handleBookmarkClick);
     if (dom.note) dom.note.addEventListener('input', handleNoteInput);
     if (dom.confSelect) dom.confSelect.addEventListener('change', handleConfidenceChange);
+
     window.addEventListener('qr:page-data-changed', (ev) => {
       const page = ev && ev.detail && ev.detail.page;
       if (page && Number(page) === state.currentPage) updateBookmarkUI();
@@ -300,6 +335,16 @@ window.QR = window.QR || {};
       const key = ev && ev.detail && ev.detail.key;
       if (!key || !state.currentPage) return;
       if (key === `page:${state.currentPage}`) updateBookmarkUI();
+    });
+    window.addEventListener('qr:profile-changed', () => {
+      const stored = readStoredRange();
+      state.rangeStartKey = stored.start || null;
+      state.rangeEndKey = stored.end || null;
+      state.loopOne = !!stored.loopOne;
+      applyRangeToSelectors();
+      if (dom.loopOne) dom.loopOne.checked = state.loopOne;
+      updateRangeStatus();
+      updateBookmarkUI();
     });
   }
 
@@ -371,4 +416,3 @@ window.QR = window.QR || {};
     state,
   };
 })();
-

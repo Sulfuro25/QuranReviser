@@ -3,10 +3,29 @@
 
 // Elements
 const els = {
+  // Landing page
+  landing: document.getElementById('test-landing'),
+  viewer: document.getElementById('test-viewer'),
+  modeCards: null, // Will be populated after DOM ready
+  backToLanding: document.getElementById('back-to-landing'),
+  
+  // Toolbar
+  currentModeName: document.getElementById('current-mode-name'),
+  currentScopeInfo: document.getElementById('current-scope-info'),
+  progressIndicator: document.getElementById('progress-indicator'),
+  progressText: document.getElementById('progress-text'),
+  timerDisplay: document.getElementById('timer-display'),
+  timerText: document.getElementById('timer-text'),
+  optionsBtn: document.getElementById('options-btn'),
+  
+  // Test content
+  testContent: document.getElementById('test-content'),
+  
+  // Audio element
+  audio: document.getElementById('audio'),
+  
+  // Legacy elements (kept for compatibility)
   reciteShowMeta: document.getElementById('recite-show-meta'),
-  setupSection: document.getElementById('setup-section'),
-
-  // Scope inputs
   scopeKind: document.getElementById('scope-kind'),
   scopeSurahs: document.getElementById('scope-surahs'),
   scopeSurahsInput: document.getElementById('scope-surahs-input'),
@@ -14,55 +33,9 @@ const els = {
   scopeJuzInput: document.getElementById('scope-juz-input'),
   scopeHizb: document.getElementById('scope-hizb'),
   scopeHizbInput: document.getElementById('scope-hizb-input'),
-
-  // Mode + controls
-  mode: document.getElementById('mode'),
-  xWrapper: document.getElementById('x-wrapper'),
-  fontWrapper: document.getElementById('font-wrapper'),
   xCount: document.getElementById('x-count'),
   fontPx: document.getElementById('font-px'),
   tajweed: document.getElementById('tajweed'),
-  // seed removed
-  start: document.getElementById('start'),
-
-  // Recite mode
-  reciteSection: document.getElementById('recite-section'),
-  recPrompt: document.getElementById('recite-prompt'),
-  recMainBtn: document.getElementById('rec-main-btn'),
-  recAudio: document.getElementById('rec-audio'),
-  recAnswer: document.getElementById('rec-answer'),
-
-  // MCQ mode
-  mcqSection: document.getElementById('mcq-section'),
-  mcqPrompt: document.getElementById('mcq-prompt'),
-  mcqChoices: document.getElementById('mcq-choices'),
-  mcqNext: document.getElementById('mcq-next'),
-
-  // Order mode
-  orderSection: document.getElementById('order-section'),
-  orderList: document.getElementById('order-list'),
-  orderCheck: document.getElementById('order-check'),
-  orderNext: document.getElementById('order-next'),
-  orderResult: document.getElementById('order-result'),
-
-  // Optional wrapper used in original file; keep if present
-  reciteMetaWrapper: document.getElementById('recite-meta-wrapper'),
-  // Fill-in-the-blank
-  fillSection: document.getElementById('fill-section'),
-  fillQuestion: document.getElementById('fill-question'),
-  fillCheck: document.getElementById('fill-check'),
-  fillNext: document.getElementById('fill-next'),
-  fillResult: document.getElementById('fill-result'),
-  // Audio-only
-  audioOnlySection: document.getElementById('audioonly-section'),
-  audioPlay: document.getElementById('audio-play'),
-  audioReplay: document.getElementById('audio-replay'),
-  audioReveal: document.getElementById('audio-reveal'),
-  audioNext: document.getElementById('audio-next'),
-  audioStatus: document.getElementById('audio-status'),
-  audioAnswer: document.getElementById('audio-answer'),
-  // Timer
-  timerView: document.getElementById('timer-view'),
   timerOn: document.getElementById('timer-on'),
   timerSec: document.getElementById('timer-sec'),
 };
@@ -71,19 +44,299 @@ const PREFS_KEY = (window.QR && QR.prefs && QR.prefs.storageKey && QR.prefs.stor
 const HIFDH_KEY = (window.QR && QR.profiles && QR.profiles.key && QR.profiles.key('hifdh_progress')) || 'hifdh_progress';
 
 const state = {
+  selectedMode: null,
+  currentQuestion: 0,
+  totalQuestions: 0,
+  correctAnswers: 0,
   rng: Math.random,
-  versesFlat: [],     // array of { verse_key, text_uthmani, page_number }
-  orderCorrect: [],   // correct order keys for Order mode
-  orderUser: [],      // current user order keys
-  // fill
+  versesFlat: [],
+  orderCorrect: [],
+  orderUser: [],
   fillCurrent: null,
-  // audio-only
   audioPrompt: null,
   audioEl: null,
-  // timer
   tRemain: 0,
   tId: null,
+  mediaRecorder: null,
+  recordedChunks: [],
 };
+
+// ---------- Landing Page Functions ----------
+
+function showLanding() {
+  if (els.landing) {
+    els.landing.style.display = 'flex';
+  }
+  if (els.viewer) {
+    els.viewer.classList.remove('active');
+  }
+  stopTimer();
+}
+
+function hideLanding() {
+  if (els.landing) {
+    els.landing.style.display = 'none';
+  }
+  if (els.viewer) {
+    els.viewer.classList.add('active');
+  }
+}
+
+function selectMode(mode) {
+  state.selectedMode = mode;
+  
+  // Update mode name in toolbar
+  const modeNames = {
+    recite: 'Recite Mode',
+    mcq: 'Multiple Choice',
+    order: 'Order the Page',
+    fill: 'Fill in the Blanks',
+    audio: 'Audio Prompt'
+  };
+  
+  if (els.currentModeName) {
+    els.currentModeName.textContent = modeNames[mode] || 'Test Mode';
+  }
+  
+  // Show configuration modal or start directly
+  showConfigModal(mode);
+}
+
+function showConfigModal(mode) {
+  // Create a configuration panel in the test content area
+  const config = createConfigPanel(mode);
+  if (els.testContent) {
+    els.testContent.innerHTML = '';
+    els.testContent.appendChild(config);
+  }
+  hideLanding();
+}
+
+function createConfigPanel(mode) {
+  const panel = document.createElement('div');
+  panel.className = 'config-panel';
+  
+  panel.innerHTML = `
+    <div class="config-section">
+      <h3 class="config-section-title">
+        <ion-icon name="compass-outline"></ion-icon>
+        Select Scope
+      </h3>
+      <div class="config-grid">
+        <div class="form-field">
+          <label class="form-label">
+            <ion-icon name="list-outline"></ion-icon>
+            Scope Type
+          </label>
+          <select id="config-scope-kind" class="form-select">
+            <option value="progress">My Hifdh Progress</option>
+            <option value="surahs">Specific Surahs</option>
+            <option value="juz">Juz Range</option>
+            <option value="hizb">Hizb Range</option>
+          </select>
+        </div>
+        <div class="form-field" id="config-surahs" style="display: none;">
+          <label class="form-label">
+            <ion-icon name="book-outline"></ion-icon>
+            Surahs (e.g., 1, 36, 67-70)
+          </label>
+          <input id="config-surahs-input" type="text" class="form-input" placeholder="1, 36, 67-70">
+        </div>
+        <div class="form-field" id="config-juz" style="display: none;">
+          <label class="form-label">
+            <ion-icon name="layers-outline"></ion-icon>
+            Juz (e.g., 1-3)
+          </label>
+          <input id="config-juz-input" type="text" class="form-input" placeholder="1-3">
+        </div>
+        <div class="form-field" id="config-hizb" style="display: none;">
+          <label class="form-label">
+            <ion-icon name="git-network-outline"></ion-icon>
+            Hizb (e.g., 1, 10-15)
+          </label>
+          <input id="config-hizb-input" type="text" class="form-input" placeholder="1, 10-15">
+        </div>
+      </div>
+    </div>
+    
+    <div class="config-section">
+      <h3 class="config-section-title">
+        <ion-icon name="settings-outline"></ion-icon>
+        Test Options
+      </h3>
+      <div class="config-grid">
+        ${mode === 'recite' ? `
+        <div class="form-field">
+          <label class="form-label">
+            <ion-icon name="list-outline"></ion-icon>
+            Number of verses to recite
+          </label>
+          <input id="config-x-count" type="number" class="form-input" min="1" max="20" value="3">
+        </div>
+        <div class="form-field">
+          <label class="form-checkbox">
+            <input type="checkbox" id="config-show-meta" checked>
+            Show verse number and surah name
+          </label>
+        </div>
+        ` : ''}
+        <div class="form-field">
+          <label class="form-label">
+            <ion-icon name="text-outline"></ion-icon>
+            Arabic font size (px)
+          </label>
+          <input id="config-font-px" type="number" class="form-input" min="18" max="60" value="36">
+        </div>
+        <div class="form-field">
+          <label class="form-label">
+            <ion-icon name="color-palette-outline"></ion-icon>
+            Tajweed coloring
+          </label>
+          <select id="config-tajweed" class="form-select">
+            <option value="off">Off</option>
+            <option value="on">On (if available)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-checkbox">
+            <input type="checkbox" id="config-timer-on">
+            Enable timer
+          </label>
+        </div>
+        <div class="form-field">
+          <label class="form-label">
+            <ion-icon name="time-outline"></ion-icon>
+            Timer duration (seconds)
+          </label>
+          <input id="config-timer-sec" type="number" class="form-input" min="5" step="5" value="30">
+        </div>
+      </div>
+    </div>
+    
+    <div class="action-buttons">
+      <button class="btn-test primary" id="config-start">
+        <ion-icon name="play-outline"></ion-icon>
+        Start Test
+      </button>
+      <button class="btn-test secondary" id="config-cancel">
+        <ion-icon name="close-outline"></ion-icon>
+        Cancel
+      </button>
+    </div>
+  `;
+  
+  // Setup event listeners after panel is created
+  setTimeout(() => {
+    const scopeKind = document.getElementById('config-scope-kind');
+    const startBtn = document.getElementById('config-start');
+    const cancelBtn = document.getElementById('config-cancel');
+    
+    if (scopeKind) {
+      scopeKind.addEventListener('change', () => {
+        document.getElementById('config-surahs').style.display = scopeKind.value === 'surahs' ? 'block' : 'none';
+        document.getElementById('config-juz').style.display = scopeKind.value === 'juz' ? 'block' : 'none';
+        document.getElementById('config-hizb').style.display = scopeKind.value === 'hizb' ? 'block' : 'none';
+      });
+    }
+    
+    if (startBtn) {
+      startBtn.addEventListener('click', () => startTestWithConfig(mode));
+    }
+    
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', showLanding);
+    }
+  }, 0);
+  
+  return panel;
+}
+
+async function startTestWithConfig(mode) {
+  // Gather configuration
+  const config = {
+    scopeKind: document.getElementById('config-scope-kind')?.value || 'progress',
+    surahs: document.getElementById('config-surahs-input')?.value || '',
+    juz: document.getElementById('config-juz-input')?.value || '',
+    hizb: document.getElementById('config-hizb-input')?.value || '',
+    xCount: parseInt(document.getElementById('config-x-count')?.value) || 3,
+    showMeta: document.getElementById('config-show-meta')?.checked || false,
+    fontPx: parseInt(document.getElementById('config-font-px')?.value) || 36,
+    tajweed: document.getElementById('config-tajweed')?.value || 'off',
+    timerOn: document.getElementById('config-timer-on')?.checked || false,
+    timerSec: parseInt(document.getElementById('config-timer-sec')?.value) || 30,
+  };
+  
+  // Apply font size
+  applyFontSize(config.fontPx);
+  
+  // Build verses scope
+  await buildVersesScope(config);
+  
+  // Update scope info in toolbar
+  updateScopeInfo(config);
+  
+  // Initialize test based on mode
+  state.currentQuestion = 0;
+  state.totalQuestions = state.versesFlat.length;
+  state.correctAnswers = 0;
+  updateProgress();
+  
+  // Run the appropriate test mode
+  switch (mode) {
+    case 'recite':
+      runReciteMode(config);
+      break;
+    case 'mcq':
+      runMCQMode(config);
+      break;
+    case 'order':
+      runOrderMode(config);
+      break;
+    case 'fill':
+      runFillMode(config);
+      break;
+    case 'audio':
+      runAudioMode(config);
+      break;
+  }
+}
+
+function updateScopeInfo(config) {
+  let scopeText = '';
+  switch (config.scopeKind) {
+    case 'progress':
+      scopeText = 'My Hifdh Progress';
+      break;
+    case 'surahs':
+      scopeText = `Surahs: ${config.surahs}`;
+      break;
+    case 'juz':
+      scopeText = `Juz: ${config.juz}`;
+      break;
+    case 'hizb':
+      scopeText = `Hizb: ${config.hizb}`;
+      break;
+  }
+  
+  if (els.currentScopeInfo) {
+    els.currentScopeInfo.textContent = scopeText;
+  }
+}
+
+function updateProgress() {
+  if (els.progressText) {
+    els.progressText.textContent = `${state.currentQuestion} / ${state.totalQuestions}`;
+  }
+}
+
+async function buildVersesScope(config) {
+  // This function builds the verses list based on the config
+  // For now, we'll keep the existing logic and just set defaults
+  state.versesFlat = [];
+  
+  // TODO: Implement proper scope building based on config
+  // This would involve fetching verses from the API
+}
 
 // ---------- utilities bound to UI ----------
 
@@ -389,8 +642,9 @@ async function startTest(){
   else runAudioOnly();
 }
 
-// ---------- wiring ----------
-
+// ---------- OLD wiring (disabled for new design) ----------
+// The following code is from the old design and is no longer needed
+/*
 els.scopeKind.addEventListener('change', ()=>{
   const v = els.scopeKind.value;
   els.scopeSurahs.hidden = v !== 'surahs';
@@ -414,6 +668,7 @@ if (els.fontPx) els.fontPx.addEventListener('change', ()=> ensureFont());
 els.start.addEventListener('click', ()=> startTest());
 if (els.orderCheck) els.orderCheck.addEventListener('click', checkOrder);
 if (els.orderNext) els.orderNext.addEventListener('click', ()=> runOrder());
+*/
 
 // ---- Fill-in-the-blank ----
 function runFill(){
@@ -487,13 +742,281 @@ async function runAudioOnly(){
   if (els.timerOn && els.timerOn.checked) startTimer(els.timerSec && els.timerSec.value, ()=>{ try { els.audioStatus.textContent += ' (Time up)'; els.audioAnswer.classList.remove('hidden'); } catch {} }); else stopTimer();
 }
 
-// Initial UI
-try {
-  const prefs = JSON.parse(localStorage.getItem(PREFS_KEY)||'{}');
-  if (typeof prefs.font_px==='number' && els.fontPx) els.fontPx.value = prefs.font_px;
-} catch {}
-ensureFont();
-els.xWrapper.hidden = (els.mode.value !== 'recite');
-if (els.fontWrapper) els.fontWrapper.hidden = true;
-if (els.fontPx) els.fontPx.disabled = true;
-if (els.reciteMetaWrapper) els.reciteMetaWrapper.style.display = (els.mode.value === 'recite') ? '' : 'none';
+// ---------- New Test Mode Renderers ----------
+
+function runReciteMode(config) {
+  if (!els.testContent) return;
+  
+  els.testContent.innerHTML = `
+    <div class="question-card">
+      <div class="question-label">
+        <ion-icon name="mic-outline"></ion-icon>
+        Recite the next ${config.xCount} verses
+      </div>
+      ${config.showMeta ? `
+        <div class="question-meta">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Starting verse: <strong>Al-Fatiha 1:1</strong>
+        </div>
+      ` : ''}
+      <div class="question-text">
+        بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
+      </div>
+      <div class="recording-controls">
+        <button class="record-btn" id="record-toggle">
+          <ion-icon name="mic"></ion-icon>
+        </button>
+        <div class="recording-duration" id="recording-duration" style="display: none;">00:00</div>
+      </div>
+      <audio id="recorded-audio" controls style="display: none; margin-top: 1rem; width: 100%;"></audio>
+      <div class="action-buttons" style="margin-top: 1.5rem;">
+        <button class="btn-test secondary" id="reveal-answer-btn">
+          <ion-icon name="eye-outline"></ion-icon>
+          Reveal Answer
+        </button>
+        <button class="btn-test primary" id="next-question-btn">
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+          Next Question
+        </button>
+      </div>
+      <div id="answer-area"></div>
+    </div>
+  `;
+  
+  setupRecordingControls();
+}
+
+function runMCQMode(config) {
+  if (!els.testContent) return;
+  
+  els.testContent.innerHTML = `
+    <div class="question-card">
+      <div class="question-label">
+        <ion-icon name="help-circle-outline"></ion-icon>
+        Which verse comes next?
+      </div>
+      <div class="question-text">
+        بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
+      </div>
+    </div>
+    <div class="choices-grid" id="choices-container">
+      ${generateMCQChoices()}
+    </div>
+    <div class="action-buttons">
+      <button class="btn-test primary" id="next-mcq-btn">
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+        Next Question
+      </button>
+    </div>
+  `;
+  
+  setupMCQControls();
+}
+
+function runOrderMode(config) {
+  if (!els.testContent) return;
+  
+  els.testContent.innerHTML = `
+    <div class="question-card">
+      <div class="question-label">
+        <ion-icon name="swap-vertical-outline"></ion-icon>
+        Drag to arrange verses in correct order
+      </div>
+    </div>
+    <ol class="draggable-list" id="draggable-verses">
+      ${generateShuffledVerses()}
+    </ol>
+    <div class="action-buttons">
+      <button class="btn-test primary" id="check-order-btn">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        Check Order
+      </button>
+      <button class="btn-test secondary" id="next-order-btn">
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+        Next Page
+      </button>
+    </div>
+    <div id="order-result"></div>
+  `;
+  
+  setupDragAndDrop();
+}
+
+function runFillMode(config) {
+  if (!els.testContent) return;
+  
+  els.testContent.innerHTML = `
+    <div class="question-card">
+      <div class="question-label">
+        <ion-icon name="create-outline"></ion-icon>
+        Fill in the missing words
+      </div>
+      <div class="fill-text" id="fill-container">
+        بِسۡمِ _____ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
+      </div>
+    </div>
+    <div class="action-buttons">
+      <button class="btn-test primary" id="check-fill-btn">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        Check Answer
+      </button>
+      <button class="btn-test secondary" id="reveal-fill-btn">
+        <ion-icon name="eye-outline"></ion-icon>
+        Reveal Answer
+      </button>
+      <button class="btn-test secondary" id="next-fill-btn">
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+        Next Question
+      </button>
+    </div>
+    <div id="fill-result"></div>
+  `;
+  
+  setupFillControls();
+}
+
+function runAudioMode(config) {
+  if (!els.testContent) return;
+  
+  els.testContent.innerHTML = `
+    <div class="audio-controls">
+      <div class="audio-visualizer" id="audio-visualizer">
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+        <div class="audio-bar"></div>
+      </div>
+      <div class="audio-status" id="audio-status-text">
+        <ion-icon name="headset-outline"></ion-icon>
+        Click play to hear the verse
+      </div>
+    </div>
+    <div class="action-buttons">
+      <button class="btn-test primary" id="play-audio-btn">
+        <ion-icon name="play-outline"></ion-icon>
+        Play Audio
+      </button>
+      <button class="btn-test secondary" id="replay-audio-btn">
+        <ion-icon name="refresh-outline"></ion-icon>
+        Replay
+      </button>
+      <button class="btn-test secondary" id="reveal-audio-btn">
+        <ion-icon name="eye-outline"></ion-icon>
+        Reveal Answer
+      </button>
+      <button class="btn-test primary" id="next-audio-btn">
+        <ion-icon name="arrow-forward-outline"></ion-icon>
+        Next Question
+      </button>
+    </div>
+    <div id="audio-answer-area"></div>
+  `;
+  
+  setupAudioControls();
+}
+
+// Helper functions for generating content
+function generateMCQChoices() {
+  const choices = [
+    'ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ',
+    'ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ',
+    'مَـٰلِكِ یَوۡمِ ٱلدِّینِ',
+    'إِیَّاكَ نَعۡبُدُ وَإِیَّاكَ نَسۡتَعِینُ',
+    'ٱهۡدِنَا ٱلصِّرَ ٰطَ ٱلۡمُسۡتَقِیمَ'
+  ];
+  
+  return choices.map((choice, i) => `
+    <button class="choice-btn" data-choice="${i}">
+      ${choice}
+    </button>
+  `).join('');
+}
+
+function generateShuffledVerses() {
+  const verses = [
+    'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ',
+    'ٱلۡحَمۡدُ لِلَّهِ رَبِّ ٱلۡعَـٰلَمِینَ',
+    'ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ',
+    'مَـٰلِكِ یَوۡمِ ٱلدِّینِ'
+  ];
+  
+  return verses.map((verse, i) => `
+    <li class="draggable-item" draggable="true" data-index="${i}">
+      <ion-icon name="menu-outline" class="drag-handle"></ion-icon>
+      <span>${verse}</span>
+    </li>
+  `).join('');
+}
+
+function setupRecordingControls() {
+  // Placeholder for recording functionality
+}
+
+function setupMCQControls() {
+  const choices = document.querySelectorAll('.choice-btn');
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => {
+      choices.forEach(c => c.classList.remove('selected'));
+      choice.classList.add('selected');
+    });
+  });
+}
+
+function setupDragAndDrop() {
+  // Placeholder for drag and drop functionality
+}
+
+function setupFillControls() {
+  // Placeholder for fill in the blanks functionality
+}
+
+function setupAudioControls() {
+  // Placeholder for audio controls functionality
+}
+
+// ---------- Initialize Landing Page ----------
+
+// Mode card selection
+function initializeModeCards() {
+  els.modeCards = document.querySelectorAll('.mode-card');
+  
+  if (els.modeCards && els.modeCards.length > 0) {
+    els.modeCards.forEach(card => {
+      card.addEventListener('click', () => {
+        // Remove selected class from all cards
+        els.modeCards.forEach(c => c.classList.remove('selected'));
+        // Add selected class to clicked card
+        card.classList.add('selected');
+        // Get mode and start configuration
+        const mode = card.dataset.mode;
+        if (mode) {
+          setTimeout(() => selectMode(mode), 300);
+        }
+      });
+    });
+  }
+}
+
+// Back to landing button initialization
+function initializeBackButton() {
+  if (els.backToLanding) {
+    els.backToLanding.addEventListener('click', showLanding);
+  }
+}
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    initializeModeCards();
+    initializeBackButton();
+    showLanding();
+    ensureFont();
+  });
+} else {
+  // DOM already loaded
+  initializeModeCards();
+  initializeBackButton();
+  showLanding();
+  ensureFont();
+}

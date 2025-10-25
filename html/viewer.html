@@ -1,5 +1,8 @@
-<!doctype html><meta charset="utf-8">
-<title>Redirecting…</title>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
   <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
@@ -8,15 +11,18 @@
   <link rel="icon" type="image/png" sizes="512x512" href="../assets/img/favicon/web-app-manifest-512x512.png">
   <link rel="manifest" href="../assets/img/favicon/site.webmanifest">
   <meta name="theme-color" content="#0c3e18">
-<link rel="alternate icon" href="../assets/img/favicon/favicon.ico"><script>
-  const qp = new URLSearchParams(location.search);
-  const has = k => !!qp.get(k);
-  const base = has('view') && qp.get('view').toLowerCase()==='page' ? 'mushaf.html' : 'reader.html';
-  // Preserve context (surah/juz/hizb), controls, mode
-  const out = new URL(base, location.href);
-  ['surah','juz','hizb','controls','mode'].forEach(k=>{
-    const v = qp.get(k); if (v) out.searchParams.set(k, v);
-  });
-  location.replace(out.toString());
-</script>
-<p>Redirecting to the appropriate view…</p>
+</head>
+<body>
+  <script>
+    const qp = new URLSearchParams(location.search);
+    const base = qp.get("view") && qp.get("view").toLowerCase() === "page" ? "mushaf.html" : "reader.html";
+    const out = new URL(base, location.href);
+    ["surah", "juz", "hizb", "controls", "mode", "page"].forEach((key) => {
+      const value = qp.get(key);
+      if (value) out.searchParams.set(key, value);
+    });
+    location.replace(out.toString());
+  </script>
+  <p>Redirecting to the requested view...</p>
+</body>
+</html>

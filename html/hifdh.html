@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,158 +15,460 @@
   <meta name="theme-color" content="#0c3e18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="../assets/css/modern.css">
+  <link rel="stylesheet" href="../assets/css/hifdh.css">
 </head>
 
-<body>
-    <header class="app-header">
+<body class="page-hifdh">
+  <header class="app-header">
     <div class="brand">
       <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
-      <h1>Hifdh Progress</h1>
+      <div class="brand-copy">
+        <h1>Hifdh Progress</h1>
+        <p class="brand-tagline">Track memorisation, plan finish dates, and stay consistent</p>
+      </div>
     </div>
+    <nav class="primary-nav" aria-label="Primary">
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
+      <a class="nav-link active" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+    </nav>
     <div class="header-actions">
-      <a href="surahs.html" class="btn secondary">Quran List</a>
+      <a class="btn ghost" href="surahs.html">
+        <ion-icon name="compass-outline"></ion-icon>
+        Quran Explorer
+      </a>
+      <a class="btn secondary" href="hifdh-test.html">
+        <ion-icon name="flash-outline"></ion-icon>
+        Quick Test
+      </a>
     </div>
   </header>
 
-  <main class="wrap">
-    <section class="card" id="summary">
-      <h2>Summary</h2>
-      <div class="stats">
-        <div class="stat">
-          <div class="k">Total Ayah Memorized</div>
-          <div class="v" id="s-ayah">0</div>
+  <main class="wrap hifdh-wrap">
+    <section class="page-hero hifdh-hero">
+      <div class="hero-body">
+        <span class="eyebrow">MEMORIZATION DASHBOARD</span>
+        <h2>Master your hifdh<br>with precision<br>tracking</h2>
+        <p>Track every ayah, monitor confidence levels, and build a sustainable revision routine tailored to your pace and goals.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#daily-plan">
+            <ion-icon name="calendar-outline"></ion-icon>
+            Create Daily Plan
+          </a>
+          <a class="btn ghost" href="#strength-map">
+            <ion-icon name="analytics-outline"></ion-icon>
+            Strength Heatmap
+          </a>
         </div>
-        <div class="stat">
-          <div class="k">Overall Progress</div>
-          <div class="v" id="s-perc">0%</div>
-        </div>
-        <div class="stat">
-          <div class="k">Approx Pages Memorized</div>
-          <div class="v" id="s-pages">0 / 604</div>
-        </div>
-        <div class="stat">
-          <div class="k">Pages Left</div>
-          <div class="v" id="s-left">604</div>
+        <div class="hero-glance">
+          <div class="glance-item">
+            <span class="label">AYAH MEMORIZED</span>
+            <span class="value" id="hero-total-ayah">0</span>
+          </div>
+          <div class="glance-item">
+            <span class="label">OVERALL PROGRESS</span>
+            <span class="value" id="hero-percent">0%</span>
+          </div>
+          <div class="glance-item">
+            <span class="label">PAGES TRACKED</span>
+            <span class="value" id="hero-pages-covered">0</span>
+          </div>
         </div>
       </div>
-      <div class="muted" style="margin-top:8px;">Pages are approximated proportionally unless per-surah page data is
-        available.</div>
+      <div class="hero-card">
+        <div class="hero-card-inner">
+          <div class="hero-metric">
+            <span>Daily Target</span>
+            <strong id="hero-daily-target">Set up your plan</strong>
+          </div>
+          <div class="hero-metric">
+            <span>Completion</span>
+            <div class="hero-progress">
+              <div class="hero-progress-bar" id="hero-progress-bar"></div>
+            </div>
+          </div>
+          <p class="hero-note">
+            <ion-icon name="flame-outline"></ion-icon>
+            Maintain consistency by completing daily assignments and reviewing weak sections regularly
+          </p>
+        </div>
+      </div>
+    </section>
+    <section class="menu-card" id="summary">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="podium-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Progress Overview</h2>
+          <p>Track your memorization journey across all surahs</p>
+        </div>
+      </div>
+      <div class="stats hifdh-stats">
+        <div class="stat">
+          <div class="stat-icon">
+            <ion-icon name="book-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="k">Ayah Memorized</div>
+            <div class="v" id="s-ayah">0</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">
+            <ion-icon name="trending-up-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="k">Overall Progress</div>
+            <div class="v" id="s-perc">0%</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">
+            <ion-icon name="document-text-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="k">Pages Memorized</div>
+            <div class="v" id="s-pages">0 / 604</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-icon">
+            <ion-icon name="hourglass-outline"></ion-icon>
+          </div>
+          <div class="stat-content">
+            <div class="k">Pages Remaining</div>
+            <div class="v" id="s-left">604</div>
+          </div>
+        </div>
+      </div>
+      <div class="menu-meta">
+        <span>
+          <ion-icon name="information-circle-outline"></ion-icon>
+          Page counts are calculated proportionally based on ayah memorized
+        </span>
+      </div>
     </section>
 
-    <section class="card">
-      <h2>Your Surahs</h2>
-      <div class="row" style="justify-content: space-between;">
-        <div class="muted">Slide to set ayah memorized per surah. Quick-sets: 0/25/50/75/100%.</div>
+    <section class="menu-card">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="list-outline"></ion-icon>
+        </span>
         <div>
-          <button class="btn secondary" id="reset-progress">Reset All</button>
+          <h2>Surah-by-Surah Progress</h2>
+          <p>Adjust the slider to track ayah memorized for each surah</p>
         </div>
+      </div>
+      <div class="surah-controls">
+        <div class="control-info">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>Use the slider or click quick-set percentages (0% / 25% / 50% / 75% / 100%)</span>
+        </div>
+        <button class="btn ghost" id="reset-progress">
+          <ion-icon name="refresh-outline"></ion-icon>
+          Reset All Progress
+        </button>
       </div>
       <div class="sep"></div>
-      <div id="list" class="list"></div>
+      <div id="list" class="list surah-list"></div>
     </section>
 
-    <section class="card">
-      <h2>Hifdh Calculator</h2>
+    <section class="menu-card">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="calculator-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Completion Calculator</h2>
+          <p>Estimate your hifdh completion timeline based on daily rate</p>
+        </div>
+      </div>
       <div class="calc-grid">
         <div class="field">
-          <label class="muted">Scope</label>
-          <select id="calc-scope">
-            <option value="all" selected>All (current tracked)</option>
+          <label class="input-label">Scope</label>
+          <select id="calc-scope" class="modern-select">
+            <option value="all" selected>All Quran (current progress)</option>
             <option value="surahs">Selected Surahs</option>
-            <option value="juz">Juz</option>
-            <option value="hizb">Hizb</option>
+            <option value="juz">Specific Juz</option>
+            <option value="hizb">Specific Hizb</option>
           </select>
         </div>
         <div class="field" id="scope-surahs-field" hidden>
-          <label class="muted">Surahs (e.g., 1, 36, 67-70)</label>
-          <input id="scope-surahs-input" type="text" placeholder="1, 36, 67-70">
+          <label class="input-label">Surahs (e.g., 1, 36, 67-70)</label>
+          <input id="scope-surahs-input" type="text" placeholder="1, 36, 67-70" class="modern-input">
         </div>
         <div class="field" id="scope-juz-field" hidden>
-          <label class="muted">Juz numbers (e.g., 1, 5-10)</label>
-          <input id="scope-juz-input" type="text" placeholder="1, 5-10">
+          <label class="input-label">Juz numbers (e.g., 1, 5-10)</label>
+          <input id="scope-juz-input" type="text" placeholder="1, 5-10" class="modern-input">
         </div>
         <div class="field" id="scope-hizb-field" hidden>
-          <label class="muted">Hizb numbers (e.g., 1, 15-30)</label>
-          <input id="scope-hizb-input" type="text" placeholder="1, 15-30">
+          <label class="input-label">Hizb numbers (e.g., 1, 15-30)</label>
+          <input id="scope-hizb-input" type="text" placeholder="1, 15-30" class="modern-input">
         </div>
         <div class="field">
-          <label class="muted">Memorization rate (pages/day)</label>
-          <input id="rate-pages" type="number" min="0.1" step="0.1" value="1">
+          <label class="input-label">Pages per day</label>
+          <input id="rate-pages" type="number" min="0.1" step="0.1" value="1" class="modern-input">
         </div>
         <div class="field">
-          <label class="muted">Minutes per page (optional)</label>
-          <input id="mins-per-page" type="number" min="1" step="1" value="20">
+          <label class="input-label">Minutes per page (optional)</label>
+          <input id="mins-per-page" type="number" min="1" step="1" value="20" class="modern-input">
         </div>
       </div>
       <div class="sep"></div>
-      <div class="stats">
-        <div class="stat">
-          <div class="k">Pages Left</div>
-          <div class="v" id="c-pages-left">0</div>
+      <div class="calc-results">
+        <div class="calc-result-item">
+          <div class="calc-icon">
+            <ion-icon name="document-outline"></ion-icon>
+          </div>
+          <div class="calc-info">
+            <span class="calc-label">Pages Left</span>
+            <span class="calc-value" id="c-pages-left">0</span>
+          </div>
         </div>
-        <div class="stat">
-          <div class="k">Days to Finish</div>
-          <div class="v" id="c-days">0</div>
+        <div class="calc-result-item">
+          <div class="calc-icon">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+          <div class="calc-info">
+            <span class="calc-label">Days to Complete</span>
+            <span class="calc-value" id="c-days">0</span>
+          </div>
         </div>
-        <div class="stat">
-          <div class="k">Finish Date</div>
-          <div class="v" id="c-date">-</div>
+        <div class="calc-result-item">
+          <div class="calc-icon">
+            <ion-icon name="flag-outline"></ion-icon>
+          </div>
+          <div class="calc-info">
+            <span class="calc-label">Estimated Finish</span>
+            <span class="calc-value" id="c-date">-</span>
+          </div>
         </div>
-        <div class="stat">
-          <div class="k">Total Time</div>
-          <div class="v" id="c-time">-</div>
+        <div class="calc-result-item">
+          <div class="calc-icon">
+            <ion-icon name="time-outline"></ion-icon>
+          </div>
+          <div class="calc-info">
+            <span class="calc-label">Total Time Required</span>
+            <span class="calc-value" id="c-time">-</span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="menu-card" id="daily-plan">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Daily Revision Plan</h2>
+          <p>Create a structured daily revision schedule to maintain consistency</p>
+        </div>
+      </div>
+      <div id="plan-setup" class="stack">
+        <div class="plan-config-grid">
+          <div class="field">
+            <label class="input-label" for="plan-unit">Plan unit</label>
+            <select id="plan-unit" class="modern-select">
+              <option value="pages">Pages per day</option>
+              <option value="juz">Juz per day</option>
+              <option value="hizb">Hizb per day</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="input-label" for="plan-amount">Amount per day</label>
+            <input id="plan-amount" type="number" min="1" max="20" value="1" class="modern-input">
+          </div>
+        </div>
+        
+        <div class="stack">
+          <span class="input-label">Starting point</span>
+          <div class="plan-start-options" id="plan-start-mode-group">
+            <label class="plan-radio-option">
+              <input type="radio" name="plan-start-mode" value="first" checked>
+              <div class="radio-card">
+                <ion-icon name="play-skip-back-outline"></ion-icon>
+                <span>Start from first tracked unit</span>
+              </div>
+            </label>
+            <label class="plan-radio-option">
+              <input type="radio" name="plan-start-mode" value="custom">
+              <div class="radio-card">
+                <ion-icon name="pencil-outline"></ion-icon>
+                <span>Choose custom start point</span>
+              </div>
+            </label>
+          </div>
+          
+          <div class="stack plan-start-custom" id="plan-start-custom" hidden>
+            <label class="input-label" id="plan-start-label" for="plan-start-page">Starting page</label>
+            <div class="plan-start-inputs">
+              <input id="plan-start-page" class="modern-input" type="number" min="1" max="604" value="1" placeholder="Page">
+              <input id="plan-start-juz" class="modern-input" type="number" min="1" max="30" value="1" placeholder="Juz" hidden>
+              <input id="plan-start-hizb" class="modern-input" type="number" min="1" max="60" value="1" placeholder="Hizb" hidden>
+            </div>
+          </div>
+        </div>
+        
+        <div class="plan-summary-box">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span id="plan-tracked-summary">Track your memorization above to unlock the daily revision plan.</span>
+        </div>
+        
+        <div class="row" style="justify-content:flex-end;">
+          <button class="btn primary" id="plan-save">
+            <ion-icon name="save-outline"></ion-icon>
+            Create Plan
+          </button>
+        </div>
+      </div>
+      
+      <div id="plan-active" class="stack" hidden>
+        <div class="plan-current-assignment" id="plan-assignment-card">
+          <div class="assignment-header">
+            <div class="assignment-day">
+              <span class="day-label" id="plan-day-label">Day 1</span>
+              <ion-icon name="flame"></ion-icon>
+            </div>
+          </div>
+          <div class="assignment-content">
+            <div class="assignment-text" id="plan-assignment-text">Loading...</div>
+            <div class="assignment-status" id="plan-status-text"></div>
+          </div>
+        </div>
+        
+        <div class="plan-actions">
+          <button class="btn ghost" id="plan-back">
+            <ion-icon name="arrow-back-outline"></ion-icon>
+            Previous Day
+          </button>
+          <button class="btn primary" id="plan-done">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Mark Complete
+          </button>
+          <button class="btn secondary" id="plan-reset">
+            <ion-icon name="refresh-outline"></ion-icon>
+            Reset Plan
+          </button>
+        </div>
+        
+        <div class="plan-info">
+          <ion-icon name="calendar-outline"></ion-icon>
+          <span id="plan-started"></span>
         </div>
       </div>
     </section>
 
-    <section class="card" id="daily-plan">
-      <h2>Today's Revision Plan</h2>
-      <div class="row" style="align-items:center; justify-content:space-between;">
-        <div class="row">
-          <label class="muted" for="plan-target">Target (ayah)</label>
-          <input id="plan-target" type="number" min="5" step="5" value="20" style="width:100px;">
-          <button id="plan-generate" class="btn primary">Generate</button>
-        </div>
-        <div class="row">
-          <a id="plan-start-reader" href="reader.html" class="btn">Start in Reader</a>
+    <section class="menu-card" id="strength-map">
+      <div class="card-header">
+        <span class="menu-card-icon">
+          <ion-icon name="analytics-outline"></ion-icon>
+        </span>
+        <div>
+          <h2>Mushaf Strength Heatmap</h2>
+          <p>Visual representation of your confidence levels across all pages</p>
         </div>
       </div>
-      <div class="sep"></div>
-      <div id="plan-list" class="list"></div>
-    </section>
 
-    <section class="card" id="activity">
-      <h2>Activity & Reports</h2>
-      <div class="row" style="justify-content: space-between; align-items:center;">
-        <div class="row">
-          <button id="heat-prev" class="btn secondary">Prev</button>
-          <div id="heat-title" class="muted" style="min-width:160px; text-align:center;"></div>
-          <button id="heat-next" class="btn secondary">Next</button>
+      <div class="strength-controls">
+        <div class="strength-filter-section">
+          <label class="input-label">Filter by Strength</label>
+          <div class="segmented" id="sm-strength-filter"></div>
         </div>
-        <div class="row">
-          <button id="heat-export" class="btn">Export PNG</button>
+
+        <div class="strength-scope-section">
+          <div class="field">
+            <label class="input-label">Scope</label>
+            <select id="sm-scope" class="modern-select">
+              <option value="all" selected>All Quran</option>
+              <option value="juz">Specific Juz</option>
+              <option value="hizb">Specific Hizb</option>
+              <option value="surah">Specific Surahs</option>
+            </select>
+          </div>
+
+          <div class="field" id="sm-scope-juz-field" hidden>
+            <label class="input-label">Juz numbers (e.g., 1, 5-10)</label>
+            <input id="sm-scope-juz-input" type="text" placeholder="1, 5-10" class="modern-input">
+          </div>
+          <div class="field" id="sm-scope-hizb-field" hidden>
+            <label class="input-label">Hizb numbers (e.g., 1, 15-30)</label>
+            <input id="sm-scope-hizb-input" type="text" placeholder="1, 15-30" class="modern-input">
+          </div>
+          <div class="field" id="sm-scope-surah-field" hidden>
+            <label class="input-label">Surahs (e.g., 1, 36, 67-70)</label>
+            <input id="sm-scope-surah-input" type="text" placeholder="1, 36, 67-70" class="modern-input">
+          </div>
         </div>
+
+        <button id="sm-export-pdf" class="btn ghost">
+          <ion-icon name="download-outline"></ion-icon>
+          Export PDF
+        </button>
       </div>
-      <div style="overflow:auto; margin-top:10px;">
-        <canvas id="heat-canvas" width="720" height="220" style="max-width:100%; border:1px solid var(--border); border-radius:12px; background:var(--surface);"></canvas>
+
+      <div class="strength-legend-row">
+        <div id="sm-legend" class="strength-legend"></div>
+        <div class="strength-totals" id="sm-totals"></div>
       </div>
-      <div class="muted" style="margin-top:8px;">Shows daily activity (e.g., audio plays, interactions). Export as image for sharing.</div>
+
+      <div class="canvas-container">
+        <canvas id="sm-canvas" width="980" height="520"></canvas>
+      </div>
+
+      <div class="field" id="sm-juz-select-field" hidden>
+        <label class="input-label">Quick Juz filter</label>
+        <select id="sm-juz-select" class="modern-select">
+          <option value="">All Juz</option>
+        </select>
+      </div>
+
+      <div class="empty-state" id="sm-empty" hidden>
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        <p>Mark pages as Weak/Okay/Strong in the Mushaf viewer to populate this strength heatmap.</p>
+      </div>
     </section>
   </main>
 
-<script src="../assets/js/core/profiles.js"></script>
-<script src="../assets/js/core/confidence.js"></script>
-<script src="../assets/js/core/prefs.js"></script>
-<script src="../assets/js/core/utils.js"></script>
-<script src="../assets/js/core/api.js"></script>
-<script src="../assets/js/core/streaks.js"></script>
-<script src="../assets/js/core/review.js"></script>
-<script src="../assets/js/hifdh.js"></script>
-<script src="../assets/js/chapters-data.js"></script>
+  <footer class="app-footer">
+    <div class="app-footer-content">
+      <div>
+        <h2>Keep momentum in your memorisation</h2>
+        <p>Review your daily assignment, reinforce weak pages, and celebrate every completed juz.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="reader.html">Reader</a>
+        <a href="mushaf.html">Mushaf</a>
+        <a href="hifdh-test.html">Hifdh Test</a>
+        <a href="tajwid.html">Tajwid</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/core/profiles.js"></script>
+  <script src="../assets/js/core/confidence.js"></script>
+  <script src="../assets/js/core/prefs.js"></script>
+  <script src="../assets/js/core/utils.js"></script>
+  <script src="../assets/js/core/api.js"></script>
+  <script src="../assets/js/core/streaks.js"></script>
+  <script src="../assets/js/core/review.js"></script>
+  <script src="../assets/js/hifdh.js"></script>
+  <script src="../assets/js/chapters-data.js"></script>
 </body>
 </html>
+
+
+
+
+

@@ -1,4 +1,4 @@
-// page-data.js – shared page-level bookmark & note storage
+// page-data.js - shared page-level page metadata storage
 window.QR = window.QR || {};
 
 (function(){
@@ -28,6 +28,7 @@ window.QR = window.QR || {};
     return {
       bookmark: !!(entry && entry.bookmark),
       note: entry && typeof entry.note === 'string' ? entry.note : '',
+      confidence: entry && typeof entry.confidence === 'string' ? entry.confidence : '',
     };
   }
 
@@ -35,12 +36,13 @@ window.QR = window.QR || {};
     const out = {};
     if (patch && Object.prototype.hasOwnProperty.call(patch, 'bookmark')) out.bookmark = !!patch.bookmark;
     if (patch && Object.prototype.hasOwnProperty.call(patch, 'note')) out.note = String(patch.note || '');
+    if (patch && Object.prototype.hasOwnProperty.call(patch, 'confidence')) out.confidence = String(patch.confidence || '');
     return out;
   }
 
   function get(page){
     const key = String(page || '');
-    if (!key) return { bookmark: false, note: '' };
+    if (!key) return { bookmark: false, note: '', confidence: '' };
     const map = readRaw();
     return normalize(map[key]);
   }
@@ -54,12 +56,14 @@ window.QR = window.QR || {};
     const next = {
       bookmark: Object.prototype.hasOwnProperty.call(changes, 'bookmark') ? changes.bookmark : current.bookmark,
       note: Object.prototype.hasOwnProperty.call(changes, 'note') ? changes.note : current.note,
+      confidence: Object.prototype.hasOwnProperty.call(changes, 'confidence') ? changes.confidence : current.confidence,
     };
     next.note = (next.note || '').trim();
-    if (!next.bookmark && !next.note){
+    next.confidence = String(next.confidence || '').trim();
+    if (!next.bookmark && !next.note && !next.confidence){
       if (map[key]) delete map[key];
     } else {
-      map[key] = { bookmark: next.bookmark, note: next.note };
+      map[key] = { bookmark: next.bookmark, note: next.note, confidence: next.confidence };
     }
     writeRaw(map);
     dispatchChanged(key, next);
@@ -81,7 +85,7 @@ window.QR = window.QR || {};
     if (map[key]){
       delete map[key];
       writeRaw(map);
-      dispatchChanged(key, { bookmark: false, note: '' });
+      dispatchChanged(key, { bookmark: false, note: '', confidence: '' });
     }
   }
 

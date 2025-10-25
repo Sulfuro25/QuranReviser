@@ -1,7 +1,7 @@
-// sync.js — Cloud Sync (Google Drive AppData) for profile-scoped data
+// sync.js - Cloud Sync (Google Drive AppData) for profile-scoped data
 // Requires a Google OAuth Client ID provided via:
 //   <meta name="google-client-id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
-// Syncs these per-profile keys: qr_prefs, hifdh_progress, qr_bookmarks, qr_notes, qr_confidence, qr_review, qr_streak
+// Syncs these per-profile keys: qr_prefs, hifdh_progress, qr_bookmarks, qr_notes, qr_page_data, qr_confidence, qr_review, qr_streak
 
 window.QR = window.QR || {};
 
@@ -9,7 +9,7 @@ window.QR = window.QR || {};
   const DRIVE_API = 'https://www.googleapis.com/drive/v3';
   const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3/files';
   const SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
-  const KEYS = ['qr_prefs','hifdh_progress','qr_bookmarks','qr_notes','qr_confidence','qr_review','qr_streak'];
+  const KEYS = ['qr_prefs','hifdh_progress','qr_bookmarks','qr_notes','qr_page_data','qr_confidence','qr_review','qr_streak'];
 
   let token = null; // access token (session)
 

@@ -1,10 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quran Reviser â€“ Home</title>
+  <title>Quran Reviser - Home</title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
   <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="../assets/img/favicon/apple-touch-icon.png">
@@ -15,64 +14,173 @@
   <meta name="theme-color" content="#0c3e18">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
-  <meta name="description" content="Quran Reviser home">
+  <meta name="description" content="Memorise, revise, and test your Qur'an journey with Quran Reviser.">
 </head>
-
-<body>
-    <header class="app-header">
+<body class="page-home">
+  <header class="app-header">
     <div class="brand">
       <a class="brand-logo" href="index.html" aria-label="Quran Reviser home">
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
-      <h1>Quran Reviser</h1>
+      <div class="brand-copy">
+        <h1>Quran Reviser</h1>
+        <p class="brand-tagline">Memorise, revise, and stay organised</p>
+      </div>
     </div>
+    <nav class="primary-nav" aria-label="Primary">
+      <a class="nav-link active" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+    </nav>
     <div class="header-actions">
-      <a href="settings.html" class="btn secondary" title="Open settings" aria-label="Settings">ï¿½sTï¿½ï¿½?</a>
+      <a href="hifdh-test.html" class="btn secondary" aria-label="Start a hifdh test">
+        <ion-icon name="flash-outline"></ion-icon>
+        Start Test
+      </a>
     </div>
   </header>
 
   <main class="home">
-    <div class="hero">
-      <h1>What would you like to revise?</h1>
-      <p>Choose a section to get started.</p>
-    </div>
-    <div class="menu-grid">
-      <a class="menu-card" href="surahs.html">
-        <h2>Quran</h2>
-        <p>Browse Surahs, Juz, and Hizb</p>
-      </a>
-      <a class="menu-card" href="hifdh.html">
-        <h2>Hifdh Progress</h2>
-        <p>Track memorization and plan finish time</p>
-      </a>
-      <a class="menu-card" href="hifdh-test.html">
-        <h2>Hifdh Test</h2>
-        <p>Test your hifdh: recite, MCQ, or order page</p>
-      </a>
+    <section class="hero">
+      <div class="hero-body">
+        <span class="eyebrow">Daily Quran companion</span>
+        <h1>Build a confident memorisation routine</h1>
+        <p>Plan your hifdh, read with focus, and stay accountable with a workspace designed for Qur'an revision.</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="reader.html">
+            <ion-icon name="musical-notes-outline"></ion-icon>
+            Open Reader
+          </a>
+          <a class="btn ghost" href="mushaf.html">
+            <ion-icon name="layers-outline"></ion-icon>
+            Mushaf View
+          </a>
+        </div>
+        <div class="hero-glance">
+          <div class="glance-item">
+            <span class="label">Hifdh planner</span>
+            <span class="value">Create finish dates and daily targets</span>
+          </div>
+          <div class="glance-item">
+            <span class="label">Confidence tracking</span>
+            <span class="value">Map strengths across the 604 pages</span>
+          </div>
+          <div class="glance-item">
+            <span class="label">Flexible testing</span>
+            <span class="value">Recite, MCQ, ordering, and fill in the blanks</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-inner" role="presentation">
+          <div class="hero-metric">
+            <span>Today</span>
+            <strong>Revision Session</strong>
+            <div class="hero-progress"></div>
+          </div>
+          <div class="hero-metric">
+            <span>Memorised</span>
+            <strong>182 pages</strong>
+          </div>
+          <p class="hero-note">
+            Keep your streak alive by completing the assignment saved in your hifdh planner.
+            Review weak pages with the confidence map before moving on.
+          </p>
+        </div>
+      </div>
+    </section>
 
-      <a class="menu-card" href="juz.html">
-        <h2>Juz</h2>
-        <p>30 Juzâ€™ in order</p>
-      </a>
-      <a class="menu-card" href="hizb.html">
-        <h2>Hizb</h2>
-        <p>60 Hizb blocks</p>
-      </a>
-      <a class="menu-card" href="tajwid.html">
-        <h2>TajwÄ«d Colors</h2>
-        <p>Rule guide with colored examples</p>
-      </a>
-    </div>
+    <section class="menu" aria-label="Primary sections">
+      <div class="section-head">
+        <h2>Explore the workspace</h2>
+        <p>Every tool is designed to support memorisation, revision, and recitation in a calm interface.</p>
+      </div>
+      <div class="menu-grid">
+        <a class="menu-card" href="reader.html">
+          <span class="menu-card-icon"><ion-icon name="book-outline"></ion-icon></span>
+          <h2>Reader Mode</h2>
+          <p>Scroll through ayat with tajwid colouring, audio playback, bookmarks, and notes in one place.</p>
+          <div class="menu-meta">
+            <span><ion-icon name="headset-outline"></ion-icon>Audio</span>
+            <span><ion-icon name="bookmark-outline"></ion-icon>Bookmarks</span>
+          </div>
+        </a>
+        <a class="menu-card" href="mushaf.html">
+          <span class="menu-card-icon"><ion-icon name="layers-outline"></ion-icon></span>
+          <h2>Mushaf View</h2>
+          <p>Flip through the Madani pages, add notes, mark confidence per page, and sync across devices.</p>
+          <div class="menu-meta">
+            <span><ion-icon name="brush-outline"></ion-icon>Tajwid overlay</span>
+            <span><ion-icon name="sync-outline"></ion-icon>Sync ready</span>
+          </div>
+        </a>
+        <a class="menu-card" href="hifdh.html">
+          <span class="menu-card-icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
+          <h2>Hifdh Progress</h2>
+          <p>Track memorised ayat per Surah, forecast your finish date, and build a day by day plan.</p>
+          <div class="menu-meta">
+            <span><ion-icon name="calendar-outline"></ion-icon>Planner</span>
+            <span><ion-icon name="analytics-outline"></ion-icon>Strength map</span>
+          </div>
+        </a>
+        <a class="menu-card" href="hifdh-test.html">
+          <span class="menu-card-icon"><ion-icon name="flash-outline"></ion-icon></span>
+          <h2>Hifdh Test</h2>
+          <p>Run recitation prompts, multiple choice questions, page ordering, fill in the blanks, or audio drills.</p>
+          <div class="menu-meta">
+            <span><ion-icon name="hourglass-outline"></ion-icon>Timed mode</span>
+            <span><ion-icon name="shuffle-outline"></ion-icon>Randomised</span>
+          </div>
+        </a>
+        <a class="menu-card" href="tajwid.html">
+          <span class="menu-card-icon"><ion-icon name="color-palette-outline"></ion-icon></span>
+          <h2>Tajwid Colors</h2>
+          <p>Refresh the rules with colour coded examples, translations, and audio tied to each rule.</p>
+          <div class="menu-meta">
+            <span><ion-icon name="volume-high-outline"></ion-icon>Audio clips</span>
+            <span><ion-icon name="school-outline"></ion-icon>Rule guide</span>
+          </div>
+        </a>
+        <a class="menu-card" href="settings.html">
+          <span class="menu-card-icon"><ion-icon name="settings-outline"></ion-icon></span>
+          <h2>Settings & Sync</h2>
+          <p>Switch themes, adjust fonts, pick a reciter, and enable Google sync to secure your progress.</p>
+          <div class="menu-meta">
+            <span><ion-icon name="moon-outline"></ion-icon>Themes</span>
+            <span><ion-icon name="cloud-outline"></ion-icon>Cloud backup</span>
+          </div>
+        </a>
+      </div>
+    </section>
   </main>
 
-<script src="../assets/js/core/profiles.js"></script>
-<script src="../assets/js/core/prefs.js"></script>
-<script src="../assets/js/core/utils.js"></script>
-<script src="../assets/js/core/api.js"></script>
+  <footer class="app-footer">
+    <div class="app-footer-content">
+      <div>
+        <h2>Ready for your next revision?</h2>
+        <p>Set a plan in Hifdh Progress, keep your streak alive, and come back daily to strengthen your memorisation.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="reader.html">Reader</a>
+        <a href="mushaf.html">Mushaf</a>
+        <a href="hifdh.html">Hifdh</a>
+        <a href="hifdh-test.html">Hifdh Test</a>
+        <a href="tajwid.html">Tajwid</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/core/profiles.js"></script>
+  <script src="../assets/js/core/prefs.js"></script>
+  <script src="../assets/js/core/utils.js"></script>
+  <script src="../assets/js/core/api.js"></script>
 </body>
-
 </html>
-
