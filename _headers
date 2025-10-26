@@ -1,0 +1,24 @@
+# Security Headers for GitHub Pages / Netlify
+# These headers protect against XSS, clickjacking, and other attacks
+
+/*
+  # Prevent clickjacking attacks
+  X-Frame-Options: DENY
+  
+  # Prevent MIME type sniffing
+  X-Content-Type-Options: nosniff
+  
+  # Control referrer information
+  Referrer-Policy: strict-origin-when-cross-origin
+  
+  # Enable browser XSS protection
+  X-XSS-Protection: 1; mode=block
+  
+  # Content Security Policy - Allow only trusted sources
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.quran.com https://cdn.jsdelivr.net https://www.googleapis.com https://accounts.google.com; frame-src https://accounts.google.com; media-src 'self' https://verses.quran.com https://cdn.islamic.network; manifest-src 'self'; worker-src 'self'
+  
+  # Permissions Policy - Restrict browser features
+  Permissions-Policy: geolocation=(), microphone=(self), camera=(), payment=(), usb=()
+  
+  # Strict Transport Security (HTTPS only) - GitHub Pages automatically uses HTTPS
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload

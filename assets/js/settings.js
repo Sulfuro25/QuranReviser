@@ -40,7 +40,9 @@ function saveTheme(theme) {
 function updateThemeDisplay(theme) {
   const display = document.getElementById('current-theme-display');
   if (display) {
-    display.textContent = theme.charAt(0).toUpperCase() + theme.slice(1);
+    // Use translation if available
+    const themeKey = theme.toLowerCase();
+    display.textContent = (typeof t === 'function') ? t(themeKey) : theme.charAt(0).toUpperCase() + theme.slice(1);
   }
 }
 
@@ -147,29 +149,59 @@ async function loadTranslations() {
   const sel = document.getElementById('translation-select');
   if (!sel) return;
   
+  // Popular translations - one per language
+  const POPULAR_TRANSLATIONS = [
+    { id: 20, name: 'Saheeh International', lang: 'English' },
+    { id: 22, name: 'A. Yusuf Ali', lang: 'English' },
+    { id: 203, name: 'Al-Hilali & Khan', lang: 'English' },
+    { id: 85, name: 'M.A.S. Abdel Haleem', lang: 'English' },
+    { id: 31, name: 'Muhammad Hamidullah', lang: 'French' },
+    { id: 27, name: 'Frank Bubenheim and Nadeem', lang: 'German' },
+    { id: 83, name: 'Sheikh Isa Garcia', lang: 'Spanish' },
+    { id: 33, name: 'Indonesian Islamic Affairs Ministry', lang: 'Indonesian' },
+    { id: 77, name: 'Turkish Translation (Diyanet)', lang: 'Turkish' },
+    { id: 54, name: 'Maulana Muhammad Junagarhi', lang: 'Urdu' },
+    { id: 74, name: 'Tajik', lang: 'Tajik' },
+    { id: 29, name: 'Hussein Taji Kal Dari', lang: 'Persian' },
+    { id: 56, name: 'Chinese Translation (Simplified) - Ma Jain', lang: 'Chinese' },
+    { id: 35, name: 'Ryoichi Mita', lang: 'Japanese' },
+    { id: 36, name: 'Korean', lang: 'Korean' },
+    { id: 38, name: 'Maranao', lang: 'Maranao' },
+    { id: 39, name: 'Abdullah Muhammad Basmeih', lang: 'Malay' },
+    { id: 37, name: 'Malayalam Translation (Abdul Hameed and Kunhi)', lang: 'Malayalam' },
+    { id: 50, name: 'Jan Trust Foundation', lang: 'Tamil' },
+    { id: 161, name: 'Taisirul Quran', lang: 'Bengali' },
+    { id: 32, name: 'Hausa Translation (Abubakar Gumi)', lang: 'Hausa' },
+    { id: 49, name: 'Ali Muhsin Al-Barwani', lang: 'Swahili' },
+    { id: 46, name: 'Mahmud Muhammad Abduh', lang: 'Somali' },
+    { id: 43, name: 'Portuguese Translation (Samir)', lang: 'Portuguese' },
+    { id: 42, name: 'Józef Bielawski', lang: 'Polish' },
+    { id: 45, name: 'Russian Translation (Elmir Kuliev)', lang: 'Russian' },
+    { id: 44, name: 'Grigore', lang: 'Romanian' },
+    { id: 30, name: 'Finnish', lang: 'Finnish' },
+    { id: 48, name: 'Knut Bernström', lang: 'Swedish' },
+    { id: 41, name: 'Norwegian', lang: 'Norwegian' },
+    { id: 26, name: 'Czech', lang: 'Czech' },
+    { id: 25, name: 'Muhamed Mehanović', lang: 'Bosnian' },
+    { id: 47, name: 'Albanian', lang: 'Albanian' },
+    { id: 23, name: 'Azerbaijani', lang: 'Azeri' }
+  ];
+  
   try {
-    const res = await fetch(`${API_BASE}/resources/translations?language=en`);
-    const data = await res.json();
-    const translations = (data.translations || []).map(t => ({
-      id: t.id,
-      name: t.name || t.translated_name?.name || ('Translation ' + t.id),
-      lang: t.language_name || t.language || t.locale || 'Unknown',
-      author: t.author_name || ''
-    }));
-    
-    translations.sort((a, b) => String(a.lang + ' ' + a.name).localeCompare(String(b.lang + ' ' + b.name)));
-    
-    sel.replaceChildren(...translations.map(t => {
+    sel.replaceChildren(...POPULAR_TRANSLATIONS.map(t => {
       const o = document.createElement('option');
       o.value = t.id;
-      const meta = t.author ? ` – ${t.author}` : '';
-      o.textContent = `[${t.lang}] ${t.name}${meta}`;
+      o.textContent = `${t.lang} – ${t.name}`;
       return o;
     }));
     
     const p = readPrefs(); 
-    const cur = parseInt(p.translation_id || '0', 10); 
-    if (cur) sel.value = String(cur);
+    const cur = parseInt(p.translation_id || '0', 10);
+    if (cur) {
+      sel.value = String(cur);
+    } else {
+      sel.value = '20';
+    }
   } catch(e) {
     console.error('Failed to load translations:', e);
     sel.replaceChildren();
@@ -181,6 +213,9 @@ function saveTranslation(id) {
   p.translation_id = parseInt(id, 10) || 0; 
   writePrefs(p);
   updatePrefsProgress();
+  
+  // Dispatch event to notify reader page
+  window.dispatchEvent(new CustomEvent('qr:prefs-changed', { detail: p }));
 }
 
 function saveTranslationToggle(on) {
@@ -191,21 +226,12 @@ function saveTranslationToggle(on) {
   if (on) {
     let cur = parseInt(p.translation_id || '0', 10) || 0;
     if (!cur && sel && sel.options && sel.options.length) {
-      let pick = null;
-      // Prefer Saheeh International
-      for (let i = 0; i < sel.options.length; i++) {
-        const opt = sel.options[i];
-        if (/saheeh/i.test(opt.textContent || '')) { pick = opt; break; }
-      }
-      // Otherwise first English
-      if (!pick) {
-        for (let i = 0; i < sel.options.length; i++) {
-          const opt = sel.options[i];
-          if (/\[english\]/i.test(opt.textContent || '')) { pick = opt; break; }
-        }
-      }
-      // Fallback to first available
-      if (!pick) pick = sel.options[0];
+      // Default to Saheeh International (id: 20)
+      const saheehOpt = Array.from(sel.options).find(opt => opt.value === '20');
+      const firstOpt = sel.options[0];
+      
+      const pick = saheehOpt || firstOpt;
+      
       if (pick) {
         cur = parseInt(pick.value, 10) || 0;
         sel.value = String(cur);
@@ -217,6 +243,9 @@ function saveTranslationToggle(on) {
   writePrefs(p);
   if (sel) sel.disabled = !on;
   updatePrefsProgress();
+  
+  // Dispatch event to notify reader page
+  window.dispatchEvent(new CustomEvent('qr:prefs-changed', { detail: p }));
 }
 
 function updateQuickDisplay(type, value) {
@@ -251,14 +280,19 @@ function updatePrefsProgress() {
   
   const percentage = Math.round((configured / total) * 100);
   const progressBar = document.getElementById('prefs-progress');
-  const prefsCount = document.getElementById('prefs-count');
+  const prefsCountNum = document.getElementById('prefs-count-num');
+  const prefsCountTotal = document.getElementById('prefs-count-total');
   
   if (progressBar) {
     progressBar.style.width = percentage + '%';
   }
   
-  if (prefsCount) {
-    prefsCount.textContent = `${configured} of ${total} configured`;
+  if (prefsCountNum) {
+    prefsCountNum.textContent = configured;
+  }
+  
+  if (prefsCountTotal) {
+    prefsCountTotal.textContent = total;
   }
 }
 
@@ -275,21 +309,21 @@ function updateSyncUI(connected) {
       icon.innerHTML = '<ion-icon name="cloud-done-outline"></ion-icon>';
       icon.classList.add('connected');
     }
-    if (label) label.textContent = 'Connected';
-    if (desc) desc.textContent = 'Your data is being synced automatically';
+    if (label) label.textContent = (typeof t === 'function') ? t('connected') : 'Connected';
+    if (desc) desc.textContent = (typeof t === 'function') ? t('syncingAuto') : 'Your data is being synced automatically';
     if (connectBtn) connectBtn.style.display = 'none';
     if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
-    updateQuickDisplay('sync', 'Connected & syncing');
+    updateQuickDisplay('sync', (typeof t === 'function') ? t('connectingSyncing') : 'Connected & syncing');
   } else {
     if (icon) {
       icon.innerHTML = '<ion-icon name="cloud-offline-outline"></ion-icon>';
       icon.classList.remove('connected');
     }
-    if (label) label.textContent = 'Not Connected';
-    if (desc) desc.textContent = 'Connect your Google account to enable cloud backup';
+    if (label) label.textContent = (typeof t === 'function') ? t('notConnected') : 'Not Connected';
+    if (desc) desc.textContent = (typeof t === 'function') ? t('connectAccount') : 'Connect your Google account to enable cloud backup';
     if (connectBtn) connectBtn.style.display = 'inline-flex';
     if (disconnectBtn) disconnectBtn.style.display = 'none';
-    updateQuickDisplay('sync', 'Not connected');
+    updateQuickDisplay('sync', (typeof t === 'function') ? t('notConnected') : 'Not connected');
   }
   
   updatePrefsProgress();
@@ -326,22 +360,57 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   if (toggle) toggle.checked = !!p.translation_on;
   if (trSel) trSel.disabled = !(toggle && toggle.checked);
-  if (toggle) toggle.addEventListener('change', () => saveTranslationToggle(toggle.checked));
-  if (trSel) trSel.addEventListener('change', (e) => saveTranslation(e.target.value));
+  if (toggle) toggle.addEventListener('change', () => {
+    saveTranslationToggle(toggle.checked);
+  });
+  if (trSel) trSel.addEventListener('change', (e) => {
+    saveTranslation(e.target.value);
+  });
+
+  // Language selector
+  const langSelect = document.getElementById('language-select');
+  if (langSelect && typeof initLanguage === 'function') {
+    initLanguage(); // Initialize language from i18n.js
+    
+    langSelect.addEventListener('change', (e) => {
+      if (typeof setLanguage === 'function') {
+        setLanguage(e.target.value);
+      }
+    });
+  }
 
   // Cloud sync
   try {
     const connectBtn = document.getElementById('sync-connect');
     const disconnectBtn = document.getElementById('sync-disconnect');
     
-    const isConnected = window.QR && QR.sync && QR.sync.isConnected && QR.sync.isConnected();
+    // Check if connected via auth module or sync module
+    let isConnected = false;
+    if (window.QR && QR.auth && typeof QR.auth.isSignedIn === 'function') {
+      isConnected = QR.auth.isSignedIn();
+    } else if (window.QR && QR.sync && typeof QR.sync.isConnected === 'function') {
+      isConnected = QR.sync.isConnected();
+    }
+    
     updateSyncUI(isConnected);
     
     if (connectBtn) {
       connectBtn.addEventListener('click', async () => { 
-        try { 
-          await QR.sync.connect(); 
-          updateSyncUI(true);
+        try {
+          // Try to use auth module first
+          if (window.QR && QR.profiles && typeof QR.profiles.signIn === 'function') {
+            await QR.profiles.signIn();
+            updateSyncUI(true);
+            
+            // Auto-sync data to cloud
+            if (window.QR && QR.sync && typeof QR.sync.push === 'function') {
+              await QR.sync.push();
+            }
+          } else if (window.QR && QR.sync && typeof QR.sync.connect === 'function') {
+            await QR.sync.connect();
+            updateSyncUI(true);
+          }
+          
           // Show success feedback
           const originalText = connectBtn.innerHTML;
           connectBtn.innerHTML = '<ion-icon name="checkmark-circle-outline"></ion-icon> Connected!';
@@ -356,13 +425,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     if (disconnectBtn) {
       disconnectBtn.addEventListener('click', () => { 
-        try { 
-          QR.sync.disconnect(); 
+        try {
+          // Sign out from auth module
+          if (window.QR && QR.profiles && typeof QR.profiles.signOut === 'function') {
+            QR.profiles.signOut();
+          }
+          // Also disconnect sync
+          if (window.QR && QR.sync && typeof QR.sync.disconnect === 'function') {
+            QR.sync.disconnect();
+          }
           updateSyncUI(false);
-        } catch {} 
+        } catch(e) {
+          console.error('Disconnect error:', e);
+        }
       });
     }
   } catch {}
+  
+  // Listen for auth state changes
+  if (window.QR && window.QR.events) {
+    QR.events.on('auth:signedIn', (user) => {
+      updateSyncUI(true);
+      
+      // Auto-sync data to cloud after sign-in
+      if (window.QR && QR.sync && typeof QR.sync.push === 'function') {
+        QR.sync.push().catch(err => console.error('Auto-sync failed:', err));
+      }
+    });
+    
+    QR.events.on('auth:signedOut', () => {
+      updateSyncUI(false);
+    });
+  }
   
   // Initialize progress
   updatePrefsProgress();

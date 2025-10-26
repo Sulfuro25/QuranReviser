@@ -43,6 +43,12 @@ window.QR = window.QR || {};
   function get(page){
     const key = String(page || '');
     if (!key) return { bookmark: false, note: '', confidence: '' };
+    // Validate page number
+    const validate = window.QR && QR.utils && QR.utils.validatePageNumber;
+    if (validate && !validate(key)) {
+      console.warn('Invalid page number:', key);
+      return { bookmark: false, note: '', confidence: '' };
+    }
     const map = readRaw();
     return normalize(map[key]);
   }
@@ -50,9 +56,28 @@ window.QR = window.QR || {};
   function set(page, patch){
     const key = String(page || '');
     if (!key) return;
+    // Validate page number
+    const validate = window.QR && QR.utils && QR.utils.validatePageNumber;
+    if (validate && !validate(key)) {
+      console.warn('Invalid page number:', key);
+      return;
+    }
     const map = readRaw();
     const current = normalize(map[key]);
     const changes = sanitizePatch(patch);
+    // Validate confidence level if being set
+    if (changes.confidence) {
+      const validateLevel = window.QR && QR.utils && QR.utils.validateConfidenceLevel;
+      if (validateLevel && !validateLevel(changes.confidence)) {
+        console.warn('Invalid confidence level:', changes.confidence);
+        changes.confidence = current.confidence;
+      }
+    }
+    // Sanitize note text to prevent XSS
+    if (changes.note) {
+      const sanitize = window.QR && QR.utils && QR.utils.sanitizeHTML;
+      changes.note = sanitize ? sanitize(changes.note) : changes.note;
+    }
     const next = {
       bookmark: Object.prototype.hasOwnProperty.call(changes, 'bookmark') ? changes.bookmark : current.bookmark,
       note: Object.prototype.hasOwnProperty.call(changes, 'note') ? changes.note : current.note,

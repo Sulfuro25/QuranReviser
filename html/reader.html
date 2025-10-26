@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <title>Quran Reader</title>
   <link rel="icon" type="image/svg+xml" href="../assets/img/favicon/favicon.svg">
   <link rel="alternate icon" href="../assets/img/favicon/favicon.ico">
@@ -18,6 +18,10 @@
   <link rel="stylesheet" href="../assets/css/styles.css" />
   <link rel="stylesheet" href="../assets/css/pages.css" />
   <link rel="stylesheet" href="../assets/css/reader.css" />
+  <link rel="stylesheet" href="../assets/css/mobile-enhancements.css" />
+  <!-- Compatibility scripts (load first) -->
+  <script src="../assets/js/polyfills.js"></script>
+  <script src="../assets/js/compat.js"></script>
 </head>
 <body class="page-reader" data-mode="reader">
   <header class="app-header">
@@ -26,26 +30,19 @@
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
       <div class="brand-copy">
-        <h1>Quran Reader</h1>
-        <p class="brand-tagline">Scroll, listen, and note ayat with ease</p>
+        <h1 data-i18n="quranReader">Quran Reader</h1>
+        <p class="brand-tagline" data-i18n="scrollListenNote">Scroll, listen, and note ayat with ease</p>
       </div>
     </div>
     <nav class="primary-nav" aria-label="Primary">
-      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
-      <a class="nav-link active" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
-      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
-      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
-      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon><span data-i18n="home">Home</span></a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon><span data-i18n="mushaf">Mushaf</span></a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon><span data-i18n="hifdh">Hifdh</span></a>
+      <a class="nav-link" href="hifdh-test.html"><ion-icon name="flash-outline"></ion-icon><span data-i18n="hifdhTest">Test</span></a>
+      <a class="nav-link" href="tajwid.html"><ion-icon name="color-palette-outline"></ion-icon><span data-i18n="tajwid">Tajwid</span></a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon><span data-i18n="settings">Settings</span></a>
     </nav>
     <div class="header-actions">
-      <a class="btn ghost back-link" href="surahs.html">
-        <ion-icon name="compass-outline"></ion-icon>
-        <span data-label>Explorer</span>
-      </a>
-      <a class="btn secondary" href="mushaf.html">
-        <ion-icon name="layers-outline"></ion-icon>
-        Mushaf
-      </a>
     </div>
   </header>
 
@@ -55,28 +52,28 @@
       <div class="hero-icon">
         <ion-icon name="book"></ion-icon>
       </div>
-      <h1 class="hero-title">Quran Reader</h1>
-      <p class="hero-desc">Select where to start reading</p>
+      <h1 class="hero-title" data-i18n="quranReader">Quran Reader</h1>
+      <p class="hero-desc" data-i18n="selectWhereToStart">Select where to start reading</p>
       
       <!-- Browse Tabs -->
       <div class="browse-tabs">
         <button class="tab-btn active" data-tab="surahs">
           <ion-icon name="book-outline"></ion-icon>
-          <span>By Surah</span>
+          <span data-i18n="bySurah">By Surah</span>
         </button>
         <button class="tab-btn" data-tab="juz">
           <ion-icon name="bookmark-outline"></ion-icon>
-          <span>By Juz</span>
+          <span data-i18n="byJuz">By Juz</span>
         </button>
         <button class="tab-btn" data-tab="hizb">
           <ion-icon name="albums-outline"></ion-icon>
-          <span>By Hizb</span>
+          <span data-i18n="byHizb">By Hizb</span>
         </button>
       </div>
       
       <div class="landing-search">
         <ion-icon name="search-outline"></ion-icon>
-        <input type="search" id="landing-search" placeholder="Search..." />
+        <input type="search" id="landing-search" data-i18n-placeholder="search" placeholder="Search..." />
       </div>
     </div>
     
@@ -164,26 +161,26 @@
   <!-- Drawer -->
   <aside id="control-drawer" class="drawer" aria-hidden="true" tabindex="-1">
     <div class="drawer-head">
-      <h2>Options</h2>
-      <button id="drawer-close" class="btn">Close</button>
+      <h2 data-i18n="options">Options</h2>
+      <button id="drawer-close" class="btn" data-i18n="close">Close</button>
     </div>
     <div class="drawer-body stack">
       <!-- Audio Playback Section -->
       <div class="drawer-section">
         <div class="section-header">
           <ion-icon name="play-circle-outline"></ion-icon>
-          <h3>Audio Playback</h3>
+          <h3 data-i18n="audioPlayback">Audio Playback</h3>
         </div>
         <div class="audio-controls-grid">
           <button id="prev-ayah" class="btn small">
             <ion-icon name="play-skip-back"></ion-icon>
-            <span>Previous</span>
+            <span data-i18n="previousAyah">Previous</span>
           </button>
           <button id="play-pause" class="btn primary">
             <ion-icon name="play"></ion-icon>
           </button>
           <button id="next-ayah" class="btn small">
-            <span>Next</span>
+            <span data-i18n="nextAyah">Next</span>
             <ion-icon name="play-skip-forward"></ion-icon>
           </button>
         </div>
@@ -224,68 +221,38 @@
         </div>
       </div>
 
-      <!-- Page Navigation Section -->
-      <div class="drawer-section">
-        <div class="section-header">
-          <ion-icon name="navigate-outline"></ion-icon>
-          <h3>Page Navigation</h3>
-        </div>
-        <div class="page-nav-grid">
-          <button id="prev-page" class="btn small">
-            <ion-icon name="chevron-back"></ion-icon>
-            <span>Previous</span>
-          </button>
-          <span id="page-info" class="page-info-text">-</span>
-          <button id="next-page" class="btn small">
-            <span>Next</span>
-            <ion-icon name="chevron-forward"></ion-icon>
-          </button>
-        </div>
-      </div>
-
       <!-- Notes & Tracking Section -->
       <div class="drawer-section">
         <div class="section-header">
           <ion-icon name="create-outline"></ion-icon>
-          <h3>Notes & Tracking</h3>
+          <h3 data-i18n="notesTracking">Notes & Tracking</h3>
         </div>
         <div class="form-group">
           <button class="btn small" id="bm-toggle">
             <ion-icon name="bookmark-outline"></ion-icon>
-            <span>Bookmark this page</span>
+            <span data-i18n="bookmark">Bookmark this page</span>
           </button>
           <div id="bm-status"></div>
         </div>
         <div class="form-group">
           <label class="form-label" for="note-text">
             <ion-icon name="pencil-outline"></ion-icon>
-            <span>Notes for this page</span>
+            <span data-i18n="notes">Notes for this page</span>
           </label>
-          <textarea id="note-text" class="form-textarea" rows="3" placeholder="Type your reflection or reminder..."></textarea>
+          <textarea id="note-text" class="form-textarea" rows="3" data-i18n-placeholder="typeReflection" placeholder="Type your reflection or reminder..."></textarea>
         </div>
         <div class="form-group">
           <label class="form-label" for="conf-select">
             <ion-icon name="analytics-outline"></ion-icon>
-            <span>Confidence level</span>
+            <span data-i18n="confidence">Confidence level</span>
           </label>
           <select id="conf-select" class="form-select">
-            <option value="">Not set</option>
-            <option value="weak">⚠️ Weak - Need more practice</option>
-            <option value="ok">✓ Okay - Getting there</option>
-            <option value="strong">✨ Strong - Confident</option>
+            <option value="" data-i18n="notSet">Not set</option>
+            <option value="weak" data-i18n="weak">⚠️ Weak - Need more practice</option>
+            <option value="ok" data-i18n="ok">✓ Okay - Getting there</option>
+            <option value="strong" data-i18n="strong">✨ Strong - Confident</option>
           </select>
         </div>
-      </div>
-
-      <!-- Quick Links Section -->
-      <div class="drawer-section">
-        <div class="section-header">
-          <ion-icon name="link-outline"></ion-icon>
-          <h3>Quick Links</h3>
-        </div>
-        <p class="section-desc">
-          Prefer the page layout? <a id="to-mushaf" class="inline-link" href="mushaf.html">Open Mushaf view</a>
-        </p>
       </div>
     </div>
   </aside>
@@ -296,22 +263,16 @@
   <footer class="app-footer">
     <div class="app-footer-content">
       <div>
-        <h2>Balance reading with memorisation</h2>
-        <p>Use playback ranges, bookmarks, and notes, then switch to the Mushaf or Hifdh planner to log your progress.</p>
+        <h2 data-i18n="balanceReadingMemorisation">Balance reading with memorisation</h2>
+        <p data-i18n="balanceReadingDesc">Use playback ranges, bookmarks, and notes, then switch to the Mushaf or Hifdh planner to log your progress.</p>
       </div>
-      <nav class="footer-nav" aria-label="Footer">
-        <a href="mushaf.html">Mushaf</a>
-        <a href="surahs.html">Quran Explorer</a>
-        <a href="hifdh.html">Hifdh</a>
-        <a href="hifdh-test.html">Hifdh Test</a>
-        <a href="settings.html">Settings</a>
-      </nav>
     </div>
   </footer>
 
   <!-- core -->
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/i18n.js"></script>
   <script src="../assets/js/core/profiles.js"></script>
   <script src="../assets/js/core/confidence.js"></script>
   <script src="../assets/js/core/review.js"></script>
@@ -321,9 +282,14 @@
   <script src="../assets/js/chapters-data.js"></script>
   <script src="../assets/js/core/page-data.js"></script>
   <script src="../assets/js/core/control-panel.js"></script>
-  <script src="../assets/js/core/streaks.js"></script>
   <!-- page -->
   <script src="../assets/js/script.js"></script>
+  <script>
+    // Initialize language on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+    });
+  </script>
 </body>
 </html>
 

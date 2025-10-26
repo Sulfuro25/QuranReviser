@@ -71,6 +71,40 @@ const KEY = (window.QR && QR.profiles && QR.profiles.key('hifdh_progress')) || '
 const PLAN_KEY = 'qr_daily_revision_plan';
 const TOTAL_SURAHS = 114;
 
+// Juz data for page lookups
+const JUZ_DATA = [
+  { id: 1, startPage: 1 }, { id: 2, startPage: 22 }, { id: 3, startPage: 42 },
+  { id: 4, startPage: 62 }, { id: 5, startPage: 82 }, { id: 6, startPage: 102 },
+  { id: 7, startPage: 122 }, { id: 8, startPage: 142 }, { id: 9, startPage: 162 },
+  { id: 10, startPage: 182 }, { id: 11, startPage: 202 }, { id: 12, startPage: 222 },
+  { id: 13, startPage: 242 }, { id: 14, startPage: 262 }, { id: 15, startPage: 282 },
+  { id: 16, startPage: 302 }, { id: 17, startPage: 322 }, { id: 18, startPage: 342 },
+  { id: 19, startPage: 362 }, { id: 20, startPage: 382 }, { id: 21, startPage: 402 },
+  { id: 22, startPage: 422 }, { id: 23, startPage: 442 }, { id: 24, startPage: 462 },
+  { id: 25, startPage: 482 }, { id: 26, startPage: 502 }, { id: 27, startPage: 522 },
+  { id: 28, startPage: 542 }, { id: 29, startPage: 562 }, { id: 30, startPage: 582 }
+];
+
+// Hizb data for page lookups
+const HIZB_DATA = [
+  { id: 1, startPage: 1 }, { id: 2, startPage: 11 }, { id: 3, startPage: 22 }, { id: 4, startPage: 32 },
+  { id: 5, startPage: 42 }, { id: 6, startPage: 52 }, { id: 7, startPage: 62 }, { id: 8, startPage: 72 },
+  { id: 9, startPage: 82 }, { id: 10, startPage: 92 }, { id: 11, startPage: 102 }, { id: 12, startPage: 112 },
+  { id: 13, startPage: 122 }, { id: 14, startPage: 132 }, { id: 15, startPage: 142 }, { id: 16, startPage: 152 },
+  { id: 17, startPage: 162 }, { id: 18, startPage: 172 }, { id: 19, startPage: 182 }, { id: 20, startPage: 192 },
+  { id: 21, startPage: 202 }, { id: 22, startPage: 212 }, { id: 23, startPage: 222 }, { id: 24, startPage: 232 },
+  { id: 25, startPage: 242 }, { id: 26, startPage: 252 }, { id: 27, startPage: 262 }, { id: 28, startPage: 272 },
+  { id: 29, startPage: 282 }, { id: 30, startPage: 292 }, { id: 31, startPage: 302 }, { id: 32, startPage: 312 },
+  { id: 33, startPage: 322 }, { id: 34, startPage: 332 }, { id: 35, startPage: 342 }, { id: 36, startPage: 352 },
+  { id: 37, startPage: 362 }, { id: 38, startPage: 372 }, { id: 39, startPage: 382 }, { id: 40, startPage: 392 },
+  { id: 41, startPage: 402 }, { id: 42, startPage: 412 }, { id: 43, startPage: 422 }, { id: 44, startPage: 432 },
+  { id: 45, startPage: 442 }, { id: 46, startPage: 452 }, { id: 47, startPage: 462 }, { id: 48, startPage: 472 },
+  { id: 49, startPage: 482 }, { id: 50, startPage: 492 }, { id: 51, startPage: 502 }, { id: 52, startPage: 512 },
+  { id: 53, startPage: 522 }, { id: 54, startPage: 532 }, { id: 55, startPage: 542 }, { id: 56, startPage: 552 },
+  { id: 57, startPage: 562 }, { id: 58, startPage: 572 }, { id: 59, startPage: 582 }, { id: 60, startPage: 592 }
+];
+
+
 let chapters = [];               // [{id, name_en, name_ar, verses}]
 let progress = {};               // { [surahId]: memorizedCount }
 const surahPagesCache = new Map();  // sid -> [page_number per verse]
@@ -232,38 +266,37 @@ function makeSurahRow(ch){
   names.appendChild(en); names.appendChild(ar);
 
   const ctrls = document.createElement('div'); ctrls.className='ctrls';
-  const top = document.createElement('div'); top.className='top';
-  const label = document.createElement('div'); label.className='muted'; label.textContent = `${ch.verses} ayah`;
-  const perc = document.createElement('div'); perc.className='perc'; perc.textContent = '0%';
-  top.appendChild(label); top.appendChild(perc);
-
-  const range = document.createElement('input'); range.type='range'; range.min='0'; range.max=String(ch.verses||0); range.step='1'; range.value=String(progress[ch.id]||0);
-
-  const quick = document.createElement('div'); quick.className='quick';
-  [0,25,50,75,100].forEach(p => {
-    const b = document.createElement('button'); b.textContent = p+'%';
-    b.addEventListener('click', ()=>{
-      range.value = String(Math.round((ch.verses||0)*p/100));
-      range.dispatchEvent(new Event('input',{bubbles:true}));
-      range.dispatchEvent(new Event('change',{bubbles:true}));
-    });
-    quick.appendChild(b);
-  });
-
-  ctrls.appendChild(top); ctrls.appendChild(range); ctrls.appendChild(quick);
+  
+  // Checkbox to mark as memorized
+  const checkboxWrapper = document.createElement('label'); 
+  checkboxWrapper.className = 'memorized-checkbox';
+  
+  const checkbox = document.createElement('input');
+  checkbox.type = 'checkbox';
+  checkbox.checked = (progress[ch.id] || 0) >= (ch.verses || 0);
+  
+  const checkboxLabel = document.createElement('span');
+  checkboxLabel.className = 'checkbox-label';
+  checkboxLabel.textContent = checkbox.checked ? 'Memorized' : 'Not Memorized';
+  
+  const checkmark = document.createElement('span');
+  checkmark.className = 'checkmark';
+  checkmark.innerHTML = '<ion-icon name="checkmark-outline"></ion-icon>';
+  
+  checkboxWrapper.appendChild(checkbox);
+  checkboxWrapper.appendChild(checkmark);
+  checkboxWrapper.appendChild(checkboxLabel);
+  
+  ctrls.appendChild(checkboxWrapper);
   row.appendChild(sid); row.appendChild(names); row.appendChild(ctrls);
 
-  const sync = () => {
-    const m = QR.utils.clamp(parseInt(range.value,10)||0, 0, ch.verses||0);
-    const pct = (ch.verses>0) ? Math.round((m/(ch.verses))*100) : 0;
-    perc.textContent = `${pct}% - ${m}/${ch.verses}`;
-  };
-  sync();
-
-  range.addEventListener('input', sync);
-  range.addEventListener('change', async () => {
-    const m = QR.utils.clamp(parseInt(range.value,10)||0, 0, ch.verses||0);
-    progress[ch.id] = m; writeProgress(progress);
+  // Update on checkbox change
+  checkbox.addEventListener('change', async () => {
+    const memorized = checkbox.checked;
+    progress[ch.id] = memorized ? (ch.verses || 0) : 0;
+    checkboxLabel.textContent = memorized ? 'Memorized' : 'Not Memorized';
+    
+    writeProgress(progress);
     invalidateTrackedPagesCache();
     await updateSummary();
     await updateCalculator();
@@ -1414,8 +1447,39 @@ function formatUnitLabel(unit){
 function formatPlanAssignment(plan, items){
   if (!items || !items.length) return 'All assignments completed. Adjust or reset the plan to continue.';
   const unitLabel = formatUnitLabel(plan.unit);
-  if (items.length === 1) return `Review ${unitLabel.toLowerCase()} ${items[0]}`;
-  return `Review ${unitLabel.toLowerCase()}s ${items[0]}-${items[items.length - 1]}`;
+  
+  // Convert items to page numbers for display
+  let pageInfo = '';
+  if (plan.unit === 'page') {
+    if (items.length === 1) {
+      pageInfo = ` (Page ${items[0]})`;
+    } else {
+      pageInfo = ` (Pages ${items[0]}-${items[items.length - 1]})`;
+    }
+  } else if (plan.unit === 'juz') {
+    // Get page range for juz
+    const firstJuz = JUZ_DATA.find(j => j.id === items[0]);
+    const lastJuz = items.length > 1 ? JUZ_DATA.find(j => j.id === items[items.length - 1]) : firstJuz;
+    if (firstJuz && lastJuz) {
+      const startPage = firstJuz.startPage;
+      const endPage = lastJuz.id < 30 ? JUZ_DATA.find(j => j.id === lastJuz.id + 1).startPage - 1 : 604;
+      pageInfo = ` (Pages ${startPage}-${endPage})`;
+    }
+  } else if (plan.unit === 'hizb') {
+    // Get page range for hizb
+    const firstHizb = HIZB_DATA.find(h => h.id === items[0]);
+    const lastHizb = items.length > 1 ? HIZB_DATA.find(h => h.id === items[items.length - 1]) : firstHizb;
+    if (firstHizb && lastHizb) {
+      const startPage = firstHizb.startPage;
+      const endPage = lastHizb.id < 60 ? HIZB_DATA.find(h => h.id === lastHizb.id + 1).startPage - 1 : 604;
+      pageInfo = ` (Pages ${startPage}-${endPage})`;
+    }
+  }
+  
+  if (items.length === 1) {
+    return `Review ${unitLabel.toLowerCase()} ${items[0]}${pageInfo}`;
+  }
+  return `Review ${unitLabel.toLowerCase()}s ${items[0]}-${items[items.length - 1]}${pageInfo}`;
 }
 
 async function refreshPlanUI(){

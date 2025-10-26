@@ -9,41 +9,62 @@ window.QR = window.QR || {};
   const DRIVE_API = 'https://www.googleapis.com/drive/v3';
   const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3/files';
   const SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
-  const KEYS = ['qr_prefs','hifdh_progress','qr_bookmarks','qr_notes','qr_page_data','qr_confidence','qr_review','qr_streak'];
+  const KEYS = ['qr_prefs','hifdh_progress','qr_bookmarks','qr_notes','qr_page_data','qr_confidence','qr_review','qr_daily_revision_plan'];
 
   let token = null; // access token (session)
 
-  function clientId(){
-    try { const m = document.querySelector('meta[name="google-client-id"]'); const cid = (m && m.getAttribute('content')) || ''; return cid.trim(); } catch { return ''; }
+  // Load token from auth module
+  function loadToken() {
+    if (window.QR && window.QR.auth && window.QR.auth.isSignedIn()) {
+      token = window.QR.auth.getAccessToken();
+      return token;
+    }
+    return null;
   }
 
-  function fileName(){ try { const pid = QR.profiles.currentId(); return `quran-reviser-profile-${pid}.json`; } catch { return 'quran-reviser-profile-default.json'; } }
+  // Initialize token from auth
+  loadToken();
 
   function setStatus(txt){ try { const el = document.getElementById('sync-status'); if (el) el.textContent = txt || ''; } catch {}
     try { const state = { connected: !!token, at: Date.now() }; QR.profiles.setItem('qr_sync_state', JSON.stringify(state)); } catch {}
   }
 
-  async function ensureGis(){
-    if (window.google && window.google.accounts && window.google.accounts.oauth2) return true;
-    await new Promise((resolve, reject)=>{
-      const s = document.createElement('script'); s.src='https://accounts.google.com/gsi/client'; s.async=true; s.defer=true; s.onload=resolve; s.onerror=reject; document.head.appendChild(s);
-    });
-    return true;
+  async function ensureToken(interactive=true){
+    // Check if we already have a valid token in memory
+    if (token) return token;
+    
+    // Try to load from auth module
+    const storedToken = loadToken();
+    if (storedToken) {
+      setStatus('Connected to Google');
+      return storedToken;
+    }
+    
+    // Need to get a new token - use auth module
+    if (window.QR && window.QR.profiles && typeof window.QR.profiles.signIn === 'function') {
+      try {
+        await window.QR.profiles.signIn();
+        token = window.QR.auth.getAccessToken();
+        if (token) {
+          setStatus('Connected to Google');
+          return token;
+        }
+      } catch (e) {
+        console.error('Auth module sign-in failed:', e);
+        throw e;
+      }
+    }
+    
+    throw new Error('Authentication module not available');
   }
 
-  async function ensureToken(interactive=true){
-    if (token) return token;
-    const cid = clientId();
-    if (!cid) { setStatus('Set Google Client ID in <meta name="google-client-id">'); throw new Error('Missing Google Client ID'); }
-    await ensureGis();
-    token = await new Promise((resolve, reject)=>{
-      try {
-        const tc = google.accounts.oauth2.initTokenClient({ client_id: cid, scope: SCOPE, callback: (res)=>{ if (res && res.access_token) resolve(res.access_token); else reject(new Error('No access token')); } });
-        tc.requestAccessToken({ prompt: interactive ? 'consent' : '' });
-      } catch(e){ reject(e); }
-    });
-    setStatus('Connected to Google');
-    return token;
+  function fileName(){ 
+    try { 
+      const pid = QR.profiles.currentId(); 
+      return `quran-reviser-profile-${pid}.json`; 
+    } catch { 
+      return 'quran-reviser-profile-default.json'; 
+    } 
   }
 
   function authHeaders(){ return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }; }
@@ -153,7 +174,10 @@ window.QR = window.QR || {};
     return true;
   }
 
-  function disconnect(){ token = null; setStatus('Disconnected'); }
+  function disconnect(){ 
+    token = null;
+    setStatus('Disconnected'); 
+  }
   function isConnected(){ return !!token; }
 
   QR.sync = { connect: connectAndAuto, pull, push, disconnect, isConnected };

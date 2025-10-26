@@ -11,10 +11,10 @@ QR.prefs = (function(){
 
   function ensureTheme(){
     try {
-      const theme = get('theme','dark');
+      const theme = get('theme','light');
       document.body.setAttribute('data-theme', theme);
     } catch {
-      document.body.setAttribute('data-theme', 'dark');
+      document.body.setAttribute('data-theme', 'light');
     }
   }
 

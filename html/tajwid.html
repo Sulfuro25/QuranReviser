@@ -17,6 +17,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="../assets/css/modern.css">
+  <link rel="stylesheet" href="../assets/css/mobile-enhancements.css">
+  <!-- Compatibility scripts (load first) -->
+  <script src="../assets/js/polyfills.js"></script>
+  <script src="../assets/js/compat.js"></script>
 </head>
 <body class="page-tajwid">
   <header class="app-header">
@@ -25,30 +30,66 @@
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
       <div class="brand-copy">
-        <h1>Tajwid Colors</h1>
-        <p class="brand-tagline">Reference rules, colors, and recitations in one view</p>
+        <h1 data-i18n="tajwidRules">Tajwid Colors</h1>
+        <p class="brand-tagline" data-i18n="learnTajwid">Reference rules, colors, and recitations in one view</p>
       </div>
     </div>
     <nav class="primary-nav" aria-label="Primary">
-      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
-      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
-      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
-      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
-      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon><span data-i18n="home">Home</span></a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon><span data-i18n="reader">Reader</span></a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon><span data-i18n="mushaf">Mushaf</span></a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon><span data-i18n="hifdh">Hifdh</span></a>
+      <a class="nav-link" href="hifdh-test.html"><ion-icon name="flash-outline"></ion-icon><span data-i18n="hifdhTest">Test</span></a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon><span data-i18n="settings">Settings</span></a>
     </nav>
     <div class="header-actions">
-      <a class="btn ghost" href="reader.html">
-        <ion-icon name="book-outline"></ion-icon>
-        Reader
-      </a>
     </div>
   </header>
 
-  <main class="list-shell">
-    <div class="list-head">
-      <h2 class="muted" style="margin:0;">Tajwid rules and examples</h2>
+  <main style="max-width: 900px; margin: 0 auto; padding: clamp(40px, 8vw, 120px) clamp(24px, 4vw, 40px); text-align: center;">
+    <!-- Coming Soon Section -->
+    <div style="display: inline-flex; align-items: center; justify-content: center; width: 120px; height: 120px; background: linear-gradient(135deg, var(--primary) 0%, rgb(16, 80, 32) 100%); border-radius: 24px; margin-bottom: 32px;">
+      <ion-icon name="color-palette-outline" style="font-size: 64px; color: white;"></ion-icon>
     </div>
-    <div id="rules" class="list-grid" style="margin-top:14px;"></div>
+    
+    <h1 style="margin: 0 0 16px 0; font-size: clamp(2rem, 5vw, 3rem); color: var(--text);">Coming Soon</h1>
+    
+    <p style="margin: 0 0 32px 0; color: var(--muted); font-size: 1.15rem; line-height: 1.6; max-width: 600px; margin-left: auto; margin-right: auto;">
+      We're working on an interactive Tajwid guide with color-coded rules, audio examples, and detailed explanations to help you master Quranic recitation.
+    </p>
+
+    <div style="display: inline-flex; gap: 24px; flex-wrap: wrap; justify-content: center; margin-bottom: 48px;">
+      <div style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 600; color: var(--primary); margin-bottom: 4px;">15+</div>
+        <div style="color: var(--muted); font-size: 0.9rem;">Tajwid Rules</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 600; color: var(--primary); margin-bottom: 4px;">50+</div>
+        <div style="color: var(--muted); font-size: 0.9rem;">Examples</div>
+      </div>
+      <div style="text-align: center;">
+        <div style="font-size: 2rem; font-weight: 600; color: var(--primary); margin-bottom: 4px;">Audio</div>
+        <div style="color: var(--muted); font-size: 0.9rem;">Demonstrations</div>
+      </div>
+    </div>
+
+    <div style="background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 32px; text-align: left; max-width: 700px; margin: 0 auto;">
+      <h3 style="margin: 0 0 16px 0; color: var(--text); font-size: 1.3rem;">What's Coming:</h3>
+      <ul style="margin: 0; padding-left: 24px; color: var(--muted); line-height: 1.8; font-size: 1.05rem;">
+        <li>Color-coded Tajwid rules with visual examples</li>
+        <li>Interactive audio demonstrations for each rule</li>
+        <li>Searchable and filterable rule categories</li>
+        <li>Detailed explanations in multiple languages</li>
+        <li>Practice exercises and quizzes</li>
+      </ul>
+    </div>
+
+    <div style="margin-top: 48px;">
+      <a href="index.html" class="btn primary" style="display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; font-size: 1.05rem;">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        <span>Back to Home</span>
+      </a>
+    </div>
   </main>
 
   <audio id="audio" preload="none"></audio>
@@ -56,24 +97,24 @@
   <footer class="app-footer">
     <div class="app-footer-content">
       <div>
-        <h2>Connect tajwid to daily recitation</h2>
-        <p>After reviewing the rules, open the Reader or Mushaf view and apply them to the ayat you are revising.</p>
+        <h2 data-i18n="connectTajwidDaily">Connect tajwid to daily recitation</h2>
+        <p data-i18n="connectTajwidDesc">After reviewing the rules, open the Reader or Mushaf view and apply them to the ayat you are revising.</p>
       </div>
-      <nav class="footer-nav" aria-label="Footer">
-        <a href="reader.html">Reader</a>
-        <a href="mushaf.html">Mushaf</a>
-        <a href="hifdh.html">Hifdh</a>
-        <a href="hifdh-test.html">Hifdh Test</a>
-        <a href="settings.html">Settings</a>
-      </nav>
     </div>
   </footer>
 
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/i18n.js"></script>
+  <script src="../assets/js/core/profiles.js"></script>
   <script src="../assets/js/core/prefs.js"></script>
   <script src="../assets/js/core/utils.js"></script>
   <script src="../assets/js/core/api.js"></script>
   <script src="../assets/js/tajwid.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+    });
+  </script>
 </body>
 </html>

@@ -17,6 +17,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
+  <link rel="stylesheet" href="../assets/css/mobile-enhancements.css">
+  <!-- Compatibility scripts (load first) -->
+  <script src="../assets/js/polyfills.js"></script>
+  <script src="../assets/js/compat.js"></script>
 </head>
 <body class="page-surahs">
   <header class="app-header">
@@ -25,22 +29,23 @@
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
       <div class="brand-copy">
-        <h1>Quran Explorer</h1>
-        <p class="brand-tagline">Browse Surahs, Juz, and Hizb in one workspace</p>
+        <h1 data-i18n="quranExplorer">Quran Explorer</h1>
+        <p class="brand-tagline" data-i18n="exploreSurahs">Browse Surahs, Juz, and Hizb in one workspace</p>
       </div>
     </div>
     <nav class="primary-nav" aria-label="Primary">
-      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
-      <a class="nav-link active" href="surahs.html"><ion-icon name="compass-outline"></ion-icon>Quran</a>
-      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
-      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
-      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
-      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon><span data-i18n="home">Home</span></a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon><span data-i18n="reader">Reader</span></a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon><span data-i18n="mushaf">Mushaf</span></a>
+      <a class="nav-link" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon><span data-i18n="hifdh">Hifdh</span></a>
+      <a class="nav-link" href="hifdh-test.html"><ion-icon name="flash-outline"></ion-icon><span data-i18n="hifdhTest">Test</span></a>
+      <a class="nav-link" href="tajwid.html"><ion-icon name="color-palette-outline"></ion-icon><span data-i18n="tajwid">Tajwid</span></a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon><span data-i18n="settings">Settings</span></a>
     </nav>
     <div class="header-actions">
       <button id="view-toggle" class="btn ghost" title="Toggle Reader/Mushaf view">
         <ion-icon name="layers-outline"></ion-icon>
-        Mushaf
+        <span data-i18n="mushaf">Mushaf</span>
       </button>
     </div>
   </header>
@@ -48,11 +53,11 @@
   <main class="list-shell">
     <div class="list-head">
       <div class="segmented" role="tablist" aria-label="List type">
-        <button id="tab-surahs" role="tab" aria-selected="true" aria-pressed="true">Surahs</button>
-        <button id="tab-juz" role="tab" aria-selected="false" aria-pressed="false">Juz</button>
-        <button id="tab-hizb" role="tab" aria-selected="false" aria-pressed="false">Hizb</button>
+        <button id="tab-surahs" role="tab" aria-selected="true" aria-pressed="true" data-i18n="surahs">Surahs</button>
+        <button id="tab-juz" role="tab" aria-selected="false" aria-pressed="false" data-i18n="juz">Juz</button>
+        <button id="tab-hizb" role="tab" aria-selected="false" aria-pressed="false" data-i18n="hizb">Hizb</button>
       </div>
-      <input id="filter" class="search" placeholder="Search by number or name..." />
+      <input id="filter" class="search" data-i18n-placeholder="searchByNumber" placeholder="Search by number or name..." />
     </div>
     <div id="list" class="list-grid" role="list"></div>
   </main>
@@ -60,26 +65,25 @@
   <footer class="app-footer">
     <div class="app-footer-content">
       <div>
-        <h2>Ready to recite what you find?</h2>
-        <p>Jump into Reader for audio assisted recitation or open the Mushaf view for the classic layout.</p>
+        <h2 data-i18n="readyToRecite">Ready to recite what you find?</h2>
+        <p data-i18n="readyToReciteDesc">Jump into Reader for audio assisted recitation or open the Mushaf view for the classic layout.</p>
       </div>
-      <nav class="footer-nav" aria-label="Footer">
-        <a href="reader.html">Reader</a>
-        <a href="mushaf.html">Mushaf</a>
-        <a href="hifdh.html">Hifdh</a>
-        <a href="hifdh-test.html">Hifdh Test</a>
-        <a href="settings.html">Settings</a>
-      </nav>
     </div>
   </footer>
 
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/i18n.js"></script>
   <script src="../assets/js/core/profiles.js"></script>
   <script src="../assets/js/core/prefs.js"></script>
   <script src="../assets/js/core/utils.js"></script>
   <script src="../assets/js/core/api.js"></script>
   <script src="../assets/js/chapters-data.js"></script>
   <script src="../assets/js/surahs.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      initLanguage();
+    });
+  </script>
 </body>
 </html>

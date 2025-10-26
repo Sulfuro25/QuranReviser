@@ -358,6 +358,7 @@
   padding: 0.75rem 1.5rem;
   position: sticky;
   top: 0;
+  margin-top: 0;
   z-index: 50;
   box-shadow: var(--shadow-sm);
 }
@@ -501,8 +502,20 @@
 
 /* Hide header when in viewer mode */
 body.viewer-mode .app-header {
-  transform: translateY(-100%);
-  transition: transform 0.3s ease;
+  position: absolute;
+  top: -200px;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.viewer-mode {
+  padding-top: 0;
+}
+
+body.viewer-mode .toolbar.compact {
+  margin-top: 0;
+  top: 0;
 }
 
 /* ========== IMAGE VIEWER CONTAINER ========== */
@@ -515,7 +528,7 @@ body.viewer-mode .app-header {
   align-items: center;
   justify-content: center;
   gap: 1.5rem;
-  padding: 2rem 1.5rem 1rem;
+  padding: 0.5rem 1.5rem 1rem;
 }
 
 .mushaf-content {

@@ -1,0 +1,1231 @@
+/* mobile-enhancements.css - Smartphone-specific optimizations */
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+
+/* Reduce paint/layout costs */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Use CSS containment for better performance */
+.menu-card,
+.surah-card,
+.juz-card,
+.glance-item,
+.hero-card {
+  contain: layout style paint;
+}
+
+/* GPU acceleration for animations */
+.btn,
+.nav-link,
+.menu-card {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Optimize text rendering */
+body {
+  text-rendering: optimizeSpeed;
+}
+
+h1, h2, h3, .hero-title {
+  text-rendering: optimizeLegibility;
+}
+
+/* ===== BASE MOBILE IMPROVEMENTS ===== */
+
+/* Fix iOS Safari address bar height issue */
+@supports (-webkit-touch-callout: none) {
+  body {
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Larger tap targets for mobile (44x44px minimum per Apple guidelines) */
+@media (max-width: 768px) {
+  button, 
+  .btn, 
+  .nav-link, 
+  a.block,
+  select,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Improve touch scrolling */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent text size adjustment on iOS */
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Smoother font rendering on mobile */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Better padding for mobile screens */
+  .app-header {
+    padding: 6px 12px;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  /* Compact navigation on mobile */
+  .primary-nav {
+    gap: 2px !important;
+    padding: 3px !important;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    margin-top: 0;
+    flex-wrap: nowrap !important;
+    white-space: nowrap;
+  }
+
+  .primary-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-link {
+    padding: 6px 10px !important;
+    font-size: 14px !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .nav-link ion-icon {
+    font-size: 20px;
+  }
+
+  .nav-link span {
+    display: none; /* Hide text labels on mobile, show only icons */
+  }
+
+  /* COMPLETELY REMOVE active navigation link on mobile */
+  .primary-nav .nav-link.active,
+  .primary-nav a.nav-link.active,
+  nav.primary-nav .nav-link.active,
+  nav.primary-nav a.nav-link.active {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* Make brand more compact */
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-logo img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .brand-copy h1 {
+    font-size: 16px;
+  }
+
+  .brand-tagline {
+    display: none; /* Hide tagline on mobile */
+  }
+
+  /* Larger font sizes for better readability */
+  body {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents iOS zoom on input focus */
+  }
+
+  /* Optimize button spacing */
+  .btn {
+    padding: 12px 20px;
+    font-size: 16px;
+  }
+
+  /* Better modal/overlay sizing */
+  .modal,
+  .overlay-panel {
+    max-height: calc(100vh - 32px);
+    max-height: calc(var(--vh, 1vh) * 100 - 32px);
+    margin: 16px;
+  }
+
+  /* Larger icons for better visibility */
+  ion-icon {
+    font-size: 1.5rem;
+  }
+
+  .nav-link ion-icon {
+    font-size: 1.3rem;
+  }
+
+  /* Better spacing for cards */
+  .card {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  /* Improve list item spacing */
+  .block {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  /* Better Arabic text rendering */
+  .arabic,
+  .ar {
+    font-size: 24px;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+  }
+
+  /* Improve verse card readability */
+  .verse-card .arabic {
+    font-size: 26px;
+    line-height: 2;
+  }
+
+  /* Better translation text */
+  .translation {
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* Optimize segmented control for mobile */
+  .segmented {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .segmented button {
+    flex: 1;
+    padding: 12px 16px;
+    font-size: 15px;
+  }
+
+  /* Better search input */
+  .search {
+    padding: 14px 16px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+
+  /* Improve form controls */
+  select,
+  .range-picker-row select {
+    padding: 12px 14px;
+    font-size: 16px;
+  }
+
+  /* Better textarea */
+  textarea {
+    padding: 14px 16px;
+    font-size: 16px;
+    min-height: 120px;
+  }
+
+  /* Optimize range sliders for touch */
+  input[type="range"] {
+    height: 44px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Remove tap highlight on all touch interactions */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+
+  /* Allow selection of text */
+  p, span, div.translation, div.arabic {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Prevent selection on interactive elements */
+  button, a, .nav-link, .btn {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* ===== EXTRA SMALL PHONES (< 375px) ===== */
+@media (max-width: 374px) {
+  .app-header {
+    padding: 10px 12px;
+  }
+
+  .nav-link {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .nav-link ion-icon {
+    font-size: 1.2rem;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 15px;
+  }
+
+  .arabic, .ar {
+    font-size: 22px;
+  }
+
+  .verse-card .arabic {
+    font-size: 24px;
+  }
+
+  .brand h1 {
+    font-size: 18px;
+  }
+
+  .brand-tagline {
+    font-size: 13px;
+  }
+}
+
+/* ===== LANDSCAPE MODE ON MOBILE ===== */
+@media (max-width: 768px) and (orientation: landscape) {
+  .app-header {
+    padding: 8px 16px;
+  }
+
+  .nav-link {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .verse-card .arabic {
+    font-size: 22px;
+    line-height: 1.7;
+  }
+
+  /* Reduce vertical spacing in landscape */
+  .card {
+    padding: 12px 16px;
+  }
+
+  .modal,
+  .overlay-panel {
+    max-height: calc(100vh - 16px);
+    max-height: calc(var(--vh, 1vh) * 100 - 16px);
+  }
+}
+
+/* ===== TOUCH-SPECIFIC IMPROVEMENTS ===== */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase all interactive element sizes for touch */
+  button:not(.icon-only),
+  .btn:not(.icon-only),
+  a.nav-link,
+  a.btn,
+  .tab-btn {
+    min-height: 48px;
+    padding: 14px 20px;
+  }
+
+  /* Larger clickable areas for icons */
+  .icon-btn,
+  .close-btn,
+  .nav-arrow {
+    min-width: 48px;
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  /* Better feedback on touch */
+  button:active,
+  .btn:active,
+  .nav-link:active {
+    transform: scale(0.97);
+    transition: transform 0.1s ease;
+  }
+
+  /* Prevent double-tap zoom on links/buttons */
+  a, button {
+    touch-action: manipulation;
+  }
+
+  /* Better scrollable areas */
+  .scrollable {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+}
+
+/* ===== READER MODE MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+  .reader-landing {
+    padding: 20px 16px;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .hero-desc {
+    font-size: 16px;
+  }
+
+  .browse-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 8px;
+  }
+
+  .browse-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    white-space: nowrap;
+    min-width: auto;
+    padding: 10px 20px;
+  }
+}
+
+/* ===== MUSHAF MODE MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+  .mushaf-wrap {
+    padding: 0 8px;
+  }
+
+  .mushaf-img {
+    max-height: calc(100vh - 140px);
+    max-height: calc(var(--vh, 1vh) * 100 - 140px);
+  }
+
+  .nav-arrow {
+    width: 52px;
+    height: 52px;
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+  }
+
+  .nav-arrow.left {
+    left: 4px;
+  }
+
+  .nav-arrow.right {
+    right: 4px;
+  }
+
+  .nav-arrow ion-icon {
+    font-size: 1.8rem;
+  }
+
+  /* Better control panel on mobile */
+  .control-panel {
+    padding: 12px 16px;
+  }
+
+  .page-number {
+    font-size: 18px;
+  }
+
+  /* ===== DRAWER/CONTROL PANEL MOBILE FIXES ===== */
+  .drawer {
+    width: 100% !important;
+    max-width: 100% !important;
+    right: 0 !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .drawer * {
+    box-sizing: border-box !important;
+  }
+
+  .drawer-head {
+    padding: 16px 24px 14px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box !important;
+  }
+
+  .drawer-head h2 {
+    font-size: 16px !important;
+    font-weight: 600;
+    max-width: calc(100% - 60px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .drawer-head .btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+
+  .drawer-body {
+    padding: 16px 24px 24px;
+    gap: 16px;
+    padding-bottom: max(24px, env(safe-area-inset-bottom) + 16px);
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .drawer-section {
+    padding: 16px 20px;
+    margin-bottom: 0;
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+
+  /* Ensure all text wraps properly */
+  .drawer-section *,
+  .section-header *,
+  .section-desc,
+  .form-label,
+  .form-group label {
+    max-width: 100% !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+    box-sizing: border-box !important;
+  }
+
+  .section-header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+  }
+
+  .section-header h3 {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+  }
+
+  .section-header ion-icon {
+    font-size: 18px !important;
+  }
+
+  .section-desc {
+    font-size: 12px !important;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  /* Form controls - bigger touch targets */
+  .form-group {
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .form-label {
+    font-size: 13px !important;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+  }
+
+  .form-label input[type="checkbox"] {
+    min-width: 18px;
+    min-height: 18px;
+    margin-right: 10px;
+  }
+
+  .form-group .btn {
+    min-height: 44px;
+    font-size: 14px !important;
+    padding: 10px 14px;
+    border-radius: 8px;
+  }
+
+  .form-group .btn ion-icon {
+    font-size: 18px !important;
+  }
+
+  /* Textarea bigger on mobile */
+  .form-textarea {
+    font-size: 16px !important;
+    padding: 12px !important;
+    min-height: 100px;
+    border-radius: 10px;
+  }
+
+  /* Audio controls - full width on mobile */
+  .audio-controls-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .audio-controls-grid .btn {
+    min-height: 52px;
+    font-size: 16px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .audio-controls-grid .btn ion-icon {
+    font-size: 24px;
+  }
+
+  .audio-controls-grid .btn span {
+    font-size: 12px;
+  }
+
+  .audio-controls-grid .btn.primary {
+    grid-column: span 1;
+  }
+
+  /* Range pickers - better mobile layout */
+  .range-pickers {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+  }
+
+  .range-picker {
+    width: 100%;
+  }
+
+  .range-picker > span {
+    font-size: 14px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .range-picker-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .range-picker-row select {
+    font-size: 16px !important;
+    padding: 12px !important;
+    min-height: 48px;
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  /* Bookmark status */
+  #bm-status {
+    font-size: 16px;
+    padding: 10px 12px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Confidence select */
+  #conf-select {
+    font-size: 16px !important;
+    padding: 12px !important;
+    min-height: 48px;
+    border-radius: 8px;
+    width: 100%;
+  }
+
+  /* Range status */
+  #range-status {
+    font-size: 14px;
+    padding: 12px;
+    line-height: 1.6;
+    word-wrap: break-word;
+    background: var(--bg);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  /* Clear range button */
+  #range-clear {
+    min-height: 48px;
+    font-size: 16px;
+    padding: 12px 16px;
+    margin-top: 8px;
+  }
+}
+
+/* ===== HIFDH TEST MODE MOBILE ===== */
+@media (max-width: 768px) {
+  .test-config,
+  .test-content {
+    padding: 16px;
+  }
+
+  .test-option {
+    padding: 16px;
+  }
+
+  .test-option label {
+    font-size: 16px;
+  }
+
+  .option-range {
+    height: 48px;
+  }
+
+  /* Better MCQ buttons */
+  .mcq-choice {
+    padding: 16px;
+    font-size: 16px;
+    min-height: 60px;
+  }
+
+  /* Better recording UI */
+  .rec-prompt,
+  .rec-answer {
+    font-size: 22px;
+    line-height: 1.8;
+    padding: 20px 16px;
+  }
+
+  #record-toggle {
+    min-height: 56px;
+    font-size: 18px;
+    padding: 16px 32px;
+  }
+}
+
+/* ===== SETTINGS PAGE MOBILE ===== */
+@media (max-width: 768px) {
+  .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .settings-section h2 {
+    font-size: 20px;
+  }
+
+  .settings-row {
+    padding: 14px 0;
+  }
+
+  .settings-row label {
+    font-size: 16px;
+  }
+}
+
+/* ===== ACCESSIBILITY IMPROVEMENTS ===== */
+@media (max-width: 768px) {
+  /* Ensure focus is visible on mobile */
+  *:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+  }
+
+  /* Better contrast for muted text */
+  .muted {
+    color: var(--text-dim);
+  }
+
+  /* Ensure sufficient line height for readability */
+  p, li, span {
+    line-height: 1.6;
+  }
+}
+
+/* ===== PERFORMANCE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+  /* Reduce animations on mobile for performance */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Optimize rendering */
+  .card,
+  .block,
+  .btn {
+    will-change: transform;
+  }
+
+  /* GPU acceleration for smooth scrolling */
+  .scrollable,
+  .quran,
+  .mushaf-wrap {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+}
+
+/* ===== DARK MODE MOBILE ADJUSTMENTS ===== */
+@media (max-width: 768px) {
+  body[data-theme="dark"] {
+    /* Darker background for OLED power saving */
+    --bg: #000000;
+    --surface: rgba(18, 28, 22, 0.98);
+  }
+
+  body[data-theme="dark"] .mushaf-img {
+    /* Reduce brightness on mobile dark mode */
+    filter: brightness(0.9);
+  }
+
+  /* Remove excessive top padding on mushaf landing page */
+  .mushaf-landing {
+    padding-top: 1rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .landing-hero {
+    margin-bottom: 1.5rem !important;
+  }
+
+  .hero-icon {
+    width: 64px !important;
+    height: 64px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Remove top padding when viewing mushaf pages */
+  .mushaf-viewer-container {
+    padding: 0 !important;
+    gap: 0 !important;
+    margin: 0 !important;
+  }
+
+  .mushaf-wrap {
+    min-height: 100vh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .mushaf-content {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  /* Full-screen immersive mushaf view on mobile */
+  .mushaf-image-container {
+    min-height: 100vh !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .mushaf-img {
+    max-height: 100vh !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #mushaf-canvas {
+    max-height: 100vh !important;
+    height: 100vh !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    object-fit: contain !important;
+  }
+
+  /* Hide viewer info overlay on mobile */
+  .viewer-info-overlay {
+    display: none !important;
+  }
+
+  /* Hide audio controls bar on mobile */
+  .audio-controls-bar {
+    display: none !important;
+  }
+
+  /* Hide navigation arrows on mobile - use swipe instead */
+  .nav-arrow {
+    display: none !important;
+  }
+
+  /* Hide toolbar by default, show on tap */
+  .toolbar.compact {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin-top: 0 !important;
+    padding: 0.5rem 1rem !important;
+    z-index: 100 !important;
+    transform: translateY(-100%) !important;
+    transition: transform 0.3s ease !important;
+  }
+
+  /* Show toolbar when body has 'show-toolbar' class */
+  body.show-toolbar .toolbar.compact {
+    transform: translateY(0) !important;
+  }
+
+  /* Hide header completely in viewer mode on mobile */
+  body.viewer-mode .app-header {
+    position: absolute !important;
+    top: -200px !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Make toolbar stick to top with no gap */
+  .toolbar.compact {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    margin-top: 0 !important;
+    padding: 0.5rem 1rem !important;
+    padding-top: max(0.5rem, env(safe-area-inset-top)) !important;
+    z-index: 100 !important;
+  }
+
+  /* Adjust mushaf-wrap to account for fixed toolbar */
+  .mushaf-wrap {
+    padding-top: 50px !important;
+    margin-top: 0 !important;
+  }
+
+  /* Ensure no space at top of viewport */
+  body.viewer-mode {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+}
+
+/* ===== SAFE AREA INSETS (iPhone Notch/Island) ===== */
+@supports (padding: max(0px)) {
+  @media (max-width: 768px) {
+    .app-header {
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      padding-top: max(12px, env(safe-area-inset-top));
+    }
+
+    .app-footer {
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
+      padding-bottom: max(30px, env(safe-area-inset-bottom));
+    }
+
+    .quran,
+    .mushaf-wrap,
+    .list-shell {
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
+    }
+
+    /* Fixed elements (modals, bottom sheets) */
+    .modal,
+    .control-panel {
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
+}
+
+/* ===== PULL TO REFRESH PREVENTION ===== */
+@media (max-width: 768px) {
+  body {
+    overscroll-behavior-y: contain;
+  }
+
+  /* Prevent pull-to-refresh on specific containers */
+  .quran,
+  .mushaf-wrap,
+  .test-content {
+    overscroll-behavior: contain;
+  }
+}
+
+/* ===== HOME PAGE MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 768px) {
+  body.page-home main {
+    padding: 20px 16px 40px;
+  }
+
+  .home {
+    gap: 32px;
+  }
+
+  /* Hero section - single column on mobile */
+  .hero {
+    grid-template-columns: 1fr !important;
+    gap: 24px;
+    padding: 24px 20px;
+    border-radius: 24px;
+    min-height: auto;
+  }
+
+  .hero::after {
+    display: none; /* Hide decorative background on mobile */
+  }
+
+  .hero-body {
+    gap: 16px;
+  }
+
+  .hero-body .eyebrow {
+    font-size: 11px;
+    letter-spacing: .2em;
+  }
+
+  .hero-body h1 {
+    font-size: 28px !important;
+    line-height: 1.2;
+  }
+
+  .hero-body p {
+    font-size: 16px !important;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    gap: 12px;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    min-height: 52px;
+    font-size: 16px !important;
+    justify-content: center;
+  }
+
+  /* Hero glance - single column */
+  .hero-glance {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .glance-item {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .glance-item .label {
+    font-size: 11px;
+  }
+
+  .glance-item .value {
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  /* Hero card - full width on mobile */
+  .hero-card {
+    width: 100%;
+  }
+
+  .hero-card-inner {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px;
+    border-radius: 20px;
+    gap: 16px;
+  }
+
+  .hero-metric span {
+    font-size: 11px;
+  }
+
+  .hero-metric strong {
+    font-size: 26px;
+  }
+
+  .hero-progress {
+    height: 10px;
+  }
+
+  .hero-note {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* Menu section */
+  .menu {
+    gap: 20px;
+  }
+
+  .section-head h2 {
+    font-size: 24px;
+  }
+
+  .section-head p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Menu cards - single column on mobile */
+  .menu-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  .menu-card {
+    padding: 20px;
+    border-radius: 20px;
+    gap: 14px;
+  }
+
+  .menu-card::after {
+    display: none; /* Hide decorative background */
+  }
+
+  .menu-card-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .menu-card-icon ion-icon {
+    font-size: 24px;
+  }
+
+  .menu-card h2 {
+    font-size: 18px;
+  }
+
+  .menu-card p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .menu-meta {
+    gap: 12px;
+    font-size: 13px;
+  }
+
+  .menu-meta ion-icon {
+    font-size: 16px;
+  }
+
+  /* Footer */
+  .app-footer {
+    padding: 32px 20px;
+  }
+
+  .app-footer-content {
+    gap: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .app-footer h2 {
+    font-size: 22px;
+  }
+
+  .app-footer p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .footer-nav {
+    flex-direction: row !important;
+    gap: 6px;
+    align-items: center;
+    flex-wrap: nowrap !important;
+    width: 100%;
+    max-width: 100%;
+    justify-content: space-between;
+  }
+
+  .footer-nav a {
+    font-size: 13px;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    flex: 1;
+    padding: 10px 8px;
+    text-align: center;
+  }
+}
+
+/* Smaller phones - even more compact */
+@media (max-width: 480px) {
+  body.page-home main {
+    padding: 16px 12px 32px;
+  }
+
+  .hero {
+    padding: 20px 16px;
+  }
+
+  .hero-body h1 {
+    font-size: 24px !important;
+  }
+
+  .hero-body p {
+    font-size: 15px !important;
+  }
+
+  .hero-card-inner {
+    padding: 18px;
+  }
+
+  .menu-card {
+    padding: 18px;
+  }
+}

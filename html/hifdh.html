@@ -18,8 +18,12 @@
   <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/styles.css">
   <link rel="stylesheet" href="../assets/css/pages.css">
-  <link rel="stylesheet" href="../assets/css/modern.css">
+  <link rel="stylesheet" href="../assets/css/pages.css">
   <link rel="stylesheet" href="../assets/css/hifdh.css">
+  <link rel="stylesheet" href="../assets/css/mobile-enhancements.css">
+  <!-- Compatibility scripts (load first) -->
+  <script src="../assets/js/polyfills.js"></script>
+  <script src="../assets/js/compat.js"></script>
 </head>
 
 <body class="page-hifdh">
@@ -29,56 +33,49 @@
         <img src="../assets/img/favicon/favicon.svg" alt="Quran Reviser logo">
       </a>
       <div class="brand-copy">
-        <h1>Hifdh Progress</h1>
-        <p class="brand-tagline">Track memorisation, plan finish dates, and stay consistent</p>
+        <h1 data-i18n="hifdhProgress">Hifdh Progress</h1>
+        <p class="brand-tagline" data-i18n="hifdhTagline">Track memorisation, plan finish dates, and stay consistent</p>
       </div>
     </div>
     <nav class="primary-nav" aria-label="Primary">
-      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon>Home</a>
-      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon>Reader</a>
-      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon>Mushaf</a>
-      <a class="nav-link active" href="hifdh.html"><ion-icon name="bar-chart-outline"></ion-icon>Hifdh</a>
-      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon>Settings</a>
+      <a class="nav-link" href="index.html"><ion-icon name="home-outline"></ion-icon><span data-i18n="home">Home</span></a>
+      <a class="nav-link" href="reader.html"><ion-icon name="book-outline"></ion-icon><span data-i18n="reader">Reader</span></a>
+      <a class="nav-link" href="mushaf.html"><ion-icon name="layers-outline"></ion-icon><span data-i18n="mushaf">Mushaf</span></a>
+      <a class="nav-link" href="hifdh-test.html"><ion-icon name="flash-outline"></ion-icon><span data-i18n="hifdhTest">Test</span></a>
+      <a class="nav-link" href="tajwid.html"><ion-icon name="color-palette-outline"></ion-icon><span data-i18n="tajwid">Tajwid</span></a>
+      <a class="nav-link" href="settings.html"><ion-icon name="settings-outline"></ion-icon><span data-i18n="settings">Settings</span></a>
     </nav>
     <div class="header-actions">
-      <a class="btn ghost" href="surahs.html">
-        <ion-icon name="compass-outline"></ion-icon>
-        Quran Explorer
-      </a>
-      <a class="btn secondary" href="hifdh-test.html">
-        <ion-icon name="flash-outline"></ion-icon>
-        Quick Test
-      </a>
     </div>
   </header>
 
   <main class="wrap hifdh-wrap">
     <section class="page-hero hifdh-hero">
       <div class="hero-body">
-        <span class="eyebrow">MEMORIZATION DASHBOARD</span>
-        <h2>Master your hifdh<br>with precision<br>tracking</h2>
-        <p>Track every ayah, monitor confidence levels, and build a sustainable revision routine tailored to your pace and goals.</p>
+        <span class="eyebrow" data-i18n="memorizationDashboard">MEMORIZATION DASHBOARD</span>
+        <h2 data-i18n="masterHifdh">Master your hifdh<br>with precision<br>tracking</h2>
+        <p data-i18n="trackEveryAyah">Track every ayah, monitor confidence levels, and build a sustainable revision routine tailored to your pace and goals.</p>
         <div class="hero-actions">
           <a class="btn primary" href="#daily-plan">
             <ion-icon name="calendar-outline"></ion-icon>
-            Create Daily Plan
+            <span data-i18n="createDailyPlan">Create Daily Plan</span>
           </a>
           <a class="btn ghost" href="#strength-map">
             <ion-icon name="analytics-outline"></ion-icon>
-            Strength Heatmap
+            <span data-i18n="strengthHeatmap">Strength Heatmap</span>
           </a>
         </div>
         <div class="hero-glance">
           <div class="glance-item">
-            <span class="label">AYAH MEMORIZED</span>
+            <span class="label" data-i18n="ayahMemorized">AYAH MEMORIZED</span>
             <span class="value" id="hero-total-ayah">0</span>
           </div>
           <div class="glance-item">
-            <span class="label">OVERALL PROGRESS</span>
+            <span class="label" data-i18n="overallProgress">OVERALL PROGRESS</span>
             <span class="value" id="hero-percent">0%</span>
           </div>
           <div class="glance-item">
-            <span class="label">PAGES TRACKED</span>
+            <span class="label" data-i18n="pagesTracked">PAGES TRACKED</span>
             <span class="value" id="hero-pages-covered">0</span>
           </div>
         </div>
@@ -86,18 +83,18 @@
       <div class="hero-card">
         <div class="hero-card-inner">
           <div class="hero-metric">
-            <span>Daily Target</span>
-            <strong id="hero-daily-target">Set up your plan</strong>
+            <span data-i18n="dailyTarget">Daily Target</span>
+            <strong id="hero-daily-target" data-i18n="setUpYourPlan">Set up your plan</strong>
           </div>
           <div class="hero-metric">
-            <span>Completion</span>
+            <span data-i18n="completion">Completion</span>
             <div class="hero-progress">
               <div class="hero-progress-bar" id="hero-progress-bar"></div>
             </div>
           </div>
           <p class="hero-note">
             <ion-icon name="flame-outline"></ion-icon>
-            Maintain consistency by completing daily assignments and reviewing weak sections regularly
+            <span data-i18n="maintainConsistency">Maintain consistency by completing daily assignments and reviewing weak sections regularly</span>
           </p>
         </div>
       </div>
@@ -108,8 +105,8 @@
           <ion-icon name="podium-outline"></ion-icon>
         </span>
         <div>
-          <h2>Progress Overview</h2>
-          <p>Track your memorization journey across all surahs</p>
+          <h2 data-i18n="progressOverview">Progress Overview</h2>
+          <p data-i18n="trackJourney">Track your memorization journey across all surahs</p>
         </div>
       </div>
       <div class="stats hifdh-stats">
@@ -118,7 +115,7 @@
             <ion-icon name="book-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="k">Ayah Memorized</div>
+            <div class="k" data-i18n="ayahMemorized">Ayah Memorized</div>
             <div class="v" id="s-ayah">0</div>
           </div>
         </div>
@@ -127,7 +124,7 @@
             <ion-icon name="trending-up-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="k">Overall Progress</div>
+            <div class="k" data-i18n="overallProgress">Overall Progress</div>
             <div class="v" id="s-perc">0%</div>
           </div>
         </div>
@@ -136,7 +133,7 @@
             <ion-icon name="document-text-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="k">Pages Memorized</div>
+            <div class="k" data-i18n="pagesMemorized">Pages Memorized</div>
             <div class="v" id="s-pages">0 / 604</div>
           </div>
         </div>
@@ -145,7 +142,7 @@
             <ion-icon name="hourglass-outline"></ion-icon>
           </div>
           <div class="stat-content">
-            <div class="k">Pages Remaining</div>
+            <div class="k" data-i18n="pagesRemaining">Pages Remaining</div>
             <div class="v" id="s-left">604</div>
           </div>
         </div>
@@ -153,7 +150,7 @@
       <div class="menu-meta">
         <span>
           <ion-icon name="information-circle-outline"></ion-icon>
-          Page counts are calculated proportionally based on ayah memorized
+          <span data-i18n="pageCountsProportional">Page counts are calculated proportionally based on ayah memorized</span>
         </span>
       </div>
     </section>
@@ -164,18 +161,18 @@
           <ion-icon name="list-outline"></ion-icon>
         </span>
         <div>
-          <h2>Surah-by-Surah Progress</h2>
-          <p>Adjust the slider to track ayah memorized for each surah</p>
+          <h2 data-i18n="surahByProgress">Surah-by-Surah Progress</h2>
+          <p data-i18n="adjustSliderTrack">Mark which surahs you have memorized</p>
         </div>
       </div>
       <div class="surah-controls">
         <div class="control-info">
           <ion-icon name="information-circle-outline"></ion-icon>
-          <span>Use the slider or click quick-set percentages (0% / 25% / 50% / 75% / 100%)</span>
+          <span data-i18n="useSliderQuickSet">Click to mark each surah as memorized or not</span>
         </div>
         <button class="btn ghost" id="reset-progress">
           <ion-icon name="refresh-outline"></ion-icon>
-          Reset All Progress
+          <span data-i18n="resetAllProgress">Reset All Progress</span>
         </button>
       </div>
       <div class="sep"></div>
@@ -188,38 +185,38 @@
           <ion-icon name="calculator-outline"></ion-icon>
         </span>
         <div>
-          <h2>Completion Calculator</h2>
-          <p>Estimate your hifdh completion timeline based on daily rate</p>
+          <h2 data-i18n="completionCalculator">Completion Calculator</h2>
+          <p data-i18n="estimateTimeline">Estimate your hifdh completion timeline based on daily rate</p>
         </div>
       </div>
       <div class="calc-grid">
         <div class="field">
-          <label class="input-label">Scope</label>
+          <label class="input-label" data-i18n="scope">Scope</label>
           <select id="calc-scope" class="modern-select">
-            <option value="all" selected>All Quran (current progress)</option>
-            <option value="surahs">Selected Surahs</option>
-            <option value="juz">Specific Juz</option>
-            <option value="hizb">Specific Hizb</option>
+            <option value="all" selected data-i18n="allQuranProgress">All Quran (current progress)</option>
+            <option value="surahs" data-i18n="selectedSurahs">Selected Surahs</option>
+            <option value="juz" data-i18n="specificJuz">Specific Juz</option>
+            <option value="hizb" data-i18n="specificHizb">Specific Hizb</option>
           </select>
         </div>
         <div class="field" id="scope-surahs-field" hidden>
-          <label class="input-label">Surahs (e.g., 1, 36, 67-70)</label>
-          <input id="scope-surahs-input" type="text" placeholder="1, 36, 67-70" class="modern-input">
+          <label class="input-label" data-i18n="surahsExample">Surahs (e.g., 1, 36, 67-70)</label>
+          <input id="scope-surahs-input" type="text" data-i18n-placeholder="surahsExample" placeholder="1, 36, 67-70" class="modern-input">
         </div>
         <div class="field" id="scope-juz-field" hidden>
-          <label class="input-label">Juz numbers (e.g., 1, 5-10)</label>
-          <input id="scope-juz-input" type="text" placeholder="1, 5-10" class="modern-input">
+          <label class="input-label" data-i18n="juzExample">Juz numbers (e.g., 1, 5-10)</label>
+          <input id="scope-juz-input" type="text" data-i18n-placeholder="juzExample" placeholder="1, 5-10" class="modern-input">
         </div>
         <div class="field" id="scope-hizb-field" hidden>
-          <label class="input-label">Hizb numbers (e.g., 1, 15-30)</label>
-          <input id="scope-hizb-input" type="text" placeholder="1, 15-30" class="modern-input">
+          <label class="input-label" data-i18n="hizbExample">Hizb numbers (e.g., 1, 15-30)</label>
+          <input id="scope-hizb-input" type="text" data-i18n-placeholder="hizbExample" placeholder="1, 15-30" class="modern-input">
         </div>
         <div class="field">
-          <label class="input-label">Pages per day</label>
+          <label class="input-label" data-i18n="pagesPerDay">Pages per day</label>
           <input id="rate-pages" type="number" min="0.1" step="0.1" value="1" class="modern-input">
         </div>
         <div class="field">
-          <label class="input-label">Minutes per page (optional)</label>
+          <label class="input-label" data-i18n="minsPerPage">Minutes per page (optional)</label>
           <input id="mins-per-page" type="number" min="1" step="1" value="20" class="modern-input">
         </div>
       </div>
@@ -230,7 +227,7 @@
             <ion-icon name="document-outline"></ion-icon>
           </div>
           <div class="calc-info">
-            <span class="calc-label">Pages Left</span>
+            <span class="calc-label" data-i18n="pagesLeft">Pages Left</span>
             <span class="calc-value" id="c-pages-left">0</span>
           </div>
         </div>
@@ -239,7 +236,7 @@
             <ion-icon name="calendar-outline"></ion-icon>
           </div>
           <div class="calc-info">
-            <span class="calc-label">Days to Complete</span>
+            <span class="calc-label" data-i18n="daysToComplete">Days to Complete</span>
             <span class="calc-value" id="c-days">0</span>
           </div>
         </div>
@@ -248,7 +245,7 @@
             <ion-icon name="flag-outline"></ion-icon>
           </div>
           <div class="calc-info">
-            <span class="calc-label">Estimated Finish</span>
+            <span class="calc-label" data-i18n="estimatedFinish">Estimated Finish</span>
             <span class="calc-value" id="c-date">-</span>
           </div>
         </div>
@@ -257,7 +254,7 @@
             <ion-icon name="time-outline"></ion-icon>
           </div>
           <div class="calc-info">
-            <span class="calc-label">Total Time Required</span>
+            <span class="calc-label" data-i18n="totalTimeRequired">Total Time Required</span>
             <span class="calc-value" id="c-time">-</span>
           </div>
         </div>
@@ -441,30 +438,29 @@
   <footer class="app-footer">
     <div class="app-footer-content">
       <div>
-        <h2>Keep momentum in your memorisation</h2>
-        <p>Review your daily assignment, reinforce weak pages, and celebrate every completed juz.</p>
+        <h2 data-i18n="keepMomentum">Keep momentum in your memorisation</h2>
+        <p data-i18n="reviewDaily">Review your daily assignment, reinforce weak pages, and celebrate every completed juz.</p>
       </div>
-      <nav class="footer-nav" aria-label="Footer">
-        <a href="reader.html">Reader</a>
-        <a href="mushaf.html">Mushaf</a>
-        <a href="hifdh-test.html">Hifdh Test</a>
-        <a href="tajwid.html">Tajwid</a>
-        <a href="settings.html">Settings</a>
-      </nav>
     </div>
   </footer>
 
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <script src="../assets/js/i18n.js"></script>
   <script src="../assets/js/core/profiles.js"></script>
   <script src="../assets/js/core/confidence.js"></script>
   <script src="../assets/js/core/prefs.js"></script>
   <script src="../assets/js/core/utils.js"></script>
   <script src="../assets/js/core/api.js"></script>
-  <script src="../assets/js/core/streaks.js"></script>
   <script src="../assets/js/core/review.js"></script>
   <script src="../assets/js/hifdh.js"></script>
   <script src="../assets/js/chapters-data.js"></script>
+  <script>
+    // Initialize language on page load
+    if (typeof initLanguage === 'function') {
+      initLanguage();
+    }
+  </script>
 </body>
 </html>
 

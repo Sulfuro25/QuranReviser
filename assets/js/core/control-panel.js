@@ -89,7 +89,7 @@ window.QR = window.QR || {};
     for (let i = 1; i <= count; i += 1){
       const opt = document.createElement('option');
       opt.value = String(i);
-      opt.textContent = `Ayah ${i}`;
+      opt.textContent = String(i);
       select.appendChild(opt);
     }
     const want = desired || prev;
@@ -367,10 +367,21 @@ window.QR = window.QR || {};
     populateAyahSelect(dom.startAyah, null, null);
     populateAyahSelect(dom.endAyah, null, null);
 
-    const stored = readStoredRange();
-    state.rangeStartKey = stored.start || null;
-    state.rangeEndKey = stored.end || null;
-    state.loopOne = !!stored.loopOne;
+    // Clear any previously stored range to avoid confusion
+    // Users can set a new range if they want
+    state.rangeStartKey = null;
+    state.rangeEndKey = null;
+    state.loopOne = false;
+    
+    // Clear from storage as well
+    try {
+      if (window.QR && QR.profiles && QR.profiles.setItem) {
+        QR.profiles.setItem(RANGE_KEY, JSON.stringify({ start: '', end: '', loopOne: false }));
+      } else {
+        localStorage.setItem(RANGE_KEY, JSON.stringify({ start: '', end: '', loopOne: false }));
+      }
+    } catch {}
+    
     applyRangeToSelectors();
     if (dom.loopOne) dom.loopOne.checked = state.loopOne;
     updateRangeStatus();

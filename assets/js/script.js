@@ -521,10 +521,17 @@ function setStatus(text) { if (els.status) els.status.textContent = text || ''; 
 function persistPrefs() {
   try {
     const theme = document.body.getAttribute('data-theme') || 'dark';
-    if (window.QR && QR.prefs) QR.prefs.set({ theme });
-    else {
-      let prefs = {}; try { prefs = JSON.parse(localStorage.getItem('qr_prefs') || '{}'); } catch {}
-      prefs.theme = theme; localStorage.setItem('qr_prefs', JSON.stringify(prefs));
+    if (window.QR && QR.prefs) {
+      QR.prefs.set({ 
+        theme,
+        follow_mode_on: state.followMode
+      });
+    } else {
+      let prefs = {}; 
+      try { prefs = JSON.parse(localStorage.getItem('qr_prefs') || '{}'); } catch {}
+      prefs.theme = theme;
+      prefs.follow_mode_on = state.followMode;
+      localStorage.setItem('qr_prefs', JSON.stringify(prefs));
     }
   } catch {}
 }
@@ -577,6 +584,9 @@ function loadPrefs() {
     state.wbwOn = !!prefs.wbw_on;
     state.wbwHover = ('wbw_hover' in prefs) ? !!prefs.wbw_hover : true;
     if (els.themeToggle) els.themeToggle.textContent = (document.body.getAttribute('data-theme') === 'light') ? 'Dark' : 'Light';
+    
+    // Set follow mode checkbox to match saved preference
+    if (els.followToggle) els.followToggle.checked = state.followMode;
   } catch {}
 }
 
@@ -650,11 +660,26 @@ function extractTranslationMapFromVerses(verses) {
 async function fetchTranslationsForChapter(translationId, chapterNumber) {
   if (!translationId) return new Map();
   setStatus('Loading translation...');
-  const res = await fetch(`${API_BASE}/quran/translations/${translationId}?chapter_number=${chapterNumber}`);
-  if (!res.ok) throw new Error(`Translation HTTP ${res.status}`);
-  const data = await res.json();
+  
   const map = new Map();
-  (data.translations || []).forEach(t => map.set(t.verse_key, t.text));
+  let page = 1;
+  
+  while (true) {
+    const res = await fetch(`${API_BASE}/quran/translations/${translationId}?chapter_number=${chapterNumber}&per_page=300&page=${page}`);
+    if (!res.ok) throw new Error(`Translation HTTP ${res.status}`);
+    const data = await res.json();
+    
+    (data.translations || []).forEach((t, idx) => {
+      const verseKey = `${chapterNumber}:${t.verse_number || (idx + 1)}`;
+      map.set(verseKey, t.text);
+    });
+    
+    const next = (data.pagination && data.pagination.next_page) || (data.meta && data.meta.next_page) || null;
+    if (!next) break;
+    page = next;
+    if (page > 20) break;
+  }
+  
   setStatus('');
   return map;
 }
@@ -709,6 +734,12 @@ function setAudioForIndex(i, autoplay = false) {
   try { if (window.QR && QR.review) QR.review.markSeen(v.verse_key); } catch {}
   updatePlayerInfo();
   setStatus('');
+  
+  // Highlight and scroll to the verse if follow mode is on
+  if (state.followMode) {
+    try { highlightAndFollow(); } catch {}
+  }
+  
   return true;
 }
 function getCurrentVerseKey() {
@@ -802,9 +833,10 @@ function highlightAndFollow() {
     currentKey = v && v.verse_key || '';
   }
   if (!currentKey) return;
-  // Only highlight/scroll if the current ayah exists on the visible page; do not change pages here
-  try { document.querySelectorAll('.verse.active').forEach(el => el.classList.remove('active')); } catch {}
-  const el = document.querySelector(`.verse[data-key="${CSS.escape(currentKey)}"]`);
+  // Remove active class from all verses
+  try { document.querySelectorAll('.verse-container.active').forEach(el => el.classList.remove('active')); } catch {}
+  // Find and highlight the current verse
+  const el = document.querySelector(`.verse-container[data-key="${CSS.escape(currentKey)}"]`);
   if (el) {
     el.classList.add('active');
     try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch {}
@@ -828,9 +860,30 @@ function ensureCurrentAudioPrepared(autoplay=false) {
 
 function togglePlay() {
   if (!ensureCurrentAudioPrepared(true)) return;
-  if (els.audio.paused) els.audio.play().then(()=>{ try { if (window.QR && QR.streaks) QR.streaks.bump('play'); } catch {} }).catch(()=>{});
+  if (els.audio.paused) els.audio.play().catch(()=>{});
   else els.audio.pause();
   updatePlayerInfo();
+}
+
+async function defaultNextAyah() {
+  const verses = getVisibleVerses();
+  if (state.playIndex < verses.length - 1) {
+    // Move to next verse in current page
+    setAudioForIndex(state.playIndex + 1, true);
+    return;
+  }
+  // At the end of current page, try to advance to next page
+  await nextPage();
+}
+
+async function defaultPrevAyah() {
+  if (state.playIndex > 0) {
+    // Move to previous verse in current page
+    setAudioForIndex(state.playIndex - 1, true);
+    return;
+  }
+  // At the start of current page, try to go to previous page
+  await prevPage();
 }
 
 async function nextAyah() {
@@ -841,17 +894,18 @@ async function nextAyah() {
   }
   const range = (window.QR && QR.controlPanel && typeof QR.controlPanel.getRange === 'function') ? normaliseRange(QR.controlPanel.getRange()) : null;
   const currentKey = getCurrentVerseKey();
-  if (range && range.start && range.end) {
-    let target = currentKey;
-    if (!target || compareVerseKeys(target, range.start) < 0) {
-      target = range.start;
-    } else {
-      const nextKey = nextVerseKey(target);
-      target = (nextKey && compareVerseKeys(nextKey, range.end) <= 0) ? nextKey : range.start;
+  
+  // Only use range if current verse is within the range
+  if (range && range.start && range.end && currentKey) {
+    const isInRange = compareVerseKeys(currentKey, range.start) >= 0 && compareVerseKeys(currentKey, range.end) <= 0;
+    if (isInRange) {
+      const nextKey = nextVerseKey(currentKey);
+      const target = (nextKey && compareVerseKeys(nextKey, range.end) <= 0) ? nextKey : range.start;
+      if (target) await focusOnKey(target, true, true);
+      return;
     }
-    if (target) await focusOnKey(target, true, true);
-    return;
   }
+  
   await defaultNextAyah();
 }
 
@@ -870,17 +924,18 @@ async function prevAyah() {
   }
   const range = (window.QR && QR.controlPanel && typeof QR.controlPanel.getRange === 'function') ? normaliseRange(QR.controlPanel.getRange()) : null;
   const currentKey = getCurrentVerseKey();
-  if (range && range.start && range.end) {
-    let target = currentKey;
-    if (!target || compareVerseKeys(target, range.start) <= 0) {
-      target = range.end;
-    } else {
-      const prevKey = prevVerseKey(target);
-      target = (prevKey && compareVerseKeys(prevKey, range.start) >= 0) ? prevKey : range.end;
+  
+  // Only use range if current verse is within the range
+  if (range && range.start && range.end && currentKey) {
+    const isInRange = compareVerseKeys(currentKey, range.start) >= 0 && compareVerseKeys(currentKey, range.end) <= 0;
+    if (isInRange) {
+      const prevKey = prevVerseKey(currentKey);
+      const target = (prevKey && compareVerseKeys(prevKey, range.start) >= 0) ? prevKey : range.end;
+      if (target) await focusOnKey(target, true, true);
+      return;
     }
-    if (target) await focusOnKey(target, true, true);
-    return;
   }
+  
   await defaultPrevAyah();
 }
 
@@ -903,10 +958,20 @@ async function nextPage() {
     if (cur > 0 && cur < 114) {
       if (els.audio) { els.audio.pause(); els.audio.currentTime = 0; els.audio.removeAttribute('src'); delete els.audio.dataset.current; }
       await loadSurah(cur + 1);
+      state.playIndex = 0;
       setAudioForIndex(0, !!wasPlaying);
       try { window.scrollTo(0, 0); } catch {}
+      return;
     }
   }
+  // At the end, stop playback
+  if (els.audio) { 
+    els.audio.pause(); 
+    els.audio.currentTime = 0; 
+    els.audio.removeAttribute('src'); 
+    delete els.audio.dataset.current; 
+  }
+  updatePlayerInfo();
 }
 
 async function fetchVersesByRange(range, id, withTr) {
@@ -1002,6 +1067,20 @@ function renderVerses() {
     const actions = document.createElement('div');
     actions.className = 'verse-actions';
 
+    const playBtn = document.createElement('button');
+    playBtn.className = 'verse-btn';
+    playBtn.title = 'Play';
+    const playIcon = document.createElement('ion-icon');
+    playIcon.setAttribute('name', 'play-outline');
+    playBtn.appendChild(playIcon);
+    playBtn.addEventListener('click', () => {
+      const verses = getVisibleVerses();
+      const idx = verses.findIndex(verse => verse.verse_key === v.verse_key);
+      if (idx !== -1) {
+        setAudioForIndex(idx, true);
+      }
+    });
+
     const copyBtn = document.createElement('button');
     copyBtn.className = 'verse-btn';
     copyBtn.title = 'Copy';
@@ -1016,6 +1095,8 @@ function renderVerses() {
         setTimeout(() => copyIcon.setAttribute('name', 'copy-outline'), 1500);
       } catch {}
     });
+    
+    actions.appendChild(playBtn);
     actions.appendChild(copyBtn);
     head.appendChild(meta);
     head.appendChild(actions);
@@ -1049,14 +1130,27 @@ function renderVerses() {
       });
       arabic.appendChild(fragTokens);
     } else {
-      if (v.text_uthmani) arabic.textContent = v.text_uthmani; else arabic.innerHTML = v.text_uthmani_tajweed;
+      // Sanitize Tajweed HTML from API
+      if (v.text_uthmani) {
+        arabic.textContent = v.text_uthmani;
+      } else if (v.text_uthmani_tajweed) {
+        const sanitized = window.QR && QR.utils && QR.utils.sanitizeTajweedHTML 
+          ? QR.utils.sanitizeTajweedHTML(v.text_uthmani_tajweed) 
+          : v.text_uthmani_tajweed;
+        arabic.innerHTML = sanitized;
+      }
     }
     card.appendChild(arabic);
 
     if (state.translationEnabled && hasTr) {
       const tr = document.createElement('div');
       tr.className = 'translation';
-      tr.innerHTML = state.translations.get(v.verse_key) || '';
+      // Sanitize translation text from API (could contain formatting)
+      const translationText = state.translations.get(v.verse_key) || '';
+      const sanitized = window.QR && QR.utils && QR.utils.sanitizeHTML 
+        ? QR.utils.sanitizeHTML(translationText) 
+        : translationText;
+      tr.textContent = sanitized; // Use textContent since we escaped it
       card.appendChild(tr);
     }
 
@@ -1161,7 +1255,13 @@ async function buildTranslationsForVerses(verses, translationId){
 }
 
 async function loadSurah(surahId) {
-  state.currentContext = { type: 'surah', id: surahId };
+  // Ensure surahId is a number
+  const numericId = parseInt(surahId, 10);
+  if (Number.isNaN(numericId) || numericId < 1 || numericId > 114) {
+    console.error('Invalid surah ID:', surahId);
+    return;
+  }
+  state.currentContext = { type: 'surah', id: numericId };
   try {
     if (state.isLoading) return; state.isLoading = true;
     setStatus('Loading...');
@@ -1171,16 +1271,15 @@ async function loadSurah(surahId) {
     const withTr = state.translationEnabled && !!state.translationId;
     let verses = [];
     if (state.wbwOn) {
-      verses = await QR.api.fetchVersesByChapterWBW(surahId, 'translation,transliteration,root,lemma', 'page_number');
+      verses = await QR.api.fetchVersesByChapterWBW(numericId, 'translation,transliteration,root,lemma', 'page_number');
     } else {
-      verses = await QR.api.fetchVersesByChapter(surahId, 'text_uthmani,page_number');
+      verses = await QR.api.fetchVersesByChapter(numericId, 'text_uthmani,page_number');
     }
     const [audioMap, trMap] = await Promise.all([
-      fetchAudioMap(state.currentReciterId, surahId),
+      fetchAudioMap(state.currentReciterId, numericId),
       (async ()=>{
         if (!withTr) return new Map();
-        // If WBW fetch omitted verse translations, fetch them by chapter
-        try { return await fetchTranslationsForChapter(state.translationId, surahId); } catch { return new Map(); }
+        try { return await fetchTranslationsForChapter(state.translationId, surahId); } catch (e) { console.error('[Translation] Error:', e); return new Map(); }
       })()
     ]);
     state.verses = verses;
@@ -1200,7 +1299,13 @@ async function loadSurah(surahId) {
 }
 
 async function loadJuz(juzNumber) {
-  state.currentContext = { type: 'juz', id: juzNumber };
+  // Ensure juzNumber is a number
+  const numericId = parseInt(juzNumber, 10);
+  if (Number.isNaN(numericId) || numericId < 1 || numericId > 30) {
+    console.error('Invalid juz number:', juzNumber);
+    return;
+  }
+  state.currentContext = { type: 'juz', id: numericId };
   try {
     if (state.isLoading) return; state.isLoading = true;
     setStatus('Loading Juz...');
@@ -1208,20 +1313,36 @@ async function loadJuz(juzNumber) {
     await ensureTranslationSource();
     // Pull all verses (handle pagination) with or without WBW; translations separately if enabled
     const withTr = state.translationEnabled && !!state.translationId;
-    const verses = state.wbwOn ? await QR.api.fetchVersesByRangeWBW('juz', juzNumber, 'translation,transliteration,root,lemma', 'page_number', 300)
-                               : await fetchVersesByRange('juz', juzNumber, withTr);
-    // Build audio map across involved surahs
-    const audioMap = await buildAudioForVerses(verses);
-    const trMap = withTr ? await buildTranslationsForVerses(verses, state.translationId) : new Map();
-    state.verses = verses;
+    const juzVerses = state.wbwOn ? await QR.api.fetchVersesByRangeWBW('juz', numericId, 'translation,transliteration,root,lemma', 'page_number', 300)
+                               : await fetchVersesByRange('juz', numericId, withTr);
+    
+    // Get all page numbers touched by this Juz
+    const pageNumbers = Array.from(new Set(juzVerses.map(v => v.page_number).filter(p => typeof p === 'number'))).sort((a, b) => a - b);
+    
+    // Fetch complete pages to show full context
+    const allVerses = [];
+    for (const pageNum of pageNumbers) {
+      const pageVerses = state.wbwOn ? await QR.api.fetchVersesByRangeWBW('page', pageNum, 'translation,transliteration,root,lemma', 'page_number', 300)
+                                     : await fetchVersesByRange('page', pageNum, withTr);
+      allVerses.push(...pageVerses);
+    }
+    
+    // Build audio map across all verses
+    const audioMap = await buildAudioForVerses(allVerses);
+    const trMap = withTr ? await buildTranslationsForVerses(allVerses, state.translationId) : new Map();
+    state.verses = allVerses;
     state.audioMap = audioMap;
     state.translations = trMap;
     state.pageIndex = 0;
     recomputePageNumbers();
-    applyTargetPage();
+    
+    // Always start at the first page where the Juz begins
+    // Clear any target page from URL params to prevent jumping to wrong page
+    state.targetPageNumber = null;
+    
     state.playIndex = 0;
     renderVerses();
-    setStatus(`Loaded Juz ${juzNumber} (${verses.length} ayah).`);
+    setStatus(`Loaded Juz ${juzNumber} (${allVerses.length} ayah across ${pageNumbers.length} pages).`);
     // Update Mushaf link to this Juz context (keep controls open on arrival)
   } catch (e) {
     console.error(e);
@@ -1231,26 +1352,48 @@ async function loadJuz(juzNumber) {
 }
 
 async function loadHizb(hizbNumber) {
-  state.currentContext = { type: 'hizb', id: hizbNumber };
+  // Ensure hizbNumber is a number
+  const numericId = parseInt(hizbNumber, 10);
+  if (Number.isNaN(numericId) || numericId < 1 || numericId > 60) {
+    console.error('Invalid hizb number:', hizbNumber);
+    return;
+  }
+  state.currentContext = { type: 'hizb', id: numericId };
   try {
     if (state.isLoading) return; state.isLoading = true;
     setStatus('Loading Hizb...');
     try { if (els.audio) { els.audio.pause(); els.audio.currentTime = 0; els.audio.removeAttribute('src'); delete els.audio.dataset.current; } } catch {}
     await ensureTranslationSource();
     const withTr = state.translationEnabled && !!state.translationId;
-    const verses = state.wbwOn ? await QR.api.fetchVersesByRangeWBW('hizb', hizbNumber, 'translation,transliteration,root,lemma', 'page_number', 300)
-                               : await fetchVersesByRange('hizb', hizbNumber, withTr);
-    const audioMap = await buildAudioForVerses(verses);
-    const trMap = withTr ? await buildTranslationsForVerses(verses, state.translationId) : new Map();
-    state.verses = verses;
+    const hizbVerses = state.wbwOn ? await QR.api.fetchVersesByRangeWBW('hizb', numericId, 'translation,transliteration,root,lemma', 'page_number', 300)
+                               : await fetchVersesByRange('hizb', numericId, withTr);
+    
+    // Get all page numbers touched by this Hizb
+    const pageNumbers = Array.from(new Set(hizbVerses.map(v => v.page_number).filter(p => typeof p === 'number'))).sort((a, b) => a - b);
+    
+    // Fetch complete pages to show full context
+    const allVerses = [];
+    for (const pageNum of pageNumbers) {
+      const pageVerses = state.wbwOn ? await QR.api.fetchVersesByRangeWBW('page', pageNum, 'translation,transliteration,root,lemma', 'page_number', 300)
+                                     : await fetchVersesByRange('page', pageNum, withTr);
+      allVerses.push(...pageVerses);
+    }
+    
+    const audioMap = await buildAudioForVerses(allVerses);
+    const trMap = withTr ? await buildTranslationsForVerses(allVerses, state.translationId) : new Map();
+    state.verses = allVerses;
     state.audioMap = audioMap;
     state.translations = trMap;
     state.pageIndex = 0;
     recomputePageNumbers();
-    applyTargetPage();
+    
+    // Always start at the first page where the Hizb begins
+    // Clear any target page from URL params to prevent jumping to wrong page
+    state.targetPageNumber = null;
+    
     state.playIndex = 0;
     renderVerses();
-    setStatus(`Loaded Hizb ${hizbNumber} (${verses.length} ayah).`);
+    setStatus(`Loaded Hizb ${hizbNumber} (${allVerses.length} ayah across ${pageNumbers.length} pages).`);
     // Update Mushaf link to this Hizb context (keep controls open on arrival)
   } catch (e) {
     console.error(e);
@@ -1274,9 +1417,18 @@ if (els.themeToggle) els.themeToggle.addEventListener('click', () => {
 if (els.prevAyah) els.prevAyah.addEventListener('click', () => { if (!state.isLoading) prevAyah(); });
 if (els.playPause) els.playPause.addEventListener('click', () => { if (!state.isLoading) togglePlay(); });
 if (els.nextAyah) els.nextAyah.addEventListener('click', () => { if (!state.isLoading) nextAyah(); });
+if (els.followToggle) els.followToggle.addEventListener('change', (e) => {
+  state.followMode = e.target.checked;
+  persistPrefs();
+  if (state.followMode) {
+    try { highlightAndFollow(); } catch {}
+  } else {
+    // Remove highlight when follow mode is disabled
+    try { document.querySelectorAll('.verse-container.active').forEach(el => el.classList.remove('active')); } catch {}
+  }
+});
 if (els.audio) {
   els.audio.addEventListener('ended', () => { if (!state.isLoading) nextAyah(); });
-  els.audio.addEventListener('play', () => { try { if (window.QR && QR.streaks) QR.streaks.bump('play'); } catch {} });
   ['play','playing','timeupdate','seeked','loadedmetadata'].forEach(evt => {
     els.audio.addEventListener(evt, () => { if (state.followMode) try { highlightAndFollow(); } catch {} });
   });
@@ -1363,7 +1515,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Page navigation buttons
   if (els.prevPageNav) {
     els.prevPageNav.addEventListener('click', async () => {
-      if (state.pageIndex > 0) {
+      if (!state.isLoading) {
         await prevPage();
       }
     });
@@ -1371,7 +1523,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   
   if (els.nextPageNav) {
     els.nextPageNav.addEventListener('click', async () => {
-      if (state.pageIndex < state.pageNumbers.length - 1) {
+      if (!state.isLoading) {
         await nextPage();
       }
     });
@@ -1571,7 +1723,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ----- WBW helpers -----
 let _wbwTip;
 function ensureTip(){ if (_wbwTip) return _wbwTip; const d = document.createElement('div'); d.id='wbw-tip'; d.style.position='fixed'; d.style.zIndex='50'; d.style.pointerEvents='none'; d.style.maxWidth='320px'; d.style.background='var(--surface)'; d.style.color='var(--text)'; d.style.border='1px solid var(--border)'; d.style.borderRadius='8px'; d.style.padding='8px 10px'; d.style.boxShadow='0 4px 18px rgba(0,0,0,.35)'; d.style.fontSize='13px'; d.style.lineHeight='1.35'; d.style.display='none'; document.body.appendChild(d); _wbwTip=d; return d; }
-function showWbwTip(el, evt){ const tip = ensureTip(); const gloss = el.dataset.gloss||''; const translit = el.dataset.translit||''; const root = el.dataset.root||''; const parts=[]; if (gloss) parts.push(gloss); if (translit) parts.push(`<span class="muted">${translit}</span>`); if (root) parts.push(`<span class="muted">Root: ${root}</span>`); tip.innerHTML = parts.join('<br>'); if (!tip.innerHTML) { hideWbwTip(); return; } tip.style.display='block'; const x = Math.min(window.innerWidth-10, Math.max(10, evt.clientX+12)); const y = Math.min(window.innerHeight-10, Math.max(10, evt.clientY+12)); tip.style.left = x+'px'; tip.style.top = y+'px'; }
+function showWbwTip(el, evt){ 
+  const tip = ensureTip(); 
+  const gloss = el.dataset.gloss||''; 
+  const translit = el.dataset.translit||''; 
+  const root = el.dataset.root||''; 
+  const parts = [];
+  // Escape user data to prevent XSS
+  const esc = window.QR && QR.utils && QR.utils.escapeHTML ? QR.utils.escapeHTML : (s => s);
+  if (gloss) parts.push(esc(gloss)); 
+  if (translit) parts.push(`<span class="muted">${esc(translit)}</span>`); 
+  if (root) parts.push(`<span class="muted">Root: ${esc(root)}</span>`); 
+  tip.innerHTML = parts.join('<br>'); 
+  if (!tip.innerHTML) { hideWbwTip(); return; } 
+  tip.style.display='block'; 
+  const x = Math.min(window.innerWidth-10, Math.max(10, evt.clientX+12)); 
+  const y = Math.min(window.innerHeight-10, Math.max(10, evt.clientY+12)); 
+  tip.style.left = x+'px'; 
+  tip.style.top = y+'px'; 
+}
 function hideWbwTip(){ if (_wbwTip) _wbwTip.style.display='none'; }
 function applyRootHighlight(){ try { document.querySelectorAll('.wbw').forEach(n=>n.classList.remove('root-hit')); if (!state.rootFilter) return; document.querySelectorAll(`.wbw[data-root="${CSS.escape(state.rootFilter)}"]`).forEach(n=>n.classList.add('root-hit')); } catch {} }
 function updateRootStatus(){ try { const s = document.getElementById('root-status'); if (!s) return; if (!state.rootFilter) { s.textContent=''; return; } const count = document.querySelectorAll(`.wbw[data-root="${CSS.escape(state.rootFilter)}"]`).length; s.textContent = `Root ${state.rootFilter}: ${count} hit(s)`; } catch {} }
@@ -1583,6 +1753,24 @@ async function reloadCurrentContext(){
   if (type==='juz') return loadJuz(id);
   if (type==='hizb') return loadHizb(id);
 }
+
+// Listen for preference changes (e.g., from settings page)
+window.addEventListener('qr:prefs-changed', (event) => {
+  const prefs = event.detail || {};
+  
+  // Update translation state
+  const hasTrId = typeof prefs.translation_id === 'number' && prefs.translation_id > 0;
+  const translationChanged = (state.translationEnabled !== !!prefs.translation_on) || 
+                             (state.translationId !== (hasTrId ? prefs.translation_id : 0));
+  
+  state.translationEnabled = !!prefs.translation_on;
+  state.translationId = hasTrId ? prefs.translation_id : 0;
+  
+  // Reload verses if translation settings changed and we have content loaded
+  if (translationChanged && state.currentContext && state.verses.length > 0) {
+    reloadCurrentContext();
+  }
+});
 
 
 

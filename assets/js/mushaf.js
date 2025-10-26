@@ -85,11 +85,11 @@ const JUZ_DATA = [
   { id: 4, name: 'Juz 4', startPage: 62, startSurah: 3, startVerse: 93 },
   { id: 5, name: 'Juz 5', startPage: 82, startSurah: 4, startVerse: 24 },
   { id: 6, name: 'Juz 6', startPage: 102, startSurah: 4, startVerse: 148 },
-  { id: 7, name: 'Juz 7', startPage: 122, startSurah: 5, startVerse: 82 },
+  { id: 7, name: 'Juz 7', startPage: 121, startSurah: 5, startVerse: 82 },
   { id: 8, name: 'Juz 8', startPage: 142, startSurah: 6, startVerse: 111 },
   { id: 9, name: 'Juz 9', startPage: 162, startSurah: 7, startVerse: 88 },
   { id: 10, name: 'Juz 10', startPage: 182, startSurah: 8, startVerse: 41 },
-  { id: 11, name: 'Juz 11', startPage: 202, startSurah: 9, startVerse: 93 },
+  { id: 11, name: 'Juz 11', startPage: 201, startSurah: 9, startVerse: 93 },
   { id: 12, name: 'Juz 12', startPage: 222, startSurah: 11, startVerse: 6 },
   { id: 13, name: 'Juz 13', startPage: 242, startSurah: 12, startVerse: 53 },
   { id: 14, name: 'Juz 14', startPage: 262, startSurah: 15, startVerse: 1 },
@@ -114,65 +114,65 @@ const JUZ_DATA = [
 // Hizb data (60 Hizb, each half of a Juz)
 const HIZB_DATA = [
   { id: 1, name: 'Hizb 1', startPage: 1, juz: 1 },
-  { id: 2, name: 'Hizb 2', startPage: 11, juz: 1 },
-  { id: 3, name: 'Hizb 3', startPage: 22, juz: 2 },
-  { id: 4, name: 'Hizb 4', startPage: 32, juz: 2 },
-  { id: 5, name: 'Hizb 5', startPage: 42, juz: 3 },
-  { id: 6, name: 'Hizb 6', startPage: 52, juz: 3 },
-  { id: 7, name: 'Hizb 7', startPage: 62, juz: 4 },
-  { id: 8, name: 'Hizb 8', startPage: 72, juz: 4 },
-  { id: 9, name: 'Hizb 9', startPage: 82, juz: 5 },
-  { id: 10, name: 'Hizb 10', startPage: 92, juz: 5 },
-  { id: 11, name: 'Hizb 11', startPage: 102, juz: 6 },
-  { id: 12, name: 'Hizb 12', startPage: 112, juz: 6 },
-  { id: 13, name: 'Hizb 13', startPage: 122, juz: 7 },
-  { id: 14, name: 'Hizb 14', startPage: 132, juz: 7 },
-  { id: 15, name: 'Hizb 15', startPage: 142, juz: 8 },
-  { id: 16, name: 'Hizb 16', startPage: 152, juz: 8 },
-  { id: 17, name: 'Hizb 17', startPage: 162, juz: 9 },
-  { id: 18, name: 'Hizb 18', startPage: 172, juz: 9 },
-  { id: 19, name: 'Hizb 19', startPage: 182, juz: 10 },
-  { id: 20, name: 'Hizb 20', startPage: 192, juz: 10 },
-  { id: 21, name: 'Hizb 21', startPage: 202, juz: 11 },
-  { id: 22, name: 'Hizb 22', startPage: 212, juz: 11 },
-  { id: 23, name: 'Hizb 23', startPage: 222, juz: 12 },
-  { id: 24, name: 'Hizb 24', startPage: 232, juz: 12 },
-  { id: 25, name: 'Hizb 25', startPage: 242, juz: 13 },
-  { id: 26, name: 'Hizb 26', startPage: 252, juz: 13 },
-  { id: 27, name: 'Hizb 27', startPage: 262, juz: 14 },
-  { id: 28, name: 'Hizb 28', startPage: 272, juz: 14 },
-  { id: 29, name: 'Hizb 29', startPage: 282, juz: 15 },
-  { id: 30, name: 'Hizb 30', startPage: 292, juz: 15 },
-  { id: 31, name: 'Hizb 31', startPage: 302, juz: 16 },
-  { id: 32, name: 'Hizb 32', startPage: 312, juz: 16 },
-  { id: 33, name: 'Hizb 33', startPage: 322, juz: 17 },
-  { id: 34, name: 'Hizb 34', startPage: 332, juz: 17 },
-  { id: 35, name: 'Hizb 35', startPage: 342, juz: 18 },
-  { id: 36, name: 'Hizb 36', startPage: 352, juz: 18 },
-  { id: 37, name: 'Hizb 37', startPage: 362, juz: 19 },
-  { id: 38, name: 'Hizb 38', startPage: 372, juz: 19 },
-  { id: 39, name: 'Hizb 39', startPage: 382, juz: 20 },
-  { id: 40, name: 'Hizb 40', startPage: 392, juz: 20 },
-  { id: 41, name: 'Hizb 41', startPage: 402, juz: 21 },
-  { id: 42, name: 'Hizb 42', startPage: 412, juz: 21 },
-  { id: 43, name: 'Hizb 43', startPage: 422, juz: 22 },
-  { id: 44, name: 'Hizb 44', startPage: 432, juz: 22 },
-  { id: 45, name: 'Hizb 45', startPage: 442, juz: 23 },
-  { id: 46, name: 'Hizb 46', startPage: 452, juz: 23 },
-  { id: 47, name: 'Hizb 47', startPage: 462, juz: 24 },
-  { id: 48, name: 'Hizb 48', startPage: 472, juz: 24 },
-  { id: 49, name: 'Hizb 49', startPage: 482, juz: 25 },
-  { id: 50, name: 'Hizb 50', startPage: 492, juz: 25 },
-  { id: 51, name: 'Hizb 51', startPage: 502, juz: 26 },
-  { id: 52, name: 'Hizb 52', startPage: 512, juz: 26 },
-  { id: 53, name: 'Hizb 53', startPage: 522, juz: 27 },
-  { id: 54, name: 'Hizb 54', startPage: 532, juz: 27 },
-  { id: 55, name: 'Hizb 55', startPage: 542, juz: 28 },
-  { id: 56, name: 'Hizb 56', startPage: 552, juz: 28 },
-  { id: 57, name: 'Hizb 57', startPage: 562, juz: 29 },
-  { id: 58, name: 'Hizb 58', startPage: 572, juz: 29 },
-  { id: 59, name: 'Hizb 59', startPage: 582, juz: 30 },
-  { id: 60, name: 'Hizb 60', startPage: 592, juz: 30 }
+  { id: 2, name: 'Hizb 2', startPage: 10, juz: 1 },
+  { id: 3, name: 'Hizb 3', startPage: 21, juz: 2 },
+  { id: 4, name: 'Hizb 4', startPage: 31, juz: 2 },
+  { id: 5, name: 'Hizb 5', startPage: 41, juz: 3 },
+  { id: 6, name: 'Hizb 6', startPage: 51, juz: 3 },
+  { id: 7, name: 'Hizb 7', startPage: 61, juz: 4 },
+  { id: 8, name: 'Hizb 8', startPage: 71, juz: 4 },
+  { id: 9, name: 'Hizb 9', startPage: 81, juz: 5 },
+  { id: 10, name: 'Hizb 10', startPage: 91, juz: 5 },
+  { id: 11, name: 'Hizb 11', startPage: 101, juz: 6 },
+  { id: 12, name: 'Hizb 12', startPage: 111, juz: 6 },
+  { id: 13, name: 'Hizb 13', startPage: 121, juz: 7 },
+  { id: 14, name: 'Hizb 14', startPage: 131, juz: 7 },
+  { id: 15, name: 'Hizb 15', startPage: 141, juz: 8 },
+  { id: 16, name: 'Hizb 16', startPage: 151, juz: 8 },
+  { id: 17, name: 'Hizb 17', startPage: 161, juz: 9 },
+  { id: 18, name: 'Hizb 18', startPage: 171, juz: 9 },
+  { id: 19, name: 'Hizb 19', startPage: 181, juz: 10 },
+  { id: 20, name: 'Hizb 20', startPage: 191, juz: 10 },
+  { id: 21, name: 'Hizb 21', startPage: 201, juz: 11 },
+  { id: 22, name: 'Hizb 22', startPage: 211, juz: 11 },
+  { id: 23, name: 'Hizb 23', startPage: 221, juz: 12 },
+  { id: 24, name: 'Hizb 24', startPage: 231, juz: 12 },
+  { id: 25, name: 'Hizb 25', startPage: 241, juz: 13 },
+  { id: 26, name: 'Hizb 26', startPage: 251, juz: 13 },
+  { id: 27, name: 'Hizb 27', startPage: 261, juz: 14 },
+  { id: 28, name: 'Hizb 28', startPage: 271, juz: 14 },
+  { id: 29, name: 'Hizb 29', startPage: 281, juz: 15 },
+  { id: 30, name: 'Hizb 30', startPage: 291, juz: 15 },
+  { id: 31, name: 'Hizb 31', startPage: 301, juz: 16 },
+  { id: 32, name: 'Hizb 32', startPage: 311, juz: 16 },
+  { id: 33, name: 'Hizb 33', startPage: 321, juz: 17 },
+  { id: 34, name: 'Hizb 34', startPage: 331, juz: 17 },
+  { id: 35, name: 'Hizb 35', startPage: 341, juz: 18 },
+  { id: 36, name: 'Hizb 36', startPage: 351, juz: 18 },
+  { id: 37, name: 'Hizb 37', startPage: 361, juz: 19 },
+  { id: 38, name: 'Hizb 38', startPage: 371, juz: 19 },
+  { id: 39, name: 'Hizb 39', startPage: 381, juz: 20 },
+  { id: 40, name: 'Hizb 40', startPage: 391, juz: 20 },
+  { id: 41, name: 'Hizb 41', startPage: 401, juz: 21 },
+  { id: 42, name: 'Hizb 42', startPage: 411, juz: 21 },
+  { id: 43, name: 'Hizb 43', startPage: 421, juz: 22 },
+  { id: 44, name: 'Hizb 44', startPage: 431, juz: 22 },
+  { id: 45, name: 'Hizb 45', startPage: 441, juz: 23 },
+  { id: 46, name: 'Hizb 46', startPage: 451, juz: 23 },
+  { id: 47, name: 'Hizb 47', startPage: 461, juz: 24 },
+  { id: 48, name: 'Hizb 48', startPage: 471, juz: 24 },
+  { id: 49, name: 'Hizb 49', startPage: 481, juz: 25 },
+  { id: 50, name: 'Hizb 50', startPage: 491, juz: 25 },
+  { id: 51, name: 'Hizb 51', startPage: 501, juz: 26 },
+  { id: 52, name: 'Hizb 52', startPage: 511, juz: 26 },
+  { id: 53, name: 'Hizb 53', startPage: 521, juz: 27 },
+  { id: 54, name: 'Hizb 54', startPage: 531, juz: 27 },
+  { id: 55, name: 'Hizb 55', startPage: 541, juz: 28 },
+  { id: 56, name: 'Hizb 56', startPage: 551, juz: 28 },
+  { id: 57, name: 'Hizb 57', startPage: 561, juz: 29 },
+  { id: 58, name: 'Hizb 58', startPage: 571, juz: 29 },
+  { id: 59, name: 'Hizb 59', startPage: 581, juz: 30 },
+  { id: 60, name: 'Hizb 60', startPage: 591, juz: 30 }
 ];
 
 function populateSurahSelect(select) {
@@ -455,8 +455,7 @@ function updateViewerInfo() {
 }
 
 function setStatus(txt) {
-  // Status messages now silent or shown in console
-  if (txt) console.log('Mushaf:', txt);
+  // Status messages now silent
 }
 
 let controls = null;
@@ -820,7 +819,6 @@ if (els.nextAyah) els.nextAyah.addEventListener('click', ()=> nextAyah());
 if (els.playPause) els.playPause.addEventListener('click', togglePlay);
 if (els.audio) {
   els.audio.addEventListener('ended', ()=> nextAyah());
-  els.audio.addEventListener('play', ()=>{ try { if (window.QR && QR.streaks) QR.streaks.bump('play'); } catch {} });
 }
 // Page navigation (buttons keep labels: Prev=page-1, Next=page+1)
 if (els.prevPage) els.prevPage.addEventListener('click', ()=> loadPage(Math.max(1,state.currentPage-1)));
@@ -924,7 +922,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   
   // Check if we have URL parameters to skip landing
   let shouldShowLanding = true;
-  let initialPage = state.currentPage || 1;
+  let initialPage = 1; // Default to page 1, will be overridden by URL params
+  let skipFirstRangeChange = false; // Skip control panel's initial range restoration if we have URL params
   
   try {
     const params = new URLSearchParams(location.search);
@@ -932,16 +931,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     const surahParam = parseInt(params.get("surah") || "", 10);
     const juzParam = parseInt(params.get("juz") || "", 10);
     const hizbParam = parseInt(params.get("hizb") || "", 10);
+    const viewParam = params.get("view");
+    
+    // If view=viewer is explicitly set, skip landing
+    if (viewParam === "viewer") {
+      shouldShowLanding = false;
+      skipFirstRangeChange = true; // Don't restore saved range when explicitly navigating to a page
+    }
     
     if (!Number.isNaN(surahParam) && surahParam >= 1 && surahParam <= 114) {
       state.ctx = { type: 'surah', id: surahParam };
       shouldShowLanding = false;
+      skipFirstRangeChange = true;
     } else if (!Number.isNaN(juzParam) && juzParam >= 1 && juzParam <= 30) {
       state.ctx = { type: 'juz', id: juzParam };
       shouldShowLanding = false;
+      skipFirstRangeChange = true;
     } else if (!Number.isNaN(hizbParam) && hizbParam >= 1 && hizbParam <= 60) {
       state.ctx = { type: 'hizb', id: hizbParam };
       shouldShowLanding = false;
+      skipFirstRangeChange = true;
     } else {
       state.ctx = null;
     }
@@ -949,6 +958,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!Number.isNaN(pageParam) && pageParam >= 1 && pageParam <= 604) {
       initialPage = pageParam;
       shouldShowLanding = false;
+      skipFirstRangeChange = true;
     } else if (state.ctx && state.ctx.type === 'surah') {
       const maybePage = getSurahStartPage(state.ctx.id);
       if (maybePage) initialPage = maybePage;
@@ -972,6 +982,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (window.QR && QR.controlPanel && typeof QR.controlPanel.init === "function") {
     controls = QR.controlPanel.init({
       onRangeChange: async (range) => {
+        // Skip range change if we just loaded from URL params
+        if (skipFirstRangeChange) {
+          skipFirstRangeChange = false;
+          return;
+        }
         const prevStart = activeRange.start;
         const normalised = normaliseRange(range);
         const newStart = normalised ? normalised.start : null;

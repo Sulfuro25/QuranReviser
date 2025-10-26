@@ -50,6 +50,24 @@ window.QR = window.QR || {};
 
   function dispatchEvent(){ try { window.dispatchEvent(new CustomEvent('qr:profile-changed', { detail: { id: currentId() } })); } catch {} }
 
+  // Google sign-in wrapper
+  async function signIn() {
+    if (!window.QR || !window.QR.auth) {
+      throw new Error('Google authentication not available');
+    }
+    return await window.QR.auth.signIn();
+  }
+
+  function signOut() {
+    if (window.QR && window.QR.auth) {
+      window.QR.auth.signOut();
+    }
+  }
+
+  function isSignedIn() {
+    return window.QR && window.QR.auth && window.QR.auth.isSignedIn();
+  }
+
   // expose
-  QR.profiles = { list, currentId, current, setCurrent, add, rename, remove, key, getItem, setItem, removeItem };
+  QR.profiles = { list, currentId, current, setCurrent, add, rename, remove, key, getItem, setItem, removeItem, signIn, signOut, isSignedIn };
 })();
